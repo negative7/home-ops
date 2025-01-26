@@ -14,6 +14,7 @@ spec:
     solvers:
       - dns01:
           cloudflare:
+            email: postmaster@negative7.com
             apiKeySecretRef:
               name: cloudflare-secret
               key: CLOUDFLARE_APIKEY
