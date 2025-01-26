@@ -140,7 +140,7 @@ spec:
         annotations:
           nginx.ingress.kubernetes.io/rewrite-target: /$1
         hosts:
-          - host: zigbee2mqtt.negative7.com'
+          - host: zigbee2mqtt.negative7.com
             paths:
               - path: /(.*)
                 service:
