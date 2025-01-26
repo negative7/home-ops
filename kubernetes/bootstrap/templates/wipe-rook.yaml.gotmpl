@@ -35,7 +35,6 @@ controllers:
             sgdisk --zap-all $DISK;
             blkdiscard $DISK;
             partprobe $DISK;
-            mkfs.ext4 $DISK;
         securityContext:
           privileged: true
     pod:
