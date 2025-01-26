@@ -16,7 +16,7 @@ spec:
           cloudflare:
             email: postmaster@negative7.com
             apiKeySecretRef:
-              name: cloudflare-secret
+              name: cloudflare-api-token
               key: CLOUDFLARE_APIKEY
         selector:
           dnsZones:
