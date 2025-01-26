@@ -87,7 +87,7 @@ spec:
           nginx.ingress.kubernetes.io/backend-protocol: HTTPS
         className: "external-nginx"
         hosts:
-          - host: plex..negative7.com'
+          - host: plex.negative7.com'
             paths:
               - path: /
                 service:
