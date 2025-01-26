@@ -27,7 +27,7 @@ spec:
       dashboard:
         ingressClassName: "internal-nginx"
         host:
-          name: rook-main.bjw-s.dev
+          name: rook-main.negative7.com
           path: "/"
     toolbox:
       enabled: false
