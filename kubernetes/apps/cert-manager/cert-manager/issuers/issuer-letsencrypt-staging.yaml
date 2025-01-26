@@ -14,9 +14,9 @@ spec:
     solvers:
       - dns01:
           cloudflare:
-            apiTokenSecretRef:
-              name: cloudflare-api-token
-              key: api-token
+            apiKeySecretRef:
+              name: cloudflare-secret
+              key: CLOUDFLARE_APIKEY
         selector:
           dnsZones:
             - negative7.com
