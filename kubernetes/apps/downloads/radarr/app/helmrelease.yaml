@@ -1,0 +1,119 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: radarr
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.6.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+  values:
+    controllers:
+      radarr:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        pod:
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            runAsNonRoot: true
+            fsGroup: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 65542 # gladius:external-services
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/onedr0p/radarr-develop
+              tag: 5.18.1.9612@sha256:64364aa80c8e7bb1350c77a0400dcf7da298cf06c44c84081937955bbbd01e4c
+            env:
+              RADARR__APP__INSTANCENAME: Radarr
+              RADARR__AUTH__APIKEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: radarr-secret
+                    key: api_key
+              RADARR__AUTH__METHOD: External
+              RADARR__AUTH__REQUIRED: DisabledForLocalAddresses
+              RADARR__LOG__DBENABLED: "False"
+              RADARR__LOG__LEVEL: info
+              RADARR__SERVER__PORT: &port 7878
+              RADARR__UPDATE__BRANCH: develop
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 20m
+                memory: 384Mi
+              limits:
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+
+    service:
+      app:
+        controller: radarr
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      app:
+        className: "internal-nginx"
+        hosts:
+          - host: radarr.negative7.com
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+
+    persistence:
+      config:
+        existingClaim: radarr
+      add-ons:
+        type: emptyDir
+      tmp:
+        type: emptyDir
+      media:
+        enabled: true
+        type: nfs
+        server: "freenas.negative7.com"
+        path: /mnt/tank/media/movies
+        globalMounts:
+          - path:  /media
+      completed:
+        enabled: true
+        type: nfs
+        server: "freenas.negative7.com"
+        path: /mnt/tank/data
+        globalMounts:
+          - path:  /completed
