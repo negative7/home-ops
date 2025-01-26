@@ -1,0 +1,20 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webhook-receiver
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.negative7.com
+spec:
+  ingressclassName: external-nginx
+  rules:
+    - host: flux-webhook.negative7.com
+      http:
+        paths:
+          - path: /hook/
+            pathType: Prefix
+            backend:
+              service:
+                name: webhook-receiver
+                port:
+                  number: 80

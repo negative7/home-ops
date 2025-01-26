@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-lb
+  namespace: database   
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: postgres.negative7.com
+    io.cilium/lb-ipam-ips: 10.2.0.112
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 10.2.0.112
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: postgres
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    cnpg.io/cluster: postgres
+    role: primary

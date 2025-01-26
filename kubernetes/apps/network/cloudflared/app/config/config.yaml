@@ -1,0 +1,11 @@
+---
+ingress:
+  - hostname: negative7.com
+    service: https://nginx-external-controller.network.svc.cluster.local:443
+    originRequest:
+      originServerName: external.negative7.com
+  - hostname: "*.negative7.com"
+    service: https://nginx-external-controller.network.svc.cluster.local:443
+    originRequest:
+      originServerName: external.negative7.com
+  - service: http_status:404
