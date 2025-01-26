@@ -2,12 +2,13 @@
 apiVersion: cilium.io/v2alpha1
 kind: CiliumL2AnnouncementPolicy
 metadata:
-  name: policy
+  name: l2-policy
 spec:
   loadBalancerIPs: true
   externalIPs: true
   interfaces:
     - ^eno[0-9]+
+    - ^eth[0-9]+
   nodeSelector:
     matchLabels:
       kubernetes.io/os: linux
