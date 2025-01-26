@@ -116,20 +116,31 @@ spec:
     persistence:
       config:
         existingClaim: home-assistant
-        globalMounts:
-          - path: /config
-      logs:
+        advancedMounts:
+          home-assistant:
+            app:
+              - path: /config
+            code-server:
+              - path: /config
+      hass-cache:
+        existingClaim: hass-cache
+        advancedMounts:
+          home-assistant:
+            app:
+              - path: /venv
+                subPath: hass-venv
+      tmpfs:
         type: emptyDir
-        globalMounts:
-          - path: /config/logs
-      tts:
-        type: emptyDir
-        globalMounts:
-          - path: /config/tts
-      tmp:
-        type: emptyDir
-        globalMounts:
-          - path: /tmp
+        advancedMounts:
+          home-assistant:
+            app:
+              - path: /tmp
+                subPath: hass-tmp
+            code-server:
+              - path: /tmp
+                subPath: code-server-tmp
+              - path: /nonexistent
+                subPath: nonexistent
       backup:
         enabled: true
         type: nfs
