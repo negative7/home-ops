@@ -32,24 +32,3 @@ spec:
     substitute:
       APP: *appname
       VOLSYNC_CLAIM: zigbee2mqtt
----
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-metadata:
-  name: &appname zigbee2mqtt-exporter
-  namespace: &namespace home
-spec:
-  targetNamespace: *namespace
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *appname
-  interval: 30m
-  path: ./kubernetes/apps/home/zigbee2mqtt/exporter
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-    namespace: flux-system
-  wait: false
-  dependsOn:
-    - name: zigbee2mqtt
