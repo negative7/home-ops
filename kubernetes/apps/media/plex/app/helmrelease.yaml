@@ -1,0 +1,145 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: plex
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 3.6.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    controllers:
+      plex:
+        pod:
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            fsGroup: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
+            supplementalGroups:
+              - 44
+              - 109
+              - 65542
+              - 10000
+              - 1000
+              - 1001
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/onedr0p/plex
+              tag: 1.41.3.9314-a0bfb8370@sha256:cbefe5f2f44d0519fd72985ed4005b7b55a7eb9dcbdcc3b4d6bb7055730db565
+            env:
+              PLEX_ADVERTISE_URL: https://10.2.0.105:32400,https://plex.negative7.com:443
+              PLEX_NO_AUTH_NETWORKS: 10.0.1.0/16
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /identity
+                    port: 32400
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                gpu.intel.com/i915: 1
+                memory: 9248M
+
+    service:
+      app:
+        controller: plex
+        type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: 10.2.0.105
+        ports:
+          http:
+            port: 32400
+
+    ingress:
+      app:
+        annotations:
+          nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+        className: "external-nginx"
+        hosts:
+          - host: plex..negative7.com'
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+
+    persistence:
+      config:
+        existingClaim: plex
+        advancedMounts:
+          plex:
+            app:
+              - path: /config
+      plex-cache:
+        existingClaim: plex-cache
+        advancedMounts:
+          plex:
+            app:
+              - path: /config/Library/Application Support/Plex Media Server/Cache
+      logs:
+        type: emptyDir
+        advancedMounts:
+          plex:
+            app:
+              - path: /config/Library/Application Support/Plex Media Server/Logs
+      nfs-tv-media:
+        type: nfs
+        server: 'freenas.negative7.com'
+        path: /mnt/tank/media/tv
+        advancedMounts:
+          plex:
+            app:
+              - path: /media/tv
+      nfs-movies-media:
+        type: nfs
+        server: 'freenas.negative7.com'
+        path: /mnt/tank/media/movies
+        advancedMounts:
+          plex:
+            app:
+              - path: /media/movies
+      nfs-backup:
+        type: nfs
+        server: 'freenas.negative7.com'
+        path: /mnt/tank/backups/plex
+        advancedMounts:
+          plex:
+            app:
+              - path: /config/Backups
+      transcode:
+        type: emptyDir
+        advancedMounts:
+          plex:
+            app:
+              - path: /transcode
