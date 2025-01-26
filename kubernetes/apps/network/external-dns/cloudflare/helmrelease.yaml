@@ -3,8 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: externaldns-external
-  namespace: networking
+  name: externaldns-cloudflare
 spec:
   interval: 30m
   chart:
@@ -15,12 +14,13 @@ spec:
         kind: HelmRepository
         name: kubernetes-sigs-external-dns
         namespace: flux-system
+      interval: 30m
   install:
     crds: CreateReplace
   upgrade:
     crds: CreateReplace
   values:
-    fullnameOverride: &name externaldns-external
+    fullnameOverride: &name externaldns-cloudflare
     domainFilters:
       - negative7.com
     env:
