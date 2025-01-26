@@ -78,21 +78,21 @@ spec:
           limits:
             memory: 256Mi
       storage:
-        useAllNodes: true
+        useAllNodes: false
         useAllDevices: false
         nodes:
           - name: kharkiv
             devices:
-              - name: /dev/disk/by-id/ata-CT1000MX500SSD1_2045E4C5877B
+              - name: sda
           - name: dnipro
             devices:
-              - name: /dev/disk/by-id/ata-CT1000MX500SSD1_2012E2952ACE
+              - name: sda
           - name: kyiv
             devices:
-              - name: /dev/disk/by-id/ata-CT1000MX500SSD1_2012E2952A29
+              - name: sda
           - name: vinnytsia
             devices:
-              - name: /dev/disk/by-id/ata-SHGS31-1000GS-2_FJ07N442411107819
+              - name: sda
         config:
           osdsPerDevice: "1"
     cephBlockPools:
