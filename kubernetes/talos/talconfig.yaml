@@ -28,13 +28,6 @@ nodes:
         dhcp: true
         vip:
           ip: *talosControlplaneVip
-        vlans:
-          - &vlan4
-            vlanId: 4
-            mtu: 1500
-            dhcp: true
-            dhcpOptions:
-              routeMetric: 4096
 
   - hostname: vinnytsia.homelab.internal
     ipAddress: 10.2.0.22
@@ -46,8 +39,6 @@ nodes:
         dhcp: true
         vip:
           ip: *talosControlplaneVip
-        vlans:
-          - *vlan4
 
 
   - hostname: dnipro.homelab.internal
@@ -60,20 +51,16 @@ nodes:
         dhcp: true
         vip:
           ip: *talosControlplaneVip
-        vlans:
-          - *vlan4
 
 
   - hostname: kyiv.homelab.internal
     ipAddress: 10.2.0.24
-    controlPlane: false
+    controlPlane: true
     installDiskSelector:
       model: "SAMSUNG MZVLW256HEHP-000H1"
     networkInterfaces:
       - interface: eno1
         dhcp: true
-        vlans:
-          - *vlan4
 
 
 controlPlane:
@@ -251,110 +238,3 @@ controlPlane:
             allowedKubernetesNamespaces:
               - actions-runner-system
               - system-upgrade
-
-worker:
-  nodeLabels: *nodeLabels
-  extraManifests: *extraManifests
-  schematic: *schematic
-  patches:
-    # Configure containerd
-    - |-
-      machine:
-        files:
-          - op: create
-            path: /etc/cri/conf.d/20-customization.part
-            content: |
-              [plugins]
-                [plugins."io.containerd.grpc.v1.cri"]
-                  enable_unprivileged_ports = true
-                  enable_unprivileged_icmp = true
-              [plugins."io.containerd.grpc.v1.cri".containerd]
-                discard_unpacked_layers = false
-              [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-                discard_unpacked_layers = false
-    # Disable search domain everywhere
-    - |-
-      machine:
-        network:
-          disableSearchDomain: true
-
-    # Enable host dns
-    - |-
-      machine:
-        features:
-          hostDNS:
-            enabled: true
-            resolveMemberNames: true
-            forwardKubeDNSToHost: false
-
-    # Mount openebs-hostpath in kubelet
-    - |-
-      machine:
-          kubelet:
-            extraMounts:
-              - destination: /var/local/openebs
-                type: bind
-                source: /var/local/openebs
-                options:
-                  - rbind
-                  - rshared
-                  - rw
-
-    # Configure kubelet
-    - |-
-      machine:
-        kubelet:
-          extraConfig:
-            maxPods: 150
-          nodeIP:
-            validSubnets:
-                - 10.2.0.0/24
-
-
-    # Enable MutatingAdmissionPolicy
-    - |-
-      cluster:
-        apiServer:
-          extraArgs:
-            runtime-config: admissionregistration.k8s.io/v1alpha1=true
-            feature-gates: MutatingAdmissionPolicy=true
-
-    # Configure NFS mount options
-    - |
-      machine:
-        files:
-          - op: overwrite
-            path: /etc/nfsmount.conf
-            permissions: 0o644
-            content: |
-              [ NFSMount_Global_Options ]
-              nfsvers=4.2
-              hard=True
-              noatime=True
-              nconnect=16
-
-    # Configure static host entries
-    - |-
-      machine:
-        network:
-          extraHostEntries:
-            - ip: 10.2.0.20
-              aliases:
-                - main.negative7.com
-
-    # Configure custom sysctls
-    - |-
-      machine:
-        sysctls:
-          fs.inotify.max_user_instances: 8192    # Watchdog
-          fs.inotify.max_user_watches: 1048576   # Watchdog
-          net.core.rmem_max: 67108864            # Cloudflared / QUIC
-          net.core.wmem_max: 67108864            # Cloudflared / QUIC
-
-    # Configure udev rules
-    - |-
-      machine:
-        udev:
-          rules:
-            # Intel GPU
-            - SUBSYSTEM=="drm", KERNEL=="renderD*", GROUP="44", MODE="0660"
