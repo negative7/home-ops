@@ -332,7 +332,7 @@ spec:
 
     ingress:
       enabled: true
-      ingressclassName: external-nginx
+      ingressClassName: external-nginx
       annotations:
         external-dns.alpha.kubernetes.io/target: external.negative7.com
       hosts:

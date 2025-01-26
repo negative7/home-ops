@@ -56,7 +56,7 @@ spec:
             namespaced: true
       ingress:
         enabled: true
-        ingressclassName: internal-nginx
+        ingressClassName: internal-nginx
         annotations:
           external-dns.alpha.kubernetes.io/target: internal.negative7.com
         issuer:
