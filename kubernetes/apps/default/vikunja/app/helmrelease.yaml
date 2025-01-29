@@ -82,7 +82,7 @@ spec:
 
     persistence:
       data:
-        existingClaim: vikunja-data
+        existingClaim: vikunja
         advancedMounts:
           vikunja:
             app:
