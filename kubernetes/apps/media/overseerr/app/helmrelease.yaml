@@ -69,9 +69,9 @@ spec:
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 568
-        runAsGroup: 568
-        fsGroup: 568
+        runAsUser: 2000
+        runAsGroup: 2000
+        fsGroup: 2000
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile: { type: RuntimeDefault }
     service:
@@ -83,18 +83,13 @@ spec:
     ingress:
       app:
         className: external-nginx
-        annotations:
-          external-dns.alpha.kubernetes.io/target: external.negative7.com
         hosts:
-          - host: &host requests.negative7.com
+          - host: requests.negative7.com
             paths:
               - path: /
                 service:
                   identifier: app
                   port: http
-        tls:
-          - hosts:
-              - *host
     persistence:
       config:
         enabled: true
