@@ -1,34 +1,8 @@
 ---
-# Areas
-area/ansible:
-  - changed-files:
-      - any-glob-to-any-file: "ansible/**/*"
-area/docs:
-  - changed-files:
-      - any-glob-to-any-file:
-          - "docs/**/*"
-          - "README.md"
-area/github:
+# Area
+area/ci:
   - changed-files:
       - any-glob-to-any-file: ".github/**/*"
 area/kubernetes:
   - changed-files:
       - any-glob-to-any-file: "kubernetes/**/*"
-area/taskfile:
-  - changed-files:
-      - any-glob-to-any-file:
-          - ".taskfiles/**/*"
-          - "Taskfile.yaml"
-area/terraform:
-  - changed-files:
-      - any-glob-to-any-file: "terraform/**/*"
-# Clusters
-cluster/main:
-  - changed-files:
-      - any-glob-to-any-file: "kubernetes/main/**/*"
-cluster/tivoli:
-  - changed-files:
-      - any-glob-to-any-file: "kubernetes/tivoli/**/*"
-cluster/truenas:
-  - changed-files:
-      - any-glob-to-any-file: "kubernetes/truenas/**/*"

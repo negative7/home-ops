@@ -1,0 +1,4 @@
+---
+self-hosted-runner:
+  labels:
+    - arc-negative7-home-ops
