@@ -114,7 +114,7 @@ spec:
               - --extensions-dir
               - /config/.code-server
               - --port
-              - "12321"
+              - "12323"
               - /config
             resources:
               requests:
@@ -132,7 +132,7 @@ spec:
           metrics:
             port: 9000
           code-server:
-            port: 12321
+            port: 12323
 
     ingress:
       app:

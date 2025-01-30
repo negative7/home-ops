@@ -51,7 +51,7 @@ spec:
               "--auth", "none",
               "--user-data-dir", "/config/.vscode",
               "--extensions-dir", "/config/.vscode",
-              "--port", "12321",
+              "--port", "12322",
               "/config"
             ]
             resources:
@@ -75,7 +75,7 @@ spec:
           http:
             port: 6052
           code-server:
-            port: 12321
+            port: 12322
 
     ingress:
       app:
