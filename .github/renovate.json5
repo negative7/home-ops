@@ -20,7 +20,7 @@
   ],
   "dependencyDashboardTitle": "Renovate Dashboard 🤖",
   "suppressNotifications": ["prEditedNotification", "prIgnoreNotification"],
-  "onboarding": false,
+  "onboarding": true,
   "requireConfig": "ignored",
   "ignorePaths": ["**/*.sops.*", "**/resources/**",".archive/**"],
   "flux": {
