@@ -4,8 +4,7 @@ name: "Flux Local"
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: ["main"]
     paths:
       - kubernetes/apps/**
       - kubernetes/flux/**
@@ -21,7 +20,6 @@ jobs:
     steps:
       - name: Generate Token
         uses: actions/create-github-app-token@v1
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
         id: app-token
         with:
           app-id: "${{ secrets.BOT_APP_ID }}"
@@ -35,7 +33,7 @@ jobs:
       - name: Run flux-local test
         uses: docker://ghcr.io/allenporter/flux-local:v7.0.0
         with:
-          args: test --enable-helm --path /github/workspace/kubernetes/flux/cluster
+          args: test --enable-helm --all-namespaces --path /github/workspace/kubernetes/flux/cluster -v
 
   diff:
     name: Flux Local Diff
@@ -44,15 +42,12 @@ jobs:
       pull-requests: write
     strategy:
       matrix:
-        resources:
-          - helmrelease
-          - kustomization
+        resources: ["helmrelease", "kustomization"]
       max-parallel: 4
       fail-fast: false
     steps:
       - name: Generate Token
         uses: actions/create-github-app-token@v1
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
         id: app-token
         with:
           app-id: "${{ secrets.BOT_APP_ID }}"
@@ -102,20 +97,19 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - if: ${{ steps.diff.outputs.diff != '' }}
-        name: Add comment
+        name: Add Comment
         uses: mshick/add-pr-comment@v2
         with:
           repo-token: "${{ steps.app-token.outputs.token }}"
-          message-id: "${{ github.event.pull_request.number }}/main/${{ matrix.resources }}"
+          message-id: "${{ github.event.pull_request.number }}/kubernetes/${{ matrix.resources }}"
           message-failure: Diff was not successful
           message: |
             ```diff
             ${{ steps.diff.outputs.diff }}
+            ```
 
   flux-local-success:
-    needs:
-      - test
-      - diff
+    needs: ["test", "diff"]
     if: ${{ always() }}
     name: Flux Local successful
     runs-on: ubuntu-latest
