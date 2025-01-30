@@ -1,4 +1,4 @@
-#kubectl get secret admin-user -n monitoring -o jsonpath={".data.token"} | base64 -d
+# kubectl get secret admin-user -n monitoring -o jsonpath={".data.token"} | base64 -d
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -25,5 +25,5 @@ metadata:
   name: admin-user
   namespace: monitoring
   annotations:
-    kubernetes.io/service-account.name: "admin-user"   
-type: kubernetes.io/service-account-token  
+    kubernetes.io/service-account.name: "admin-user"
+type: kubernetes.io/service-account-token

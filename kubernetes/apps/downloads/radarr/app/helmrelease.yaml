@@ -109,11 +109,11 @@ spec:
         server: "freenas.negative7.com"
         path: /mnt/tank/media/movies
         globalMounts:
-          - path:  /media
+          - path: /media
       completed:
         enabled: true
         type: nfs
         server: "freenas.negative7.com"
         path: /mnt/tank/data
         globalMounts:
-          - path:  /completed
+          - path: /completed

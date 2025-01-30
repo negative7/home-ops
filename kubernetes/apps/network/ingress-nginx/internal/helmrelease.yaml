@@ -31,7 +31,7 @@ spec:
         enabled: true
         type: LoadBalancer
         annotations:
-          external-dns.alpha.kubernetes.io/hostname:  &hostname internal.negative7.com
+          external-dns.alpha.kubernetes.io/hostname: &hostname internal.negative7.com
           lbipam.cilium.io/ips: 10.2.0.101
       publishService:
         enabled: false
