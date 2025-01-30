@@ -40,7 +40,6 @@ nodes:
         vip:
           ip: *talosControlplaneVip
 
-
   - hostname: dnipro.homelab.internal
     ipAddress: 10.2.0.23
     controlPlane: true
@@ -52,7 +51,6 @@ nodes:
         vip:
           ip: *talosControlplaneVip
 
-
   - hostname: kyiv.homelab.internal
     ipAddress: 10.2.0.24
     controlPlane: true
@@ -61,7 +59,6 @@ nodes:
     networkInterfaces:
       - interface: eno1
         dhcp: true
-
 
 controlPlane:
   nodeLabels: &nodeLabels
@@ -89,8 +86,7 @@ controlPlane:
           - siderolabs/nut-client
           - siderolabs/mei
 
-  patches: &patches
-    # Configure containerd
+  patches: &patches # Configure containerd
     - |-
       machine:
         files:
@@ -142,7 +138,6 @@ controlPlane:
           nodeIP:
             validSubnets:
                 - 10.2.0.0/24
-
 
     # Enable MutatingAdmissionPolicy
     - |-
