@@ -147,7 +147,7 @@ spec:
       backup:
         enabled: true
         type: nfs
-        server: 'freenas.negative7.com'
+        server: 'freenas.homelab.internal'
         path: /mnt/tank/backups/hass
         globalMounts:
           - path: /config/backups

@@ -115,7 +115,7 @@ spec:
               - path: /config/Library/Application Support/Plex Media Server/Logs
       nfs-tv-media:
         type: nfs
-        server: 'freenas.negative7.com'
+        server: 'freenas.homelab.internal'
         path: /mnt/tank/media/tv
         advancedMounts:
           plex:
@@ -123,7 +123,7 @@ spec:
               - path: /media/tv
       nfs-movies-media:
         type: nfs
-        server: 'freenas.negative7.com'
+        server: 'freenas.homelab.internal'
         path: /mnt/tank/media/movies
         advancedMounts:
           plex:
@@ -131,7 +131,7 @@ spec:
               - path: /media/movies
       nfs-backup:
         type: nfs
-        server: 'freenas.negative7.com'
+        server: 'freenas.homelab.internal'
         path: /mnt/tank/backups/plex
         advancedMounts:
           plex:
