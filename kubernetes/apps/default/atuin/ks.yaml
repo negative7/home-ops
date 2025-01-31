@@ -29,5 +29,4 @@ spec:
   postBuild:
     substitute:
       APP: *appname
-      VOLSYNC_CLAIM: atuin
       VOLSYNC_CAPACITY: 5Gi
