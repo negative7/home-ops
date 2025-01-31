@@ -20,4 +20,12 @@ spec:
             - snapshots
           envFrom:
             - secretRef:
-                name: {{ ENV.APP }}-volsync-secret 
+                name: {{ ENV.APP }}-volsync-nfs
+          volumeMounts:
+            - mountPath: /repository
+              name: repository
+      volumes:
+        - name: repository
+          nfs:
+            server: "freenas.homelab.internal"
+            path: "/mnt/tank/volsync"

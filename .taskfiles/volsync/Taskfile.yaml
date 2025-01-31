@@ -8,14 +8,16 @@ vars:
 tasks:
   unlock:
     desc: Unlock all restic source repos
-    cmds:
-      - for: {var: SOURCES, split: "\n"}
-        cmd: kubectl --namespace {{splitList "," .ITEM | first}} patch --field-manager=flux-client-side-apply replicationsources {{splitList "," .ITEM | last}} --type merge --patch "{\"spec\":{\"restic\":{\"unlock\":\"{{now | unixEpoch}}\"}}}"
+    preconditions:
+      - which kubectl
     vars:
       SOURCES:
         sh: kubectl get replicationsources --all-namespaces --no-headers --output=jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}'
-    preconditions:
-      - which kubectl
+    cmds:
+      - for:
+          var: SOURCES
+          split: "\n"
+        cmd: kubectl --namespace {{splitList "," .ITEM | first}} patch --field-manager=flux-client-side-apply replicationsources {{splitList "," .ITEM | last}} --type merge --patch "{\"spec\":{\"restic\":{\"unlock\":\"{{now | unixEpoch}}\"}}}"
 
   list:
     desc: List snapshots for an app [NS=default] [APP=required]
@@ -40,30 +42,49 @@ tasks:
       - kubectl --namespace {{.NS}} delete job {{ .JOB }}
 
   snapshot:
-    desc: Snapshot an app [K8S_CLUSTER=main] [NS=default] [APP=required]
+    desc: Snapshot an app [NS=default] [APP=required]
     preconditions:
       - which kubectl
       - kubectl --namespace {{.NS}} get replicationsources {{.APP}}
     requires:
       vars:
-        - K8S_CLUSTER
         - APP
     vars:
+      WAIT: '{{.WAIT | default "true"}}'
       NS: '{{.NS | default "default"}}'
       JOB: volsync-src-{{.APP}}
     cmds:
       - kubectl --namespace {{.NS}} patch replicationsources {{.APP}} --type merge -p '{"spec":{"trigger":{"manual":"{{now | unixEpoch}}"}}}'
-      - until kubectl --namespace {{.NS}} get job/{{.JOB}} &>/dev/null; do sleep 5; done
-      - kubectl --namespace {{.NS}} wait job/{{.JOB}} --for=condition=complete --timeout=120m
+      - |-
+        {{ if eq "true" .WAIT }}until kubectl --namespace {{.NS}} get job/{{.JOB}} &>/dev/null; do sleep 5; done{{ end }}
+      - |-
+        {{ if eq "true" .WAIT }}kubectl --namespace {{.NS}} wait job/{{.JOB}} --for=condition=complete --timeout=120m{{ end }}
+
+  snapshot-all:
+    desc: Snapshot all apps across all namespaces without waiting
+    preconditions:
+      - which kubectl
+    vars:
+      ALL_APPS:
+        sh: |
+          kubectl get replicationsources -A --no-headers -o jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}' | grep -v '\-r2'
+    cmds:
+      - for:
+          var: ALL_APPS
+          split: "\n"
+        task: snapshot
+        vars:
+          WAIT: "false"
+          NS: '{{splitList "," .ITEM | first}}'
+          APP: '{{splitList "," .ITEM | last}}'
 
   restore:
-    desc: Restore an app [K8S_CLUSTER=main] [NS=default] [APP=required] [PREVIOUS=required]
+    desc: Restore an app [NS=default] [APP=required] [PREVIOUS=required]
     preconditions:
       - which flux kubectl minijinja-cli
       - test -f {{.VOLSYNC_TASK_RESOURCES_DIR}}/replicationdestination.yaml.j2
     requires:
       vars:
-        - K8S_CLUSTER
         - APP
         - PREVIOUS
     vars:
@@ -100,22 +121,3 @@ tasks:
       - flux --namespace {{.NS}} resume helmrelease {{.APP}}
       - flux --namespace {{.NS}} reconcile helmrelease {{.APP}} --force
       - kubectl --namespace {{.NS}} wait pod --for=condition=ready --selector="app.kubernetes.io/name={{.APP}}" --timeout=5m
-
-  unlock-local:
-    desc: Unlock a restic source repo from local machine [NS=default] [APP=required]
-    cmds:
-      - minijinja-cli {{.VOLSYNC_TASK_RESOURCES_DIR}}/unlock.yaml.j2 | kubectl apply --server-side --filename -
-      - until kubectl --namespace {{.NS}} get job/volsync-unlock-{{.APP}} &>/dev/null; do sleep 5; done
-      - kubectl --namespace {{.NS}} wait job/volsync-unlock-{{.APP}} --for condition=complete --timeout=5m
-      - stern --namespace {{.NS}} job/volsync-unlock-{{.APP}} --no-follow
-      - kubectl --namespace {{.NS}} delete job volsync-unlock-{{.APP}}
-    vars:
-      NS: '{{.NS | default "default"}}'
-    env:
-      NS: "{{.NS}}"
-      APP: "{{.APP}}"
-    requires:
-      vars: [APP]
-    preconditions:
-      - test -f {{.VOLSYNC_TASK_RESOURCES_DIR}}/unlock.yaml.j2
-      - which kubectl minijinja-cli stern
