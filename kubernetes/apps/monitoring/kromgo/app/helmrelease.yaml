@@ -85,9 +85,7 @@ spec:
             port: *hport
     ingress:
       app:
-        className: external-nginx
-        annotations:
-          external-dns.alpha.kubernetes.io/target: external.negative7.com
+        className: "external-nginx"
         hosts:
           - host: kromgo.negative7.com
             paths:
