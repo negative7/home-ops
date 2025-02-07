@@ -39,10 +39,10 @@ spec:
                 enabled: false
             resources:
               requests:
-                cpu: 5m
-                memory: 137M
+                cpu: 100m
+                memory: 512Mi
               limits:
-                memory: 500M
+                memory: 3072Mi
           code-server:
             image:
               repository: ghcr.io/coder/code-server
