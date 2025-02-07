@@ -88,7 +88,7 @@ spec:
         annotations:
           nginx.ingress.kubernetes.io/rewrite-target: /$1
         hosts:
-          - host: esphome.negative7.com"
+          - host: esphome.negative7.com
             paths:
               - path: /(.*)
                 service:
