@@ -44,7 +44,7 @@ nodes:
     ipAddress: 10.2.0.23
     controlPlane: true
     installDiskSelector:
-      model: "KBG40ZNS512G*"
+      model: "CT1000MX500SSD1"
     networkInterfaces:
       - interface: eno1
         dhcp: true

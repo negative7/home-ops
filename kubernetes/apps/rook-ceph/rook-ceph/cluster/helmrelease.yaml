@@ -86,7 +86,7 @@ spec:
               - name: sda
           - name: dnipro
             devices:
-              - name: sda
+              - name: nvme0n1
           - name: kyiv
             devices:
               - name: sda
