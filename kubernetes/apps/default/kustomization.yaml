@@ -6,6 +6,7 @@ namespace: default
 resources:
   - ./actual/ks.yaml
   - ./atuin/ks.yaml
+  - ./n8n/ks.yaml
   - ./vikunja/ks.yaml
 components:
   - ../../components/namespace
