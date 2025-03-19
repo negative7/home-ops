@@ -50,7 +50,7 @@ spec:
               kapowarr__AUTH__REQUIRED: DisabledForLocalAddresses
               kapowarr__LOG__DBENABLED: "False"
               kapowarr__LOG__LEVEL: info
-              kapowarr__SERVER__PORT: &port 7878
+              kapowarr__SERVER__PORT: &port 5656
               kapowarr__UPDATE__BRANCH: develop
             probes:
               liveness: &probes
