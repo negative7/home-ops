@@ -90,10 +90,6 @@ spec:
     persistence:
       config:
         existingClaim: kapowarr
-        advancedMounts:
-          kapowarr:
-            app:
-              - path: /app/db
       media:
         enabled: true
         type: nfs
