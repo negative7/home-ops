@@ -91,7 +91,7 @@ spec:
       config:
         existingClaim: kapowarr
         advancedMounts:
-          actual:
+          kapowarr:
             app:
               - path: /app
       media:
