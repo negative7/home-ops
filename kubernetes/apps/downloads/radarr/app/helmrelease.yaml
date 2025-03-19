@@ -32,7 +32,7 @@ spec:
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
             supplementalGroups:
-              - 65542 # gladius:external-services
+              - 65542
 
         containers:
           app:
