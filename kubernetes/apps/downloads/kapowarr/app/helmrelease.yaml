@@ -93,7 +93,7 @@ spec:
         advancedMounts:
           kapowarr:
             app:
-              - path: /app
+              - path: /app/db
       media:
         enabled: true
         type: nfs
