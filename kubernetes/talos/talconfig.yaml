@@ -1,6 +1,7 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 clusterName: &clusterName home-ops
+
 endpoint: https://k8s.homelab.internal:6443
 
 # renovate: datasource=docker depName=ghcr.io/siderolabs/installer
@@ -21,6 +22,8 @@ nodes:
   - hostname: kharkiv.homelab.internal
     ipAddress: 10.2.0.21
     controlPlane: true
+    nodeLabels:
+      intel.feature.node.kubernetes.io/gpu: "true"
     installDiskSelector:
       model: "CL1-3D256-Q11*"
     networkInterfaces:
@@ -32,6 +35,8 @@ nodes:
   - hostname: vinnytsia.homelab.internal
     ipAddress: 10.2.0.22
     controlPlane: true
+    nodeLabels:
+      intel.feature.node.kubernetes.io/gpu: "true"
     installDiskSelector:
       model: "KXG60ZNV256G*"
     networkInterfaces:
@@ -43,6 +48,8 @@ nodes:
   - hostname: dnipro.homelab.internal
     ipAddress: 10.2.0.23
     controlPlane: true
+    nodeLabels:
+      intel.feature.node.kubernetes.io/gpu: "true"
     installDiskSelector:
       model: "CT1000MX500SSD1"
     networkInterfaces:
@@ -54,6 +61,8 @@ nodes:
   - hostname: kyiv.homelab.internal
     ipAddress: 10.2.0.24
     controlPlane: true
+    nodeLabels:
+      intel.feature.node.kubernetes.io/gpu: "true"
     installDiskSelector:
       model: "SAMSUNG MZVLW256HEHP-000H1"
     networkInterfaces:
