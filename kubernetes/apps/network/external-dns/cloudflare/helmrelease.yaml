@@ -12,7 +12,8 @@ spec:
       version: 1.15.2
       sourceRef:
         kind: HelmRepository
-        name: external-dns-cloudflare
+        name: kubernetes-sigs-external-dns
+        namespace: flux-system
       interval: 30m
   install:
     crds: CreateReplace
