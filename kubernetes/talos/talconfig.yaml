@@ -64,7 +64,7 @@ nodes:
     nodeLabels:
       intel.feature.node.kubernetes.io/gpu: "true"
     installDiskSelector:
-      model: "SAMSUNG MZVLW256HEHP-000H1"
+      model: "CT1000MX500SSD1"
     networkInterfaces:
       - interface: eno1
         dhcp: true
