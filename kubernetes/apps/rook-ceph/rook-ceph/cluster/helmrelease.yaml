@@ -87,9 +87,9 @@ spec:
           - name: dnipro
             devices:
               - name: nvme0n1
-          - name: kyiv
-            devices:
-              - name: sda
+          # - name: kyiv
+          #   devices:
+          #     - name: sda
           - name: vinnytsia
             devices:
               - name: sda
