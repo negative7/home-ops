@@ -35,7 +35,7 @@ spec:
         containers:
           app:
             image:
-              repository: docker pull ghcr.io/luigi311/jellyplex-watched
+              repository: ghcr.io/luigi311/jellyplex-watched
               tag: 7.0.4
             env:
               DRYRUN: False
