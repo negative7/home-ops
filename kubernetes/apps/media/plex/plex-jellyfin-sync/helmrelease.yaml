@@ -1,0 +1,86 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: plex-jellyfin-sync
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    controllers:
+      plex-jellyfin-sync:
+        type: cronjob
+
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        cronjob:
+          schedule: "00 * * * *"
+
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            runAsNonRoot: true
+
+        containers:
+          app:
+            image:
+              repository: docker pull ghcr.io/luigi311/jellyplex-watched
+              tag: 7.0.4
+            env:
+              DRYRUN: False
+              RUN_ONLY_ONCE: True
+              LIBRARY_MAPPING: '{ "Shows": "TV Shows", "Movie": "Movies" }'
+
+              PLEX_BASEURL: http://plex.media.svc.cluster.local:32400
+              PLEX_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: plex-jellyfin-sync-secret
+                    key: PLEX_TOKEN
+              JELLYFIN_BASEURL: http://jellyfin.media.svc.cluster.local:32400
+              JELLYFIN_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: plex-jellyfin-sync-secret
+                    key: JELLYFIN_API_KEY
+              SYNC_FROM_PLEX_TO_JELLYFIN: "True"
+              SYNC_FROM_PLEX_TO_PLEX: "False"
+              SYNC_FROM_PLEX_TO_EMBY: "False"
+
+              SYNC_FROM_JELLYFIN_TO_PLEX: "True"
+              SYNC_FROM_JELLYFIN_TO_JELLYFIN: "False"
+              SYNC_FROM_JELLYFIN_TO_EMBY: "False"
+
+              SYNC_FROM_EMBY_TO_PLEX: "False"
+              SYNC_FROM_EMBY_TO_JELLYFIN: "False"
+              SYNC_FROM_EMBY_TO_EMBY: "False"
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
