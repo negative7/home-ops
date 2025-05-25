@@ -83,9 +83,7 @@ spec:
 
     ingress:
       app:
-        annotations:
-          nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-        className: "internal-nginx"
+        className: internal-nginx
         hosts:
           - host: jellyfin.negative7.com
             paths:
