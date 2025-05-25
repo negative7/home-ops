@@ -4,10 +4,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: media
 resources:
+  - ./jellyfin/ks.yaml
   - ./maintainerr/ks.yaml
+  - ./overseerr/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml
-  - ./overseerr/ks.yaml
 components:
   - ../../components/namespace
   - ../../components/flux/alerts
