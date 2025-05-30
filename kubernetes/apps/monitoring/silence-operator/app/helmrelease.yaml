@@ -6,9 +6,6 @@ metadata:
   name: silence-operator
 spec:
   interval: 30m
-  chartRef:
-    kind: OCIRepository
-    name: silence-operator
   install:
     crds: CreateReplace
   upgrade:
