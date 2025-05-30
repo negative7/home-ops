@@ -5,7 +5,7 @@ kind: Gateway
 metadata:
   name: external
   annotations:
-    external-dns.alpha.kubernetes.io/target: &hostname external.negative7.com
+    external-dns.alpha.kubernetes.io/target: &hostname ingress-ext.negative7.com
 spec:
   gatewayClassName: cilium
   addresses:
