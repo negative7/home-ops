@@ -6,9 +6,11 @@ metadata:
   name: internal
   annotations:
     external-dns.alpha.kubernetes.io/target: &hostname internal.negative7.com
-    io.cilium/lb-ipam-ips: 10.2.0.111
 spec:
   gatewayClassName: cilium
+  addresses:
+    - type: IPAddress
+      value: 10.2.0.111
   infrastructure:
     annotations:
       external-dns.alpha.kubernetes.io/hostname: *hostname
