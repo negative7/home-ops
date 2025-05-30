@@ -90,8 +90,8 @@ spec:
               value: Object.spec.template.spec.volumes{
                 name: "repository",
                 nfs: Object.spec.template.spec.volumes.nfs{
-                  server: "freenas.homelab.internal",
-                  path: "/mnt/tank/volsync"
+                  server: "gladius.bjw-s.internal",
+                  path: "/mnt/tank/Backup/Volsync"
                 }
               }
             },

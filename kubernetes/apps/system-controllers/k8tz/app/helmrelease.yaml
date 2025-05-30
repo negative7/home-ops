@@ -8,19 +8,18 @@ spec:
   chart:
     spec:
       chart: k8tz
-      version: 0.18.0
+      version: 0.17.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
         name: k8tz
-        namespace: flux-system
   interval: 30m
   values:
     namespace: system-controllers
 
     replicaCount: 2
 
-    timezone: America/New_York
+    timezone: Europe/Amsterdam
     cronJobTimeZone: true
 
     webhook:
