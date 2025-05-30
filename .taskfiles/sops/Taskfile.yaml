@@ -7,7 +7,7 @@ tasks:
     desc: Decrypt and re-encrypt all sops secrets
     vars:
       SECRET_FILES:
-        sh: find ./kubernetes/main -type f -name '*.sops.yaml' ! -name ".sops.yaml"
+        sh: find ./kubernetes -type f -name '*.sops.yaml' ! -name ".sops.yaml"
     cmds:
       - for:
           var: SECRET_FILES
