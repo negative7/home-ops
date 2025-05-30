@@ -4,10 +4,10 @@ clusterName: &clusterName home-ops
 
 endpoint: https://k8s.homelab.internal:6443
 
-# renovate: datasource=docker depName=ghcr.io/siderolabs/installer
-talosVersion: v1.9.5
-# renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
-kubernetesVersion: 1.32.4
+# renovate: depName=ghcr.io/siderolabs/installer datasource=docker
+talosVersion: v1.10.2
+# renovate: depName=ghcr.io/siderolabs/kubelet datasource=docker
+kubernetesVersion: v1.33.1
 
 additionalApiServerCertSans: &san
   - k8s.homelab.internal
@@ -70,24 +70,15 @@ nodes:
         dhcp: true
 
 controlPlane:
-  nodeLabels: &nodeLabels
+  nodeLabels:
     topology.kubernetes.io/region: *clusterName
     topology.kubernetes.io/zone: m
 
-  extraManifests: &extraManifests
-    - ./kubernetes/talos/ups.yaml
+  # extraManifests: &extraManifests
+  #   - ./ups.yaml
 
   schematic: &schematic
     customization:
-      extraKernelArgs:
-        - apparmor=0 # Less security, more speed
-        - init_on_alloc=0 # Less security, more speed
-        - init_on_free=0 # Less security, more speed
-        - intel_iommu=on # PCI Passthrough
-        - iommu=pt # PCI Passthrough
-        - mitigations=off # Less security, more speed
-        - security=none # Less security, more speed
-        - net.ifnames=1 # Enable predictable NIC naming
       systemExtensions:
         officialExtensions:
           - siderolabs/intel-ucode
@@ -110,6 +101,8 @@ controlPlane:
                 discard_unpacked_layers = false
               [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
                 discard_unpacked_layers = false
+
+
     # Disable search domain everywhere
     - |-
       machine:
@@ -215,6 +208,7 @@ controlPlane:
         sysctls:
           fs.inotify.max_user_instances: 8192    # Watchdog
           fs.inotify.max_user_watches: 1048576   # Watchdog
+          user.max_user_namespaces: 11255        # User namespaces
           net.core.rmem_max: 67108864            # Cloudflared / QUIC
           net.core.wmem_max: 67108864            # Cloudflared / QUIC
 
