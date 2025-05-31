@@ -74,8 +74,8 @@ controlPlane:
     topology.kubernetes.io/region: *clusterName
     topology.kubernetes.io/zone: m
 
-  # extraManifests: &extraManifests
-  #   - ./ups.yaml
+  extraManifests: &extraManifests
+    - ./ups.yaml
 
   schematic: &schematic
     customization:
@@ -83,7 +83,6 @@ controlPlane:
         officialExtensions:
           - siderolabs/intel-ucode
           - siderolabs/i915
-          - siderolabs/nut-client
           - siderolabs/mei
 
   patches: &patches # Configure containerd

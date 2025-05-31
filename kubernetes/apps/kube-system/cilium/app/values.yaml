@@ -24,12 +24,16 @@ dashboards:
   annotations:
     grafana_folder: Cilium
 devices: eno1,eth0
+enableIPv4BIGTCP: true
 enableRuntimeDeviceDetection: true
 endpointRoutes:
   enabled: true
 envoy:
   enabled: true
   rollOutPods: true
+  prometheus:
+    serviceMonitor:
+      enabled: true
 gatewayAPI:
   enabled: true
   enableAlpn: true
