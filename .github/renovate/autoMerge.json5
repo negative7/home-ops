@@ -7,14 +7,16 @@
       "automerge": true,
       "automergeType": "branch",
       "matchUpdateTypes": ["digest"],
-      "matchPackagePatterns":  ["ghcr.io/onedr0p", "ghcr.io/bjw-s", "ghcr.io/bjw-s-labs"]
+      "matchPackagePrefixes": ["ghcr.io/home-operations", "ghcr.io/onedr0p", "ghcr.io/bjw-s", "ghcr.io/bjw-s-labs"],
+      "ignoreTests": false,
     },
     {
       "description": "Auto merge KPS minors and patches",
       "matchDatasources": ["helm", "docker"],
       "automerge": true,
+      "automergeType": "pr",
       "matchUpdateTypes": ["minor", "patch"],
-      "matchDepNames": ["kube-prometheus-stack"],
+      "matchDepNames": ["/kube-prometheus-stack/"],
       "ignoreTests": false,
       "internalChecksAsSuccess": true
     },
