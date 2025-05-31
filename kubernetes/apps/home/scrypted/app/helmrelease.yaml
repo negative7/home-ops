@@ -41,9 +41,9 @@ spec:
               tag: 0.139.0@sha256:0a376e9166d51e0d0fae47b9234774338809fdbd317db614fdc95cef532f024e
             probes:
               liveness:
-                enabled: true
+                enabled: false
               readiness:
-                enabled: true
+                enabled: false
             resources:
               requests:
                 cpu: 136m
@@ -51,13 +51,9 @@ spec:
               limits:
                 gpu.intel.com/i915: 1
                 memory: 8192Mi
-            securityContext:
-              privileged: true
-
     service:
       app:
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: "scrypted.negative7.com."
           io.cilium/lb-ipam-ips: 10.2.0.103
         controller: scrypted
         ports:
