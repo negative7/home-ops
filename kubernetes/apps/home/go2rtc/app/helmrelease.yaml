@@ -16,7 +16,7 @@ spec:
         namespace: flux-system
   dependsOn:
     - name: home-assistant
-      namespace: home-automation
+      namespace: home
   values:
     controllers:
       go2rtc:
