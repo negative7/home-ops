@@ -4,4 +4,4 @@ log:
 
 streams:
   doorbell: rtsp://scrypted.home.svc.cluster.local:34135/e022c973b598e696
-  voron2: rtsp://scrypted.home.svc.cluster.local:34137/a7cc2efa9483af9d
+  voron2: rtsp://scrypted.home.svc.cluster.local:34136/a7cc2efa9483af9d
