@@ -40,7 +40,15 @@ spec:
             env:
               DRYRUN: false
               DEBUG: true
+              DEBUG_LEVEL: debug
               RUN_ONLY_ONCE: true
+              SLEEP_DURATION: 3600
+              LOGFILE: "log.log"
+              MARK_FILE: "mark.log"
+              REQUEST_TIMEOUT: 300
+              GENERATE_GUIDS: "True"
+              GENERATE_LOCATIONS: "True"
+              MAX_THREADS: 2
               LIBRARY_MAPPING: '{ "Shows": "TV Shows", "Movie": "Movies" }'
               PLEX_BASEURL: http://plex.media.svc.cluster.local:32400
               PLEX_TOKEN:
@@ -48,6 +56,7 @@ spec:
                   secretKeyRef:
                     name: plex-jellyfin-sync-secret
                     key: PLEX_TOKEN
+              SSL_BYPASS: ture
               JELLYFIN_BASEURL: http://jellyfin.media.svc.cluster.local:32400
               JELLYFIN_TOKEN:
                 valueFrom:
