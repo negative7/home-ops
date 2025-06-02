@@ -17,71 +17,43 @@ spec:
   interval: 30m
   values:
     controllers:
-      plex-jellyfin-sync:
-        type: cronjob
-
+      jellyfin-sync:
         annotations:
           reloader.stakater.com/auto: "true"
-
+        type: cronjob
         cronjob:
-          schedule: "00 * * * *"
-
-        pod:
-          securityContext:
-            runAsUser: 568
-            runAsGroup: 568
-            runAsNonRoot: true
-
+          schedule: 0 * * * *
+          backoffLimit: 0
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 1
+          failedJobsHistory: 1
+          ttlSecondsAfterFinished: 3600
         containers:
           app:
             image:
               repository: ghcr.io/luigi311/jellyplex-watched
-              tag: 7.0.4
+              tag: 7.0.4@sha256:63e14670708c02a94ccd6afead064e9458d75333c5dfd935f76c9539ac241aff
+            envFrom:
+              - secretRef:
+                  name: jellyfin-sync-secret
             env:
-              DRYRUN: "False"
-              DEBUG: "True"
-              DEBUG_LEVEL: info
-              RUN_ONLY_ONCE: "True"
-              LOGFILE: log.log
-              LIBRARY_MAPPING: '{ "Shows": "TV Shows" }'
-              PLEX_BASEURL: https://plex.media.svc.cluster.local:32400
-              PLEX_TOKEN:
-                valueFrom:
-                  secretKeyRef:
-                    name: plex-jellyfin-sync-secret
-                    key: PLEX_TOKEN
-              SSL_BYPASS: ture
+              DEBUG_LEVEL: debug
+              DRYRUN: false
               JELLYFIN_BASEURL: http://jellyfin.media.svc.cluster.local:8096
-              JELLYFIN_TOKEN:
-                valueFrom:
-                  secretKeyRef:
-                    name: plex-jellyfin-sync-secret
-                    key: JELLYFIN_API_KEY
-              SYNC_FROM_PLEX_TO_JELLYFIN: true
-              SYNC_FROM_PLEX_TO_PLEX: false
-              SYNC_FROM_PLEX_TO_EMBY: false
-              SYNC_FROM_JELLYFIN_TO_PLEX: true
-              SYNC_FROM_JELLYFIN_TO_JELLYFIN: false
-              SYNC_FROM_JELLYFIN_TO_EMBY: false
-              SYNC_FROM_EMBY_TO_PLEX: false
-              SYNC_FROM_EMBY_TO_JELLYFIN: false
-              SYNC_FROM_EMBY_TO_EMBY: false
-            probes:
-              liveness:
-                enabled: false
-              readiness:
-                enabled: false
-              startup:
-                enabled: false
+              LOGFILE: /tmp/sync.log
+              MARK_FILE: /tmp/mark.log
+              PLEX_BASEURL: http://plex.media.svc.cluster.local:32400
+              RUN_ONLY_ONCE: true
+              TZ: America/New_York
+              LIBRARY_MAPPING: '{ "Shows": "TV Shows" }'
             resources:
               requests:
-                cpu: 25m
-                memory: 128Mi
+                cpu: 10m
               limits:
-                memory: 128Mi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
+                memory: 512Mi
+        pod:
+          hostUsers: false
+          restartPolicy: Never
+    persistence:
+      tmp:
+        type: emptyDir
