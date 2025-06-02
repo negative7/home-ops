@@ -38,6 +38,8 @@ spec:
               repository: ghcr.io/luigi311/jellyplex-watched
               tag: 7.0.4
             env:
+              PUID: 568
+              PGID: 568
               DRYRUN: false
               DEBUG: true
               DEBUG_LEVEL: debug
