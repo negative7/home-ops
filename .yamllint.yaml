@@ -5,7 +5,6 @@ ignore: |
   .private/
   .vscode/
   *.sops.*
-  .archive/
   ansible/roles/xanmanning.k3s/
 
 extends: default
@@ -16,8 +15,6 @@ rules:
 
   comments:
     min-spaces-from-content: 1
-
-  new-line-at-end-of-file: disable
 
   line-length: disable
 
