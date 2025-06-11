@@ -65,17 +65,18 @@ spec:
         ports:
           http:
             port: *httpPort
-
-    ingress:
+    route:
       app:
-        className: "internal-nginx"
-        hosts:
-          - host: actual.negative7.com
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - actual.negative7.com
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *httpPort
 
     persistence:
       data:
