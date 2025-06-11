@@ -53,16 +53,6 @@ spec:
             name: externalsecrets.external-secrets.io
             displayName: External Secrets
             namespaced: true
-      # ingress:
-      #   enabled: true
-      #   ingressClassName: internal-nginx
-      #   annotations:
-      #     external-dns.alpha.kubernetes.io/target: internal.negative7.com
-      #   issuer:
-      #     name: letsencrypt-production
-      #     scope: cluster
-      #   hosts:
-      #     - &host dashboard.negative7.com
     metrics-server:
       enabled: false
     metricsScraper:
