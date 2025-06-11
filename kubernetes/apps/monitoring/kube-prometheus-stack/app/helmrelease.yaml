@@ -103,46 +103,34 @@ spec:
     ### Prometheus instance values
     ###
     prometheus:
-      ingress:
-        enabled: true
-        ingressClassName: internal-nginx
-        annotations:
-          external-dns.alpha.kubernetes.io/target: internal.negative7.com
-        hosts:
-          - prometheus.negative7.com
-        pathType: Prefix
-
       prometheusSpec:
-        containers:
-          - name: prometheus
-            startupProbe:
-              failureThreshold: 300
+        image:
+          registry: docker.io
+          repository: prompp/prompp
+          tag: 2.53.2-0.2.5
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 64535
+          runAsGroup: 64535
+          fsGroup: 64535
         alertingEndpoints:
           - namespace: monitoring
             name: alertmanager
             port: 9093
             apiVersion: v2
-        enableAdminAPI: true
-        enableFeatures:
-          - auto-gomaxprocs
-          - memory-snapshot-on-shutdown
-          - new-service-discovery-manager
         podMonitorSelectorNilUsesHelmValues: false
         probeSelectorNilUsesHelmValues: false
-        replicas: 1
-        replicaExternalLabelName: "__replica__" # must match with thanos value `.query.replicaLabel[0]`
         resources:
           requests:
             cpu: 100m
           limits:
-            memory: 6000M
+            memory: 2000M
         retention: 14d
         retentionSize: 50GB
-        ruleselectorniluseshelmvalues: false
+        ruleSelectorNilUsesHelmValues: false
         scrapeConfigSelectorNilUsesHelmValues: false
         scrapeInterval: 1m # Must match interval in Grafana Helm chart
         serviceMonitorSelectorNilUsesHelmValues: false
-
         storageSpec:
           volumeClaimTemplate:
             spec:
@@ -150,4 +138,13 @@ spec:
               resources:
                 requests:
                   storage: 55Gi
-        walCompression: true
+
+      route:
+        main:
+          enabled: true
+          hostnames:
+            - prometheus.negative7.com
+          parentRefs:
+            - name: internal
+              namespace: kube-system
+              sectionName: https

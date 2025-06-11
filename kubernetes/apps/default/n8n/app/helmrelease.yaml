@@ -9,8 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 4.0.1
-      interval: 30m
+      version: 4.1.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s-labs
@@ -67,17 +66,6 @@ spec:
           http:
             port: *port
 
-    ingress:
-      app:
-        className: "internal-nginx"
-        hosts:
-          - host: *hostName
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-
     persistence:
       data:
         existingClaim: n8n
@@ -85,3 +73,31 @@ spec:
           n8n:
             app:
               - path: /home/node/.n8n
+
+
+    route:
+      app:
+        hostnames:
+          - *hostName
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+      webhooks:
+        hostnames:
+          - n8n-webhook.negative7.com
+        parentRefs:
+          - name: external
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - matches:
+              - path:
+                  value: /webhook
+            backendRefs:
+              - identifier: app
+                port: *port

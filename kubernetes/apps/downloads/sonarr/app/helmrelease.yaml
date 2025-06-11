@@ -85,16 +85,18 @@ spec:
           http:
             port: *port
 
-    ingress:
+    route:
       app:
-        className: "internal-nginx"
-        hosts:
-          - host: sonarr.negative7.com
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - sonarr.negative7.com
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
 
     persistence:
       config:

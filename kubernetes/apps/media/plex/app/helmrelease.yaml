@@ -8,13 +8,15 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 4.0.1
-      interval: 30m
+      version: 4.1.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s-labs
         namespace: flux-system
   interval: 30m
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   values:
     controllers:
       plex:
@@ -79,20 +81,20 @@ spec:
           io.cilium/lb-ipam-ips: 10.2.0.105
         ports:
           http:
-            port: 32400
+            port: &port 32400
 
-    ingress:
+    route:
       app:
-        annotations:
-          nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-        className: "external-nginx"
-        hosts:
-          - host: plex.negative7.com
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - plex.negative7.com
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
 
     persistence:
       config:
@@ -107,15 +109,18 @@ spec:
           plex:
             app:
               - path: /config/Library/Application Support/Plex Media Server/Cache
-      logs:
+      tmpfs:
         type: emptyDir
         advancedMounts:
           plex:
             app:
               - path: /config/Library/Application Support/Plex Media Server/Logs
+                subPath: log
+              - path: /transcode
+                subPath: transcode
       nfs-tv-media:
         type: nfs
-        server: 'freenas.homelab.internal'
+        server: "freenas.homelab.internal"
         path: /mnt/tank/media/tv
         advancedMounts:
           plex:
@@ -123,7 +128,7 @@ spec:
               - path: /media/tv
       nfs-movies-media:
         type: nfs
-        server: 'freenas.homelab.internal'
+        server: "freenas.homelab.internal"
         path: /mnt/tank/media/movies
         advancedMounts:
           plex:
@@ -131,15 +136,9 @@ spec:
               - path: /media/movies
       nfs-backup:
         type: nfs
-        server: 'freenas.homelab.internal'
+        server: "freenas.homelab.internal"
         path: /mnt/tank/backups/plex
         advancedMounts:
           plex:
             app:
               - path: /config/Backups
-      transcode:
-        type: emptyDir
-        advancedMounts:
-          plex:
-            app:
-              - path: /transcode

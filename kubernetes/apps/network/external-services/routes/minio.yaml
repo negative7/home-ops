@@ -36,59 +36,56 @@ spec:
     app.kubernetes.io/name: *appui
 
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
   name: &app minio-proxy
   namespace: network
   labels:
     app.kubernetes.io/name: *app
     app.kubernetes.io/instance: *app
-  annotations:
-    external-dns.alpha.kubernetes.io/target: internal.negative7.com
 spec:
-  ingressClassName: internal-nginx
+  hostnames:
+    - minio.negative7.com
+  parentRefs:
+    - name: internal
+      namespace: kube-system
+      sectionName: https
   rules:
-    - host: &host 'minio.negative7.com'
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: *app
-                port:
-                  number: 9000
-  tls:
-    - hosts:
-        - *host
+    - backendRefs:
+        - name: *app
+          namespace: network
+          port: 9000
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: &appui minio-proxy-ui
+  name: &app minio-proxy-ui
   namespace: network
   labels:
-    app.kubernetes.io/name: *appui
-    app.kubernetes.io/instance: *appui
-  annotations:
-    external-dns.alpha.kubernetes.io/target: internal.negative7.com
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/instance: *app
 spec:
-  ingressClassName: internal-nginx
+  hostnames:
+    - minio-ui.negative7.com
+  parentRefs:
+    - name: internal
+      namespace: kube-system
+      sectionName: https
   rules:
-    - host: &hostui 'minio-ui.negative7.com'
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: *appui
-                port:
-                  number: 9001
-  tls:
-    - hosts:
-        - *hostui
+    - backendRefs:
+        - name: *app
+          namespace: network
+          port: 9001
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
 
 ---
 apiVersion: discovery.k8s.io/v1

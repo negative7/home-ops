@@ -57,19 +57,20 @@ spec:
         controller: maintainerr
         ports:
           http:
-            port: 6246
+            port: &port 6246
 
-    ingress:
+    route:
       app:
-        className: internal-nginx
-        hosts:
-          - host: maintainerr.negative7.com
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: app
-                  port: http
+        hostnames:
+          - maintainerr.negative7.com
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
 
     persistence:
       data:

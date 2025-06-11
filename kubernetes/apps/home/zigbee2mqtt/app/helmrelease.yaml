@@ -9,8 +9,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 4.0.1
-      interval: 30m
+      version: 4.1.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s-labs
@@ -66,7 +65,7 @@ spec:
               ZIGBEE2MQTT_CONFIG_DEVICE_OPTIONS_RETAIN: 'true'
               ZIGBEE2MQTT_CONFIG_EXPERIMENTAL_NEW_API: 'true'
               ZIGBEE2MQTT_CONFIG_FRONTEND_ENABLED: true
-              ZIGBEE2MQTT_CONFIG_FRONTEND_PORT: &port 8080
+              ZIGBEE2MQTT_CONFIG_FRONTEND_PORT: &httpPort 8080
               ZIGBEE2MQTT_CONFIG_FRONTEND_URL: https://zigbee2mqtt.negative7.com
               ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_ENABLED: true
               ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_DISCOVERY_TOPIC: homeassistant
@@ -130,28 +129,38 @@ spec:
         ports:
           http:
             primary: true
-            port: *port
+            port: *httpPort
           metrics:
             port: 9000
           code-server:
-            port: 12323
+            port: 12321
 
-    ingress:
+    route:
       app:
-        className: internal-nginx
-        annotations:
-          nginx.ingress.kubernetes.io/rewrite-target: /$1
-        hosts:
-          - host: zigbee2mqtt.negative7.com
-            paths:
-              - path: /(.*)
-                service:
-                  identifier: app
-                  port: http
-              - path: /code/(.*)
-                service:
-                  identifier: app
-                  port: code-server
+        hostnames:
+          - zigbee2mqtt.negative7.co,
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+        rules:
+          - matches:
+              - path:
+                  type: PathPrefix
+                  value: /code/
+            filters:
+              - type: URLRewrite
+                urlRewrite:
+                  path:
+                    type: ReplacePrefixMatch
+                    replacePrefixMatch: /
+            backendRefs:
+              - identifier: app
+                port: 12321
+          - backendRefs:
+              - identifier: app
+                port: *httpPort
+
     persistence:
       config:
         existingClaim: zigbee2mqtt

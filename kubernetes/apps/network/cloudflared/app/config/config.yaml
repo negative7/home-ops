@@ -1,11 +1,11 @@
 ---
+---
+originRequest:
+  originServerName: ingress-ext.negative7.com
+
 ingress:
-  - hostname: negative7.com
-    service: https://nginx-external-controller.network.svc.cluster.local:443
-    originRequest:
-      originServerName: external.negative7.com
+  - hostname: bjw-s.dev
+    service: &svc https://cilium-gateway-external.kube-system.svc.cluster.local
   - hostname: "*.negative7.com"
-    service: https://nginx-external-controller.network.svc.cluster.local:443
-    originRequest:
-      originServerName: external.negative7.com
+    service: *svc
   - service: http_status:404

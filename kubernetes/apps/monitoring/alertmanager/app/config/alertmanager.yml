@@ -45,7 +45,7 @@ route:
   routes:
     - receiver: "null"
       matchers:
-        - alertname =~ "InfoInhibitor|Watchdog|SmartDeviceHighTemperature|CPUThrottlingHigh"
+        - alertname =~ "InfoInhibitor|Watchdog"
     - receiver: "pushover"
       matchers:
         - severity = critical
