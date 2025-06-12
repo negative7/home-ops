@@ -80,7 +80,7 @@ spec:
     route:
       app:
         hostnames:
-          - alertmanager.negative7.com
+          - alert-manager.negative7.com
         parentRefs:
           - name: internal
             namespace: kube-system
