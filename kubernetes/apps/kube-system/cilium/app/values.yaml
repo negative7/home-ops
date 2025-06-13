@@ -24,7 +24,7 @@ dashboards:
   annotations:
     grafana_folder: Cilium
 devices: eno1,eth0
-enableIPv4BIGTCP: true
+enableIPv4BIGTCP: false
 enableRuntimeDeviceDetection: true
 endpointRoutes:
   enabled: true
