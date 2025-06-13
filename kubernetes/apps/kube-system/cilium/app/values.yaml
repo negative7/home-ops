@@ -1,4 +1,7 @@
 ---
+debug:
+  enabled: true
+  verbose: true
 autoDirectNodeRoutes: true
 bandwidthManager:
   bbr: false
