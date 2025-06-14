@@ -1,10 +1,7 @@
 ---
-debug:
-  enabled: true
-  verbose: "flow envoy"
 autoDirectNodeRoutes: true
 bandwidthManager:
-  bbr: false
+  bbr: true
   enabled: true
 bgpControlPlane:
   enabled: true
@@ -27,16 +24,12 @@ dashboards:
   annotations:
     grafana_folder: Cilium
 devices: eno1,eth0
-enableIPv4BIGTCP: false
 enableRuntimeDeviceDetection: true
 endpointRoutes:
   enabled: true
 envoy:
   enabled: true
   rollOutPods: true
-  prometheus:
-    serviceMonitor:
-      enabled: true
 gatewayAPI:
   enabled: true
   enableAlpn: true
@@ -51,7 +44,7 @@ k8sServicePort: 7445
 kubeProxyReplacement: true
 kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
 l2announcements:
-  enabled: true
+  enabled: false
 loadBalancer:
   algorithm: maglev
   mode: dsr
