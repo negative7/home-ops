@@ -96,7 +96,7 @@ spec:
         hostnames:
           - hass.negative7.com
         parentRefs:
-          - name: internal
+          - name: external
             namespace: kube-system
             sectionName: https
         rules:
