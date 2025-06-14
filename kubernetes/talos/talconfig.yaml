@@ -74,18 +74,27 @@ controlPlane:
     topology.kubernetes.io/region: *clusterName
     topology.kubernetes.io/zone: m
 
-  extraManifests: &extraManifests
-    - ./ups.yaml
-
-  schematic: &schematic
+  schematic:
     customization:
+      extraKernelArgs:
+        - -init_on_alloc                      # Less security, faster puter
+        - -init_on_free                       # Less security, faster puter
+        - -selinux                            # Less security, faster puter
+        - apparmor=0                          # Less security, faster puter
+        - init_on_alloc=0                     # Less security, faster puter
+        - init_on_free=0                      # Less security, faster puter
+        - intel_iommu=on                      # PCI Passthrough
+        - iommu=pt                            # PCI Passthrough
+        - mitigations=off                     # Less security, faster puter
+        - security=none                       # Less security, faster puter
+        - talos.auditd.disabled=1             # Less security, faster puter
       systemExtensions:
         officialExtensions:
           - siderolabs/intel-ucode
           - siderolabs/i915
-          - siderolabs/mei
 
-  patches: &patches # Configure containerd
+  patches:
+    # Configure containerd
     - |-
       machine:
         files:
