@@ -1,7 +1,7 @@
 ---
 autoDirectNodeRoutes: true
 bandwidthManager:
-  bbr: true
+  bbr: false
   enabled: true
 bgpControlPlane:
   enabled: true
@@ -33,6 +33,7 @@ envoy:
 gatewayAPI:
   enabled: true
   enableAlpn: true
+  enableAppProtocol: true
   xffNumTrustedHops: 1
 hubble:
   enabled: false
