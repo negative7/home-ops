@@ -1,7 +1,7 @@
 ---
 autoDirectNodeRoutes: true
 bandwidthManager:
-  bbr: false
+  bbr: true
   enabled: true
 bgpControlPlane:
   enabled: true
@@ -9,7 +9,7 @@ bpf:
   datapathMode: netkit
   masquerade: true
   preallocateMaps: true
-  hostLegacyRouting: false
+bpfClockProbe: true
 cgroup:
   autoMount:
     enabled: false
