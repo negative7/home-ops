@@ -31,7 +31,6 @@ spec:
                 "ips": ["10.0.4.20/24"],
                 "mac": "e4:54:e8:9f:1c:12"
               }]
-          hostNetwork: true
           securityContext:
             runAsUser: 65534
             runAsGroup: 65533
