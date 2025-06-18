@@ -31,7 +31,8 @@ envoy:
   enabled: true
   rollOutPods: true
   debug:
-    admin: enabled
+    admin:
+      enabled: true
 gatewayAPI:
   enabled: true
   enableAlpn: true
