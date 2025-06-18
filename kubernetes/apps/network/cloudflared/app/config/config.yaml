@@ -4,7 +4,7 @@ originRequest:
   originServerName: ingress-ext.negative7.com
 
 ingress:
-  - hostname: bjw-s.dev
+  - hostname: negative7.com
     service: &svc https://cilium-gateway-external.kube-system.svc.cluster.local
   - hostname: "*.negative7.com"
     service: *svc

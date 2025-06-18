@@ -6,6 +6,6 @@ metadata:
   namespace: networking
 spec:
   endpoints:
-    - dnsName: external.negative7.com
+    - dnsName: ingress-ext.negative7.com
       recordType: CNAME
       targets: ["30d77efe-077d-4563-a08a-499b61e01404.cfargotunnel.com"]
