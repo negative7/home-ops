@@ -86,10 +86,16 @@ spec:
 
     service:
       app:
+        annotations:
+          io.cilium/lb-ipam-ips: 10.2.0.101
         ports:
           http:
             port: 8123
             primary: true
+          h1:
+            port: 21065
+          h2:
+            port: 21063
           code-server:
             port: 12321
 
