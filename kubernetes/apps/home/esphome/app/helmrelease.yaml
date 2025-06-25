@@ -115,7 +115,7 @@ spec:
                     replacePrefixMatch: /
             backendRefs:
               - identifier: app
-                port: 12321
+                port: 12322
           - backendRefs:
               - identifier: app
                 port: 6052
