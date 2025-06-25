@@ -57,6 +57,11 @@ spec:
       enabled: false
     metricsScraper:
       enabled: true
+    # remove when https://github.com/kubernetes/dashboard/issues/9955 is fixed
+    kong:
+      image:
+        repository: kong
+        image: "3.9.0"
     extras:
       serviceMonitor:
         enabled: true
