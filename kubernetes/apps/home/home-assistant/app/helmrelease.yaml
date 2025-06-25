@@ -30,7 +30,7 @@ spec:
                 "name":"multus-iot",
                 "namespace": "network",
                 "ips": ["10.0.4.20/24"],
-                "mac": "e4:54:e8:9f:1c:12"
+                "mac": "e4:54:e8:9f:1c:20"
               }]
           securityContext:
             runAsUser: 65534
