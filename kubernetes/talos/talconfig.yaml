@@ -31,6 +31,14 @@ nodes:
         dhcp: true
         vip:
           ip: *talosControlplaneVip
+        vlans:
+          - &vlan4
+            vlanId: 4
+            mtu: 1500
+            dhcp: false
+            dhcpOptions:
+              routeMetric: 512
+
 
   - hostname: vinnytsia.homelab.internal
     ipAddress: 10.2.0.22
@@ -44,6 +52,8 @@ nodes:
         dhcp: true
         vip:
           ip: *talosControlplaneVip
+        vlans:
+          - *vlan4
 
 
   - hostname: dnipro.homelab.internal
@@ -58,6 +68,8 @@ nodes:
         dhcp: true
         vip:
           ip: *talosControlplaneVip
+        vlans:
+          - *vlan4
 
   - hostname: kyiv.homelab.internal
     ipAddress: 10.2.0.24
@@ -71,6 +83,8 @@ nodes:
         dhcp: true
         vip:
           ip: *talosControlplaneVip
+        vlans:
+          - *vlan4
 
 controlPlane:
   nodeLabels:

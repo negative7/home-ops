@@ -3,21 +3,30 @@
 version: "3"
 
 vars:
-  VOLSYNC_TASK_RESOURCES_DIR: "{{.ROOT_DIR}}/.taskfiles/volsync/resources"
+  VOLSYNC_RESOURCES_DIR: "{{.ROOT_DIR}}/.taskfiles/volsync/resources"
 
 tasks:
   unlock:
-    desc: Unlock all restic source repos
+    desc: Unlock a restic source repo from local machine [NS=default] [APP=required]
     preconditions:
-      - which kubectl
+      - which kubectl minijinja-cli stern
+      - test -f {{.VOLSYNC_RESOURCES_DIR}}/unlock.yaml.j2
+    requires:
+      vars:
+        - APP
     vars:
-      SOURCES:
-        sh: kubectl get replicationsources --all-namespaces --no-headers --output=jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}'
+      NS: >
+        {{.NS | default "default"}}
+      JOB: "volsync-unlock-{{ .APP }}"
+    env:
+      NS: "{{.NS}}"
+      APP: "{{.APP}}"
     cmds:
-      - for:
-          var: SOURCES
-          split: "\n"
-        cmd: kubectl --namespace {{splitList "," .ITEM | first}} patch --field-manager=flux-client-side-apply replicationsources {{splitList "," .ITEM | last}} --type merge --patch "{\"spec\":{\"restic\":{\"unlock\":\"{{now | unixEpoch}}\"}}}"
+      - minijinja-cli {{.VOLSYNC_RESOURCES_DIR}}/unlock.yaml.j2 | kubectl apply --server-side --filename -
+      - until kubectl --namespace {{.NS}} get job/{{ .JOB }} &>/dev/null; do sleep 5; done
+      - kubectl --namespace {{.NS}} wait job/{{ .JOB }} --for=condition=complete --timeout=5m
+      - stern --namespace {{.NS}} job/{{ .JOB }} --no-follow
+      - kubectl --namespace {{.NS}} delete job {{ .JOB }}
 
   list:
     desc: List snapshots for an app [NS=default] [APP=required]
@@ -29,7 +38,8 @@ tasks:
       vars:
         - APP
     vars:
-      NS: '{{.NS | default "default"}}'
+      NS: >
+        {{.NS | default "default"}}
       JOB: "list-snapshots-{{ .APP }}"
     env:
       NS: "{{.NS}}"
@@ -50,8 +60,10 @@ tasks:
       vars:
         - APP
     vars:
-      WAIT: '{{.WAIT | default "true"}}'
-      NS: '{{.NS | default "default"}}'
+      WAIT: >
+        {{.WAIT | default "true"}}
+      NS: >
+        {{.NS | default "default"}}
       JOB: volsync-src-{{.APP}}
     cmds:
       - kubectl --namespace {{.NS}} patch replicationsources {{.APP}} --type merge -p '{"spec":{"trigger":{"manual":"{{now | unixEpoch}}"}}}'
@@ -67,7 +79,7 @@ tasks:
     vars:
       ALL_APPS:
         sh: |
-          kubectl get replicationsources -A --no-headers -o jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}' | grep -v '\-r2'
+          kubectl get replicationsources -A --no-headers -o jsonpath='{range .items[*]}{.metadata.namespace},{.metadata.name}{"\n"}{end}'
     cmds:
       - for:
           var: ALL_APPS
@@ -75,8 +87,10 @@ tasks:
         task: snapshot
         vars:
           WAIT: "false"
-          NS: '{{splitList "," .ITEM | first}}'
-          APP: '{{splitList "," .ITEM | last}}'
+          NS: >
+            {{splitList "," .ITEM | first}}
+          APP: >
+            {{splitList "," .ITEM | last}}
 
   restore:
     desc: Restore an app [NS=default] [APP=required] [PREVIOUS=required]
@@ -88,7 +102,8 @@ tasks:
         - APP
         - PREVIOUS
     vars:
-      NS: '{{.NS | default "default"}}'
+      NS: >
+        {{.NS | default "default"}}
       CONTROLLER:
         sh: kubectl --namespace {{.NS}} get deployment {{.APP}} &>/dev/null && echo deployment || echo statefulset
     env:
