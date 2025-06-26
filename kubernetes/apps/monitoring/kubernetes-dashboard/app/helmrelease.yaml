@@ -61,7 +61,7 @@ spec:
     kong:
       image:
         repository: kong
-        tag: "3.9.0"
+        tag: "3.9.1"
     extras:
       serviceMonitor:
         enabled: true
