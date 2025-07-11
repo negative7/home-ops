@@ -15,8 +15,6 @@ spec:
         name: bjw-s-labs
         namespace: flux-system
   dependsOn:
-    - name: vernemq
-      namespace: database
     - name: rook-ceph-cluster
       namespace: rook-ceph
   values:
