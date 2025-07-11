@@ -15,6 +15,8 @@ spec:
         name: bjw-s-labs
         namespace: flux-system
   dependsOn:
+    - name: mosquitto
+      namespace: database
     - name: rook-ceph-cluster
       namespace: rook-ceph
   values:
@@ -59,9 +61,9 @@ spec:
               ZIGBEE2MQTT_CONFIG_AVAILABILITY_ENABLED: true
               ZIGBEE2MQTT_CONFIG_AVAILABILITY_ACTIVE_TIMEOUT: 60
               ZIGBEE2MQTT_CONFIG_AVAILABILITY_PASSIVE_TIMEOUT: 2000
-              ZIGBEE2MQTT_CONFIG_DEVICE_OPTIONS_LEGACY: 'false'
-              ZIGBEE2MQTT_CONFIG_DEVICE_OPTIONS_RETAIN: 'true'
-              ZIGBEE2MQTT_CONFIG_EXPERIMENTAL_NEW_API: 'true'
+              ZIGBEE2MQTT_CONFIG_DEVICE_OPTIONS_LEGACY: "false"
+              ZIGBEE2MQTT_CONFIG_DEVICE_OPTIONS_RETAIN: "true"
+              ZIGBEE2MQTT_CONFIG_EXPERIMENTAL_NEW_API: "true"
               ZIGBEE2MQTT_CONFIG_FRONTEND_ENABLED: true
               ZIGBEE2MQTT_CONFIG_FRONTEND_PORT: &httpPort 8080
               ZIGBEE2MQTT_CONFIG_FRONTEND_URL: https://zigbee2mqtt.negative7.com
@@ -75,18 +77,8 @@ spec:
               ZIGBEE2MQTT_CONFIG_MQTT_INCLUDE_DEVICE_INFORMATION: true
               ZIGBEE2MQTT_CONFIG_MQTT_KEEPALIVE: 60
               ZIGBEE2MQTT_CONFIG_MQTT_REJECT_UNAUTHORIZED: true
-              ZIGBEE2MQTT_CONFIG_MQTT_SERVER: "mqtt://vernemq-app.database.svc.cluster.local:1883"
+              ZIGBEE2MQTT_CONFIG_MQTT_SERVER: "mqtt://mosquitto.database.svc.cluster.local:1883"
               ZIGBEE2MQTT_CONFIG_MQTT_VERSION: 5
-              ZIGBEE2MQTT_CONFIG_MQTT_USER:
-                valueFrom:
-                  secretKeyRef:
-                    name: zigbee2mqtt-secret
-                    key: mqtt_user
-              ZIGBEE2MQTT_CONFIG_MQTT_PASSWORD:
-                valueFrom:
-                  secretKeyRef:
-                    name: zigbee2mqtt-secret
-                    key: mqtt_password
               ZIGBEE2MQTT_CONFIG_PERMIT_JOIN: false
               ZIGBEE2MQTT_CONFIG_SERIAL_DISABLE_LED: false
               ZIGBEE2MQTT_CONFIG_SERIAL_PORT: /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
