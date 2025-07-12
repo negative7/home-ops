@@ -91,7 +91,7 @@ spec:
               - name: nvme0n1
           - name: vinnytsia
             devices:
-              - name: sda
+              - name: nvme0n1
         config:
           osdsPerDevice: "1"
     cephBlockPools:
