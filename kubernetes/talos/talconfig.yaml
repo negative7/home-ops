@@ -25,7 +25,7 @@ nodes:
     nodeLabels:
       intel.feature.node.kubernetes.io/gpu: "true"
     installDiskSelector:
-      model: "CL1-3D256-Q11*"
+      model: "CT1000MX500SSD1"
     networkInterfaces:
       - interface: eno1
         dhcp: true
@@ -39,14 +39,13 @@ nodes:
             dhcpOptions:
               routeMetric: 512
 
-
   - hostname: vinnytsia.homelab.internal
     ipAddress: 10.2.0.22
     controlPlane: true
     nodeLabels:
       intel.feature.node.kubernetes.io/gpu: "true"
     installDiskSelector:
-      model: "KXG60ZNV256G*"
+      model: "SHGS31-1000GS-2"
     networkInterfaces:
       - interface: eno1
         dhcp: true
@@ -54,7 +53,6 @@ nodes:
           ip: *talosControlplaneVip
         vlans:
           - *vlan4
-
 
   - hostname: dnipro.homelab.internal
     ipAddress: 10.2.0.23
@@ -94,17 +92,17 @@ controlPlane:
   schematic:
     customization:
       extraKernelArgs:
-        - -init_on_alloc                      # Less security, faster puter
-        - -init_on_free                       # Less security, faster puter
-        - -selinux                            # Less security, faster puter
-        - apparmor=0                          # Less security, faster puter
-        - init_on_alloc=0                     # Less security, faster puter
-        - init_on_free=0                      # Less security, faster puter
-        - intel_iommu=on                      # PCI Passthrough
-        - iommu=pt                            # PCI Passthrough
-        - mitigations=off                     # Less security, faster puter
-        - security=none                       # Less security, faster puter
-        - talos.auditd.disabled=1             # Less security, faster puter
+        - -init_on_alloc # Less security, faster puter
+        - -init_on_free # Less security, faster puter
+        - -selinux # Less security, faster puter
+        - apparmor=0 # Less security, faster puter
+        - init_on_alloc=0 # Less security, faster puter
+        - init_on_free=0 # Less security, faster puter
+        - intel_iommu=on # PCI Passthrough
+        - iommu=pt # PCI Passthrough
+        - mitigations=off # Less security, faster puter
+        - security=none # Less security, faster puter
+        - talos.auditd.disabled=1 # Less security, faster puter
       systemExtensions:
         officialExtensions:
           - siderolabs/intel-ucode
@@ -126,7 +124,6 @@ controlPlane:
                 discard_unpacked_layers = false
               [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
                 discard_unpacked_layers = false
-
 
     # Disable search domain everywhere
     - |-
