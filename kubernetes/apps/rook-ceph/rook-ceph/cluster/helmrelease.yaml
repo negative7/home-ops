@@ -82,7 +82,7 @@ spec:
         nodes:
           - name: kharkiv
             devices:
-              - name: sda
+              - name: nvme0n1
           - name: dnipro
             devices:
               - name: nvme0n1
