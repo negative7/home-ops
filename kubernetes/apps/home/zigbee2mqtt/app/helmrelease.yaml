@@ -24,11 +24,6 @@ spec:
       zigbee2mqtt:
         annotations:
           reloader.stakater.com/auto: "true"
-
-        pod:
-          nodeSelector:
-            feature.node.kubernetes.io/usb-ff_1a86_7523.present: "true"
-
         containers:
           app:
             image:
