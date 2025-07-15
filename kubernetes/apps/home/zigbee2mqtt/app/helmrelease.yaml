@@ -81,7 +81,7 @@ spec:
               ZIGBEE2MQTT_CONFIG_MQTT_VERSION: 5
               ZIGBEE2MQTT_CONFIG_PERMIT_JOIN: false
               ZIGBEE2MQTT_CONFIG_SERIAL_DISABLE_LED: false
-              ZIGBEE2MQTT_CONFIG_SERIAL_PORT: /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
+              ZIGBEE2MQTT_CONFIG_SERIAL_PORT: tcp://10.0.4.113:6638
               ZIGBEE2MQTT_CONFIG_SERIAL_ADAPTER: zstack
             resources:
               requests:
@@ -160,8 +160,3 @@ spec:
               - path: /config
             code-server:
               - path: /config
-      usb:
-        enabled: true
-        type: hostPath
-        hostPath: /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
-        hostPathType: CharDevice
