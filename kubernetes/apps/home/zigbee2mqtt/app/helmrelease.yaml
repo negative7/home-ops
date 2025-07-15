@@ -105,7 +105,7 @@ spec:
               - --extensions-dir
               - /config/.code-server
               - --port
-              - "12323"
+              - "12321"
               - /config
             resources:
               requests:
