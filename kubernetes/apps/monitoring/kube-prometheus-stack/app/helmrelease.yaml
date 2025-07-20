@@ -146,5 +146,5 @@ spec:
             - prometheus.negative7.com
           parentRefs:
             - name: internal
-              namespace: kube-system
+              namespace: network
               sectionName: https
