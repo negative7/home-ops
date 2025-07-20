@@ -28,16 +28,16 @@ enableIPv4BIGTCP: true
 endpointRoutes:
   enabled: true
 envoy:
-  enabled: true
-  rollOutPods: true
-  debug:
-    admin:
-      enabled: true
+  enabled: false
+  # rollOutPods: true
+  # debug:
+  #   admin:
+  #     enabled: true
 gatewayAPI:
-  enabled: true
-  enableAlpn: true
-  enableAppProtocol: true
-  xffNumTrustedHops: 1
+  enabled: false
+  # enableAlpn: true
+  # enableAppProtocol: true
+  # xffNumTrustedHops: 1
 hubble:
   enabled: false
 ipam:
