@@ -98,7 +98,7 @@ spec:
           - kromgo.negative7.com
         parentRefs:
           - name: external
-            namespace: kube-system
+            namespace: network
             sectionName: https
         rules:
           - backendRefs:
