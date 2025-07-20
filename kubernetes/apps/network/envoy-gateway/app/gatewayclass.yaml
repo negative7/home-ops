@@ -10,12 +10,12 @@ spec:
     kind: EnvoyProxy
     name: proxy-config
     namespace: network
-# ---
-# apiVersion: gateway.envoyproxy.io/v1alpha1
-# kind: EnvoyProxy
-# metadata:
-#   name: proxy-config
-# spec:
-#   backendTLS:
-#     minVersion: "1.3"
-#     maxVersion: "1.3"
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: proxy-config
+spec:
+  backendTLS:
+    minVersion: "1.3"
+    maxVersion: "1.3"
