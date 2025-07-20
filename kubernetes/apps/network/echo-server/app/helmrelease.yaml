@@ -60,7 +60,7 @@ spec:
           - echo-server.negative7.com
         parentRefs:
           - name: internal
-            namespace: networking
+            namespace: network
             sectionName: https
         rules:
           - backendRefs:
