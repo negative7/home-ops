@@ -117,12 +117,6 @@ spec:
         path: /mnt/tank/data
         globalMounts:
           - path: /completed
-      temp:
-        type: emptyDir
-        advancedMounts:
-          sabnzbd:
-            app:
-              - path: /tmp
       tmpfs:
         type: emptyDir
         globalMounts:
