@@ -17,7 +17,7 @@ spec:
     remediation:
       retries: 3
   values:
-    alertmanagerAddress: http://alertmanager.monitoring.svc.cluster.local:9093
+    alertmanagerAddress: http://alertmanager-operated.monitoring.svc.cluster.local:9093
     image:
       registry: quay.io
       name: giantswarm/silence-operator
