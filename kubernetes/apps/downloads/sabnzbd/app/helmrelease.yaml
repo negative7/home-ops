@@ -123,6 +123,13 @@ spec:
           sabnzbd:
             app:
               - path: /tmp
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /config/logs
+            subPath: logs
+          - path: /tmp
+            subPath: tmp
       ephemeral:
         type: custom
         volumeSpec:
