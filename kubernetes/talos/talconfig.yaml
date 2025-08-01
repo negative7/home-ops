@@ -183,6 +183,10 @@ controlPlane:
           config:
             apiVersion: kubescheduler.config.k8s.io/v1
             kind: KubeSchedulerConfiguration
+              plugins:
+                score:
+                  disabled:
+                    - name: ImageLocality
             profiles:
               - schedulerName: default-scheduler
                 pluginConfig:
