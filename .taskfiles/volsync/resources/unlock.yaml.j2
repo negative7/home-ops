@@ -16,11 +16,21 @@ spec:
           args: ["unlock", "--remove-all"]
           envFrom:
             - secretRef:
-                name: {{ ENV.APP }}-volsync-nfs
+                name: {{ ENV.APP }}-volsync-minio
           volumeMounts:
             - name: repository
               mountPath: /repository
           resources: {}
+        - name: minio
+          image: docker.io/restic/restic:latest
+          args: ["unlock", "--remove-all"]
+          envFrom:
+            - secretRef:
+                name: {{ ENV.APP }}-volsync-minio
+          volumeMounts:
+            - name: repository
+              mountPath: /repository
+          resources: {} #}
       volumes:
         - name: repository
           nfs:
