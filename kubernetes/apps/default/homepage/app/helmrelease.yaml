@@ -33,6 +33,9 @@ spec:
             image:
               repository: ghcr.io/gethomepage/homepage
               tag: v0.10.9
+            envFrom:
+              - secretRef:
+                  name: homepage-secret
             env:
               HOMEPAGE_PORT: &httpPort 3000
             probes:

@@ -15,6 +15,10 @@ data:
   services.yaml: |
     ---
     - Media:
+        - Plex:
+            icon: plex.png
+            href: https://plex.negative7.com
+            description: Plex Server
         - Jellyfin:
             icon: jellyfin.png
             href: https://jellyfin.negative7.com
