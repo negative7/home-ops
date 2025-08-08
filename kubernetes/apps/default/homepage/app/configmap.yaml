@@ -22,7 +22,7 @@ data:
             widget:
               type: plex
               url: https://plex.negative7.com
-              token: {{HOMEPAGE_VAR_PLEX_TOKEN}}
+              token: "{{HOMEPAGE_VAR_PLEX_TOKEN}}"
         - Jellyfin:
             icon: jellyfin.png
             href: https://jellyfin.negative7.com
