@@ -38,6 +38,7 @@ spec:
                   name: homepage-secret
             env:
               HOMEPAGE_PORT: &httpPort 3000
+              HOMEPAGE_ALLOWED_HOSTS: homepage.negative7.com
             probes:
               startup:
                 enabled: true
