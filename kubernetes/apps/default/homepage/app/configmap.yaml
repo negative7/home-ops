@@ -21,7 +21,7 @@ data:
             description: Plex Server
             widget:
               type: plex
-              url: http://plex.media.svc.cluster.local:32400
+              url: http://plex.negative7.com
               token: {{HOMEPAGE_VAR_PLEX_TOKEN}}
         - Jellyfin:
             icon: jellyfin.png
