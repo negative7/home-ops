@@ -44,14 +44,21 @@ spec:
             value: /
 
 ---
-apiVersion: v1
-kind: Endpoints
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
 metadata:
-  name: adguard
-subsets:
+  name: &app adguard
+  namespace: network
+  labels:
+    app.kubernetes.io/name: *app
+    kubernetes.io/service-name: *app
+addressType: IPv4
+ports:
+  - name: http
+    port: 80
+    protocol: TCP
+endpoints:
   - addresses:
       - 10.0.5.3
-    ports:
-      - name: http
-        port: 3000
-        protocol: TCP
+    conditions:
+      ready: true
