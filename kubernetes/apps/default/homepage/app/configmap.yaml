@@ -19,6 +19,10 @@ data:
             icon: plex.png
             href: https://plex.negative7.com
             description: Plex Server
+            widget:
+              type: plex
+              url: http://plex.media.svc.cluster.local:32400
+              token: {{HOMEPAGE_VAR_PLEX_TOKEN}}
         - Jellyfin:
             icon: jellyfin.png
             href: https://jellyfin.negative7.com
@@ -28,7 +32,7 @@ data:
               url: http://jellyfin.media.svc.cluster.local:8096
               key: {{HOMEPAGE_VAR_JELLYFIN_KEY}}
               enableNowPlaying: true
-        - Ombi:
+        - Requests:
             icon: overseerr.png
             href: https://requests.negative7.com
             description: Media Requests
