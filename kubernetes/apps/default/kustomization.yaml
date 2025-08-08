@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: default
 resources:
   - ./actual/ks.yaml
+  - ./homepage/ks.yaml
   - ./atuin/ks.yaml
   - ./n8n/ks.yaml
   - ./vikunja/ks.yaml
