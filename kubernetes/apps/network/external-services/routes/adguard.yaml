@@ -55,7 +55,7 @@ metadata:
 addressType: IPv4
 ports:
   - name: http
-    port: 9000
+    port: 80
     protocol: TCP
 endpoints:
   - addresses:
