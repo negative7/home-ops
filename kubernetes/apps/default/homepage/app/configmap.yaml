@@ -20,9 +20,9 @@ data:
             href: https://plex.negative7.com
             description: Plex Server
             widget:
-              type: plex
-              url: https://plex.negative7.com
-              token: {{HOMEPAGE_VAR_PLEX_TOKEN}}
+              type: tautulli
+              url: http://tautulli.media.svc.cluster.local:8096
+              token: {{HOMEPAGE_VAR_TAUTULLI}}
         - Jellyfin:
             icon: jellyfin.png
             href: https://jellyfin.negative7.com
