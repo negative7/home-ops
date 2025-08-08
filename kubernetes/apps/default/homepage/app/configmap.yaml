@@ -23,6 +23,8 @@ data:
               type: tautulli
               url: http://tautulli.media.svc.cluster.local:8096
               token: {{HOMEPAGE_VAR_TAUTULLI}}
+              enableUser: true # optional, defaults to false
+              showEpisodeNumber: true # optional, defaults to false
         - Jellyfin:
             icon: jellyfin.png
             href: https://jellyfin.negative7.com
