@@ -63,7 +63,7 @@ data:
             description: Ad Blocking DNS
             widget:
               type: adguard
-              url: https://adguard.negative7.com
+              url: http://10.0.5.3
               username: {{HOMEPAGE_VAR_AGH_USERNAME}}
               password: {{HOMEPAGE_VAR_AGH_PASSWORD}}
     - Favorites:
