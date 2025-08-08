@@ -121,4 +121,4 @@ data:
           showLabel: true
           label: home-cluster
         nodes:
-          show: true
+          show: false
