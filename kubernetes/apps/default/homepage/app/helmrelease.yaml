@@ -35,11 +35,6 @@ spec:
               tag: v0.10.9
             env:
               HOMEPAGE_PORT: &httpPort 3000
-              HASS_TOKEN:
-                valueFrom:
-                  secretKeyRef:
-                    name: homepage-secret
-                    key: HASS_TOKEN
             probes:
               startup:
                 enabled: true
