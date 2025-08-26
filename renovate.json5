@@ -9,6 +9,7 @@
     "github>negative7/home-ops//.github/renovate/grafanaDashboards.json5",
     "github>negative7/home-ops//.github/renovate/groups.json5",
     "github>negative7/home-ops//.github/renovate/labels.json5",
+    "github>negative7/home-ops//.github/renovate/overrides.json5",
     "github>negative7/home-ops//.github/renovate/semanticCommits.json5",
     ":automergeBranch",
     ":disableRateLimiting",
@@ -34,4 +35,12 @@
   kubernetes: {
     managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml$/"]
   },
+  packageRules: [
+    {
+      description: "Configure prompp versioning",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["docker.io/prompp/prompp"],
+      versioning: "regex:^(?<build>.*)-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
+    },
+  ],
 }
