@@ -1,0 +1,160 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/refs/heads/release-1.10/website/content/v1.10/schemas/config.schema.json
+version: v1alpha1
+machine:
+  ca:
+    crt: op://home-cluster/home-ops/MACHINE_CA_CRT
+    key: op://home-cluster/home-ops/MACHINE_CA_KEY
+  features:
+    apidCheckExtKeyUsage: true
+    diskQuotaSupport: true
+    hostDNS:
+      enabled: true
+      forwardKubeDNSToHost: false
+      resolveMemberNames: true
+    kubePrism:
+      enabled: true
+      port: 7445
+    kubernetesTalosAPIAccess:
+      enabled: true
+      allowedRoles:
+        - os:admin
+      allowedKubernetesNamespaces:
+        - actions-runner-system
+        - system-upgrade
+    rbac: true
+    stableHostname: true
+  files:
+    - op: create
+      path: /etc/cri/conf.d/20-customization.part
+      content: |-
+        [plugins]
+          [plugins."io.containerd.grpc.v1.cri"]
+            enable_unprivileged_ports = true
+            enable_unprivileged_icmp = true
+        [plugins."io.containerd.cri.v1.images"]
+          discard_unpacked_layers = false
+        [plugins."io.containerd.cri.v1.runtime"]
+          device_ownership_from_security_context = true
+    - op: overwrite
+      path: /etc/nfsmount.conf
+      permissions: 0o644
+      content: |
+        [ NFSMount_Global_Options ]
+        nfsvers=4.2
+        hard=True
+        noatime=True
+        nconnect=16
+  install:
+    image: factory.talos.dev/metal-installer/4b3cd373a192c8469e859b7a0cfbed3ecc3577c4a2d346a37b0aeff9cd17cdb0:v1.11.0-rc.0
+  kubelet:
+    defaultRuntimeSeccompProfileEnabled: true
+    disableManifestsDirectory: true
+    extraConfig:
+      maxPods: 150
+      serializeImagePulls: false
+    image: ghcr.io/siderolabs/kubelet:v1.33.4
+    nodeIP:
+      validSubnets:
+        - 10.2.0.0/24
+  network:
+    disableSearchDomain: true
+    extraHostEntries:
+      - ip: 10.2.0.20
+        aliases:
+          - k8s.homelab.internal
+  sysctls:
+    fs.inotify.max_user_instances: "8192"
+    fs.inotify.max_user_watches: "1048576"
+    net.core.rmem_max: "67108864"
+    net.core.wmem_max: "67108864"
+    net.ipv4.neigh.default.gc_thresh1: "4096"
+    net.ipv4.neigh.default.gc_thresh2: "8192"
+    net.ipv4.neigh.default.gc_thresh3: "16384"
+    net.ipv4.tcp_fastopen: "3"
+    user.max_user_namespaces: "11255"
+  time:
+    disabled: false
+    servers:
+      - 10.0.1.10
+  token: op://home-cluster/home-ops/MACHINE_TOKEN
+  type: controlplane
+cluster:
+  aggregatorCA:
+    crt: op://home-cluster/home-ops/CLUSTER_AGGREGATORCA_CRT
+    key: op://home-cluster/home-ops/CLUSTER_AGGREGATORCA_KEY
+  allowSchedulingOnControlPlanes: true
+  apiServer:
+    image: registry.k8s.io/kube-apiserver:v1.33.4
+    extraArgs:
+      enable-aggregator-routing: "true"
+      feature-gates: MutatingAdmissionPolicy=true
+      runtime-config: admissionregistration.k8s.io/v1alpha1=true
+    certSANs:
+      - k8s.homelab.internal
+      - 127.0.0.1 # KubePrism
+    disablePodSecurityPolicy: true
+  ca:
+    crt: op://home-cluster/home-ops/CLUSTER_CA_CRT
+    key: op://home-cluster/home-ops/CLUSTER_CA_KEY
+  controllerManager:
+    image: registry.k8s.io/kube-controller-manager:v1.33.4
+    extraArgs:
+      bind-address: 0.0.0.0
+  controlPlane:
+    endpoint: https://k8s.homelab.internal:6443
+  coreDNS:
+    disabled: true
+  clusterName: home-ops
+  discovery:
+    enabled: true
+    registries:
+      kubernetes:
+        disabled: true
+      service:
+        disabled: false
+  etcd:
+    advertisedSubnets:
+      - 10.2.0.0/24
+    ca:
+      crt: op://home-cluster/home-ops/CLUSTER_ETCD_CA_CRT
+      key: op://home-cluster/home-ops/CLUSTER_ETCD_CA_KEY
+    extraArgs:
+      listen-metrics-urls: http://0.0.0.0:2381
+  id: op://home-cluster/home-ops/CLUSTER_ID
+  network:
+    cni:
+      name: none
+    dnsDomain: cluster.local
+    podSubnets:
+      - 10.244.0.0/16
+    serviceSubnets:
+      - 10.96.0.0/12
+  proxy:
+    disabled: true
+  scheduler:
+    config:
+      apiVersion: kubescheduler.config.k8s.io/v1
+      kind: KubeSchedulerConfiguration
+      profiles:
+        - pluginConfig:
+            - args:
+                defaultConstraints:
+                  - maxSkew: 1
+                    topologyKey: kubernetes.io/hostname
+                    whenUnsatisfiable: ScheduleAnyway
+                defaultingType: List
+              name: PodTopologySpread
+          plugins:
+            score:
+              disabled:
+                - name: ImageLocality
+          schedulerName: default-scheduler
+    extraArgs:
+      bind-address: 0.0.0.0
+    image: registry.k8s.io/kube-scheduler:v1.33.4
+  secret: op://home-cluster/home-ops/CLUSTER_SECRET
+  secretboxEncryptionSecret: op://home-cluster/home-ops/CLUSTER_SECRETBOXENCRYPTIONSECRET
+  serviceAccount:
+    key: op://home-cluster/home-ops/CLUSTER_SERVICEACCOUNT_KEY
+  token: op://home-cluster/home-ops/CLUSTER_TOKEN

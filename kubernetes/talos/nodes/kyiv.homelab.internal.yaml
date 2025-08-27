@@ -1,0 +1,37 @@
+---
+machine:
+  install:
+    diskSelector:
+      model: CT1000MX500SSD1
+  network:
+    hostname: kyiv.homelab.internal
+    interfaces:
+      - interface: eno1
+        vlans:
+          - routes: []
+            dhcp: false
+            vlanId: 4
+            mtu: 1500
+            dhcpOptions:
+              routeMetric: 512
+        dhcp: true
+        vip:
+          ip: 10.2.0.20
+  nodeLabels:
+    intel.feature.node.kubernetes.io/gpu: "true"
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  diskSelector:
+    match: system_disk
+  maxSize: 512GiB
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-hostpath
+provisioning:
+  diskSelector:
+    match: system_disk
+  maxSize: 256GiB
