@@ -43,7 +43,7 @@ tasks:
           var: NODES
         task: apply-node
         vars:
-          NODE: "{{.ITEM}}"
+          NODE: "{{.ITEM}}.homelab.internal"
           DRYRUN: >-
             {{.DRYRUN | default "false"}}
 

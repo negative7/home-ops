@@ -6,4 +6,4 @@ resources:
   - ./helmrepository.yaml
   - ./helmrelease.yaml
   - ./prometheusrule.yaml
-  - ./mutatingadmissionpolicy.yaml
+  # - ./mutatingadmissionpolicy.yaml
