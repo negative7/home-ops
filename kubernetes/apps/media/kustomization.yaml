@@ -6,7 +6,7 @@ namespace: media
 resources:
   - ./jellyfin/ks.yaml
   - ./maintainerr/ks.yaml
-  - ./overseerr/ks.yaml
+  - ./jellyseerr/ks.yaml
   - ./plex/ks.yaml
   - ./tautulli/ks.yaml
 components:
