@@ -22,6 +22,10 @@ prune-pods:
     kubectl delete pods -A --field-selector status.phase="$phase" --ignore-not-found=true; \
   done
 
+[doc('View a secret')]
+view-secret namespace secret:
+    kubectl view-secret -n {{ namespace }} {{ secret }}
+
 [doc('Sync single Flux HelmRelease')]
 sync-hr ns name:
   kubectl -n "{{ ns }}" annotate --field-manager flux-client-side-apply --overwrite hr "{{ name }}" reconcile.fluxcd.io/requestedAt="$(date +%s)" reconcile.fluxcd.io/forceAt="$(date +%s)"; \
@@ -34,20 +38,32 @@ sync-ks ns name:
 sync-es ns name:
   kubectl -n "{{ ns }}" annotate --field-manager flux-client-side-apply --overwrite es "{{ name }}" force-sync="$(date +%s)"; \
 
-[doc('Sync all Flux HelmReleases')]
-sync-all-hr:
-  kubectl get hr --no-headers -A | while read -r ns name _; do \
-    just k8s sync-hr "$ns" "$name"; \
-  done
-
-[doc('Sync all Flux Kustomizations')]
-sync-all-ks:
-  kubectl get ks --no-headers -A | while read -r ns name _; do \
-    just k8s sync-ks "$ns" "$name"; \
-  done
-
-[doc('Sync all ExternalSecrets')]
+[doc('Sync ExternalSecrets')]
 sync-all-es:
-  kubectl get es --no-headers -A | while read -r ns name _; do \
-    just k8s sync-es "$ns" "$name"; \
-  done
+    kubectl get es --no-headers -A | while read -r ns name _; do \
+        kubectl -n "$ns" annotate --field-manager flux-client-side-apply --overwrite es "$name" force-sync="$(date +%s)"; \
+    done
+
+[doc('Sync GitRepositories')]
+sync-all-git:
+    kubectl get gitrepo --no-headers -A | while read -r ns name _; do \
+        kubectl -n "$ns" annotate --field-manager flux-client-side-apply --overwrite gitrepo "$name" reconcile.fluxcd.io/requestedAt="$(date +%s)"; \
+    done
+
+[doc('Sync HelmReleases')]
+sync-all-hr:
+    kubectl get hr --no-headers -A | while read -r ns name _; do \
+        kubectl -n "$ns" annotate --field-manager flux-client-side-apply --overwrite hr "$name" reconcile.fluxcd.io/requestedAt="$(date +%s)" reconcile.fluxcd.io/forceAt="$(date +%s)"; \
+    done
+
+[doc('Sync Kustomizations')]
+sync-all-ks:
+    kubectl get ks --no-headers -A | while read -r ns name _; do \
+        kubectl -n "$ns" annotate --field-manager flux-client-side-apply --overwrite ks "$name" reconcile.fluxcd.io/requestedAt="$(date +%s)"; \
+    done
+
+[doc('Sync OCIRepositories')]
+sync-all-oci:
+    kubectl get ocirepo --no-headers -A | while read -r ns name _; do \
+        kubectl -n "$ns" annotate --field-manager flux-client-side-apply --overwrite ocirepo "$name" reconcile.fluxcd.io/requestedAt="$(date +%s)"; \
+    done

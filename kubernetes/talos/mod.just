@@ -7,7 +7,7 @@ controller := `talosctl config info --output json | jq --raw-output '.endpoints[
 
 [private]
 default:
-  just -l
+  just -l talos
 
 [doc('Apply Talos config to a node')]
 apply-node node *args:
@@ -19,6 +19,7 @@ apply-cluster *args:
     just log info "Applying Talos config to node ${node}"; \
     just talos apply-node ${node} {{ args }}; \
   done
+
 
 [doc('Generate kubeconfig for Talos cluster')]
 gen-kubeconfig:
