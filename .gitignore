@@ -8,8 +8,12 @@ testing/
 Thumbs.db
 
 # Sops
+.venv/
+*.crt
+*.env
+*.iso
+*.key
 .decrypted~*
-
 
 # Other files
 *.iso
