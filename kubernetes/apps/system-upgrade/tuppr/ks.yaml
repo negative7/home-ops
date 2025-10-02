@@ -3,43 +3,47 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname system-upgrade-controller
+  name: &appname tuppr
   namespace: &namespace system-upgrade
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 30m
-  timeout: 5m
-  path: "./kubernetes/apps/system-upgrade/system-upgrade-controller/app"
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: *appname
+      namespace: *namespace
+  interval: 1h
+  path: "./kubernetes/apps/system-upgrade/tuppr/app"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  wait: true
+  targetNamespace: *namespace
+  timeout: 5m
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname system-upgrade-controller-plans
+  name: &appname tuppr-upgrades
   namespace: &namespace system-upgrade
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
       app.kubernetes.io/name: *appname
-  interval: 30m
-  timeout: 5m
-  path: "./kubernetes/apps/system-upgrade/system-upgrade-controller/plans"
+  dependsOn:
+    - name: tuppr
+      namespace: system-upgrade
+  interval: 1h
+  path: "./kubernetes/apps/system-upgrade/tuppr/upgrades"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
   wait: false
-  dependsOn:
-    - name: system-upgrade-controller
-      namespace: system-upgrade
