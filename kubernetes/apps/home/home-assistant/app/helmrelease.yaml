@@ -5,13 +5,10 @@ kind: HelmRelease
 metadata:
   name: home-assistant
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: home-assistant
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
+  interval: 30m
   values:
     controllers:
       home-assistant:
@@ -28,11 +25,10 @@ spec:
                 "mac": "e4:54:e8:9f:1c:20"
               }]
           securityContext:
-            runAsUser: 65534
-            runAsGroup: 65533
             fsGroup: 65533
             fsGroupChangePolicy: OnRootMismatch
-
+            runAsGroup: 65533
+            runAsUser: 65534
         containers:
           app:
             image:
@@ -40,12 +36,9 @@ spec:
               tag: 2025.10.1
             env:
               VENV_FOLDER: /venv
-            envFrom:
-              - secretRef:
-                  name: home-assistant-secret
             resources:
               requests:
-                cpu: 47m
+                cpu: 100m
                 memory: 2Gi
               limits:
                 memory: 2Gi
@@ -55,7 +48,6 @@ spec:
               capabilities:
                 drop:
                   - ALL
-
           code-server:
             image:
               repository: ghcr.io/coder/code-server
@@ -76,23 +68,24 @@ spec:
               HASS_SERVER: http://localhost:8123
             resources:
               requests:
-                cpu: 10m
-              limits:
+                cpu: 100m
                 memory: 1Gi
+              limits:
+                memory: 2Gi
 
     service:
       app:
-        type: LoadBalancer
-        annotations:
-          io.cilium/lb-ipam-ips: 10.2.0.101
         ports:
           http:
+            appProtocol: kubernetes.io/wss
             port: 8123
-            primary: true
           h1:
             port: 21065
           h2:
             port: 21063
+        primary: true
+      code-server:
+        ports:
           code-server:
             port: 12321
 
