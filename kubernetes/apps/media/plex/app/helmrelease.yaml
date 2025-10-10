@@ -83,7 +83,7 @@ spec:
         hostnames:
           - plex.negative7.com
         parentRefs:
-          - name: external
+          - name: envoy-external
             namespace: network
             sectionName: https
         rules:

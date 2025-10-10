@@ -90,7 +90,7 @@ spec:
         hostnames:
           - sabnzbd.negative7.com
         parentRefs:
-          - name: internal
+          - name: envoy-internal
             namespace: network
             sectionName: https
         rules:

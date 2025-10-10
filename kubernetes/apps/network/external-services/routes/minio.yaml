@@ -48,7 +48,7 @@ spec:
   hostnames:
     - minio.negative7.com
   parentRefs:
-    - name: internal
+    - name: envoy-internal
       namespace: network
       sectionName: https
   rules:
@@ -74,7 +74,7 @@ spec:
   hostnames:
     - minio-ui.negative7.com
   parentRefs:
-    - name: internal
+    - name: envoy-internal
       namespace: network
       sectionName: https
   rules:
