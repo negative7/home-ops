@@ -79,10 +79,10 @@ spec:
           http:
             appProtocol: kubernetes.io/wss
             port: 8123
-          h1:
-            port: 21065
-          h2:
-            port: 21063
+          # h1:
+          #   port: 21065
+          # h2:
+          #   port: 21063
         primary: true
       code-server:
         ports:
