@@ -12,11 +12,5 @@ resources:
   - ./vikunja/ks.yaml
 components:
   - ../../components/namespace
-  - ../../components/flux/alerts
-patches:
-  - patch: |
-      - op: add
-        path: /metadata/name
-        value: default
-    target:
-      kind: Namespace
+replacements:
+  - path: ../../components/replacements/ks.yaml
