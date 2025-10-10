@@ -4,6 +4,7 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: envoy-gateway
+  namespace: network
 spec:
   interval: 10m
   layerSelector:
