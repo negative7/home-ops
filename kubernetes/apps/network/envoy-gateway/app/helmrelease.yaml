@@ -3,14 +3,23 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: envoy-gateway-operator
+  name: envoy-gateway
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
-    name: envoy-gateway-operator
+    name: envoy-gateway
+  install:
+    crds: CreateReplace
+  interval: 30m
+  upgrade:
+    crds: CreateReplace
   values:
     config:
       envoyGateway:
-        gateway:
-          controllerName: gateway.envoyproxy.io/gatewayclass-controller
+        provider:
+          type: Kubernetes
+          kubernetes:
+            deploy:
+              type: GatewayNamespace
+    global:
+      imageRegistry: mirror.gcr.io
