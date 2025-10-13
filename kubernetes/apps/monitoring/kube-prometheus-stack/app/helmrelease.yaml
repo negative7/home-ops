@@ -5,21 +5,14 @@ kind: HelmRelease
 metadata:
   name: kube-prometheus-stack
 spec:
-  interval: 30m
-  timeout: 15m
   chartRef:
     kind: OCIRepository
     name: kube-prometheus-stack
-  install:
-    crds: Skip
-  upgrade:
-    crds: Skip
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
+  interval: 30m
+  timeout: 15m
   values:
     crds:
-      enabled: false
+      enabled: true
     cleanPrometheusOperatorObjectNames: true
 
     ###
@@ -30,7 +23,7 @@ spec:
         main:
           enabled: true
           hostnames:
-            - alert-manager.negative7.com
+            - alertmanager.negative7.com
           parentRefs:
             - name: envoy-internal
               namespace: network
@@ -40,7 +33,7 @@ spec:
           name: alertmanager
           global:
             resolveTimeout: 5m
-        externalUrl: https://alert-manager.negative7.com
+        externalUrl: https://alertmanager.negative7.com
         storage:
           volumeClaimTemplate:
             spec:
@@ -128,10 +121,12 @@ spec:
     ###
     prometheus:
       prometheusSpec:
+        externalUrl: https://prometheus.negative7.com
+        version: v2.55.1 # override 'unsupported Prometheus version' error
         image:
           registry: docker.io
           repository: prompp/prompp
-          tag: 2.53.2-0.4.0
+          tag: 0.6.0
         securityContext:
           runAsNonRoot: true
           runAsUser: 64535
