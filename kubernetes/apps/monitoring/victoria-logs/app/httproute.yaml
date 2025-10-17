@@ -5,7 +5,7 @@ metadata:
   name: victoria-logs-server
 spec:
   hostnames:
-    - logs.bjw-s.dev
+    - logs.negative7.com
   parentRefs:
     - name: envoy-internal
       namespace: network
