@@ -95,7 +95,7 @@ spec:
         config:
           osdsPerDevice: "1"
     cephBlockPools:
-      - name: ceph-blockpool2
+      - name: ceph-blockpool
         spec:
           failureDomain: host
           replicated:
