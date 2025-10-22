@@ -4,4 +4,4 @@ kind: Kustomization
 namespace: networking
 resources:
   - ./adguard.yaml
-  - ./minio.yaml
+  - ./doco.yaml
