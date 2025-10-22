@@ -1,0 +1,9 @@
+---
+name: node-exporter
+working_dir: docker/truenas/node-exporter
+---
+name: smartctl-exporter
+working_dir: docker/truenas/smartctl-exporter
+---
+name: nginx-proxy-manager
+working_dir: docker/truenas/nginx-proxy-manager

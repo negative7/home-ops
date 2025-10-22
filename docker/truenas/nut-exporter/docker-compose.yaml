@@ -1,0 +1,12 @@
+---
+services:
+  nut_exporter:
+    # renovate: datasource=docker depName=ghcr.io/druggeri/nut_exporter
+    image:  ghcr.io/druggeri/nut_exporter:3.2.0
+    container_name: nut_exporter
+    restart: unless-stopped
+    command:
+      - '--nut.server=10.0.1.10'
+      - '--log.level=debug'
+      - '--nut.vars_enable=battery.charge,battery.runtime,ups.status,ups,input.voltage,battery.voltage'
+    network_mode: "host"
