@@ -1,27 +1,17 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
-apiVersion: helm.toolkit.fluxcd.io/v2
+piVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: externaldns-cloudflare
 spec:
+  chartRef:
+    kind: OCIRepository
+    name: externaldns-cloudflare
   interval: 30m
-  chart:
-    spec:
-      chart: external-dns
-      version: 1.16.0
-      sourceRef:
-        kind: HelmRepository
-        name: external-dns-cloudflare
-      interval: 30m
-  install:
-    crds: CreateReplace
-    disableSchemaValidation: true # Ref: https://github.com/kubernetes-sigs/external-dns/issues/5206
-  upgrade:
-    crds: CreateReplace
-    disableSchemaValidation: true # Ref: https://github.com/kubernetes-sigs/external-dns/issues/5206
   values:
     fullnameOverride: &name externaldns-cloudflare
+    logLevel: info
     domainFilters:
       - negative7.com
     env:
@@ -35,7 +25,7 @@ spec:
       - --cloudflare-proxied
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
-      - --gateway-name=external
+      - --gateway-name=envoy-external
     podAnnotations:
       secret.reloader.stakater.com/reload: externaldns-cloudflare-secrets
     policy: sync
@@ -63,7 +53,7 @@ spec:
               version: v1
               kind: Deployment
               name: *name
-            patch: |
+            patch: |-
               - op: add
                 path: /spec/template/spec/enableServiceLinks
                 value: false
