@@ -7,45 +7,50 @@ controller := `talosctl config info --output json | jq --raw-output '.endpoints[
 nodes := `talosctl config info -o yaml | yq -e '.nodes | join (" ")'`
 
 [private]
-default: talos kubernetes kubeconfig wait namespaces resources crds apps
+default: namespaces resources crds apps
 
-[doc('Install Talos')]
-talos:
-  just log info "Running stage..." "stage" "$0"
-  for n in {{ nodes }}; do \
-    if ! op=$(just talos apply-node "$n" --insecure 2>&1); then \
-      if [[ "$op" == *"certificate required"* ]]; then \
-        just log info "Talos already configured, skipping apply of config" "stage" "$0" "node" "$n"; \
-        continue; \
-      fi; \
-      just log fatal "Failed to apply Talos configuration" "stage" "$0" "node" "$n" "output" "$op"; \
-    fi; \
-  done
+# [doc('Install Talos')]
+# talos:
+#   just log info "Running stage..." "stage" "$0"
+#   for n in {{ nodes }}; do \
+#     if ! op=$(just talos apply-node "$n" --insecure 2>&1); then \
+#       if [[ "$op" == *"certificate required"* ]]; then \
+#         just log info "Talos already configured, skipping apply of config" "stage" "$0" "node" "$n"; \
+#         continue; \
+#       fi; \
+#       just log fatal "Failed to apply Talos configuration" "stage" "$0" "node" "$n" "output" "$op"; \
+#     fi; \
+#   done
 
-[doc('Install Kubernetes')]
-kubernetes:
-  just log info "Running stage..." "stage" "$0"
-  until op=$(talosctl -n "{{ controller }}" bootstrap 2>&1 || true) && [[ "$op" == *"AlreadyExists"* ]]; do \
-    just log info "Kubernetes bootstrap in progress. Retrying in 5 seconds..." "stage" "$0"; \
-    sleep 5; \
-  done
+# [doc('Install Kubernetes')]
+# kubernetes:
+#   just log info "Running stage..." "stage" "$0"
+#   until op=$(talosctl -n "{{ controller }}" bootstrap 2>&1 || true) && [[ "$op" == *"AlreadyExists"* ]]; do \
+#     just log info "Kubernetes bootstrap in progress. Retrying in 5 seconds..." "stage" "$0"; \
+#     sleep 5; \
+#   done
 
-[doc('Fetch kubeconfig for the Talos cluster')]
-kubeconfig:
-  just log info "Running stage..." "stage" "$0"
-  if ! just talos gen-kubeconfig; then \
-    just log fatal "Failed to fetch kubeconfig" "stage" "$0"; \
-  fi
+# [doc('Fetch kubeconfig')]
+# kubeconfig lb="cilium":
+#   just log info "Running stage..." "stage" "$0"
+#   if ! talosctl kubeconfig -n "{{ controller }}" -f --force-context-name home-ops {{ justfile_dir() }}; then \
+#     just log fatal "Failed to fetch kubeconfig" "stage" "$0"; \
+#   fi
+#   if [[ "{{ lb }}" != "cilium" ]]; then \
+#     if ! kubectl config set-cluster home-ops --server "https://{{ controller }}:6443"; then \
+#       just log fatal "Failed to set kubectl cluster server address" "stage" "$0"; \
+#     fi; \
+#   fi
 
-[doc('Wait for nodes to be not-ready')]
-wait:
-  just log info "Running stage..." "stage" "$0"
-  if ! kubectl wait nodes --for=condition=Ready=True --all --timeout=10s &>/dev/null; then \
-    until kubectl wait nodes --for=condition=Ready=False --all --timeout=10s &>/dev/null; do \
-      just log info "Nodes not available, waiting for nodes to be available. Retrying in 5 seconds..." "stage" "$0"; \
-      sleep 5; \
-    done \
-  fi
+# [doc('Wait for nodes to be not-ready')]
+# wait:
+#   just log info "Running stage..." "stage" "$0"
+#   if ! kubectl wait nodes --for=condition=Ready=True --all --timeout=10s &>/dev/null; then \
+#     until kubectl wait nodes --for=condition=Ready=False --all --timeout=10s &>/dev/null; do \
+#       just log info "Nodes not available, waiting for nodes to be available. Retrying in 5 seconds..." "stage" "$0"; \
+#       sleep 5; \
+#     done \
+#   fi
 
 [doc('Apply Kubernetes namespaces')]
 namespaces:
