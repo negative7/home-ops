@@ -4,7 +4,7 @@ originRequest:
 
 ingress:
   - hostname: negative7.com
-    service: &svc https://envoy-external.cloudflared.svc.cluster.local:443
+    service: &svc https://envoy-external.network.svc.cluster.local:443
   - hostname: "*.negative7.com"
     service: *svc
   - service: http_status:404
