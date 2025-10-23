@@ -59,10 +59,11 @@ spec:
                 drop:
                   - ALL
             resources:
+              claims:
+                - name: gpu
               requests:
                 cpu: 100m
               limits:
-                gpu.intel.com/i915: 1
                 memory: 9248M
 
     service:
