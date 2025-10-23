@@ -19,6 +19,9 @@ spec:
           reloader.stakater.com/auto: "true"
 
         pod:
+          resourceClaims:
+            - name: gpu
+              resourceClaimTemplateName: scrypted-gpu
           hostNetwork: true
           securityContext:
             runAsUser: 2000
@@ -40,11 +43,12 @@ spec:
               readiness:
                 enabled: false
             resources:
+              claims:
+                - name: gpu
               requests:
                 cpu: 136m
                 memory: 1024Mi
               limits:
-                gpu.intel.com/i915: 1
                 memory: 8192Mi
     service:
       app:
