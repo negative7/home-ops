@@ -6,7 +6,7 @@ services:
       HTTP_PORT: 8080
       LOG_LEVEL: info
       TZ: America/New_York
-      WEBHOOK_SECRET: <webhook-secret>
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET}
     healthcheck:
       interval: 30s
       retries: 3
