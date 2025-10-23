@@ -6,6 +6,7 @@ namespace: system
 resources:
   - ./descheduler/ks.yaml
   - ./fstrim/ks.yaml
+  - ./kopia/ks.yaml
   - ./generic-device-plugin/ks.yaml
   - ./intel-device-plugins/ks.yaml
   - ./keda/ks.yaml
