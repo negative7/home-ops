@@ -2,7 +2,7 @@
 services:
   nut_exporter:
     # renovate: datasource=docker depName=ghcr.io/druggeri/nut_exporter
-    image:  ghcr.io/druggeri/nut_exporter:3.2.1
+    image:  ghcr.io/druggeri/nut_exporter:3.2.2
     container_name: nut_exporter
     restart: unless-stopped
     command:
