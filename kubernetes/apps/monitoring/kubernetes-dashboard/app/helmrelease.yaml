@@ -42,12 +42,12 @@ spec:
             displayName: Helm Release
             namespaced: true
           - kind: customresourcedefinition
-            name: kustomizations.kustomize.toolkit.fluxcd.io
-            displayName: Kustomization
+            name: httproutes.gateway.networking.k8s.io
+            displayName: HTTP Route
             namespaced: true
           - kind: customresourcedefinition
-            name: clusters.postgresql.cnpg.io
-            displayName: CN Cluster
+            name: kustomizations.kustomize.toolkit.fluxcd.io
+            displayName: Kustomization
             namespaced: true
           - kind: customresourcedefinition
             name: externalsecrets.external-secrets.io
