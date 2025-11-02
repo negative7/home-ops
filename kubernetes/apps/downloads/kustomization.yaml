@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: downloads
 resources:
   # Flux-Kustomizations
+  - ./autobrr/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml
   - ./qui/ks.yaml
