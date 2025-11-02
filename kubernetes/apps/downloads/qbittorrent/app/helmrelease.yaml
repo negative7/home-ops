@@ -71,7 +71,7 @@ spec:
         path: /mnt/tank/data
         server: freenas.homelab.internal
         globalMounts:
-          - path: /data/nas-media/Downloads/qbittorrent
+          - path: /completed
             subPath: qbittorrent
       # qbrr:
       #   type: image
