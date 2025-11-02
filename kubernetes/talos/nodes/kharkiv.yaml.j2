@@ -4,17 +4,20 @@ machine:
     diskSelector:
       model: CT1000MX500SSD1
   network:
-    hostname: dnipro.homelab.internal
+    hostname: kharkiv.homelab.internal
     interfaces:
       - interface: eno1
-        vlans:
-          - routes: []
-            dhcp: false
-            vlanId: 4
-            mtu: 1500
-            dhcpOptions:
-              routeMetric: 512
         dhcp: true
+        mtu: 9000
+        vlans:
+          - # IOT
+            vlanId: 4
+            dhcp: false
+            mtu: 1500
+          - # VPN
+            vlanId: 77
+            dhcp: false
+            mtu: 1500
         vip:
           ip: 10.2.0.20
   nodeLabels:
