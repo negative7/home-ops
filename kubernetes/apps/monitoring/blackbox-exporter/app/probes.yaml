@@ -10,7 +10,7 @@ spec:
   targets:
     staticConfig:
       static:
-        - freenas.negative7.com
+        - freenas.homelab.internal
         - emporia-vue2.iot.test
         - t9000.iot.test
         - pikvm.negative7.com
@@ -27,4 +27,4 @@ spec:
   targets:
     staticConfig:
       static:
-        - freenas.negative7.com:2049
+        - freenas.homelab.internal:2049
