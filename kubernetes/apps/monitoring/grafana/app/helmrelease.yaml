@@ -317,7 +317,7 @@ spec:
       image:
         registry: ghcr.io
         repository: home-operations/k8s-sidecar
-        tag: 2.0.3
+        tag: 2.1.1
       dashboards:
         enabled: true
         searchNamespace: ALL
