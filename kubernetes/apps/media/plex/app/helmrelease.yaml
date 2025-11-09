@@ -119,7 +119,7 @@ spec:
                 subPath: transcode
       nfs-tv-media:
         type: nfs
-        server: "freenas.homelab.internal"
+        server: "truenas.homelab.internal"
         path: /mnt/tank/media/tv
         advancedMounts:
           plex:
@@ -127,7 +127,7 @@ spec:
               - path: /media/tv
       nfs-movies-media:
         type: nfs
-        server: "freenas.homelab.internal"
+        server: "truenas.homelab.internal"
         path: /mnt/tank/media/movies
         advancedMounts:
           plex:
@@ -135,7 +135,7 @@ spec:
               - path: /media/movies
       nfs-backup:
         type: nfs
-        server: "freenas.homelab.internal"
+        server: "truenas.homelab.internal"
         path: /mnt/tank/backups/plex
         advancedMounts:
           plex:

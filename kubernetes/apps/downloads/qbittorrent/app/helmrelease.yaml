@@ -77,7 +77,7 @@ spec:
       downloads:
         type: nfs
         path: /mnt/tank/data
-        server: freenas.homelab.internal
+        server: truenas.homelab.internal
         globalMounts:
           - path: /completed
             subPath: qbittorrent

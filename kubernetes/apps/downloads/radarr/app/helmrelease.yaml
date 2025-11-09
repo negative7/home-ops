@@ -102,14 +102,14 @@ spec:
       media:
         enabled: true
         type: nfs
-        server: "freenas.homelab.internal"
+        server: "truenas.homelab.internal"
         path: /mnt/tank/media/movies
         globalMounts:
           - path: /media
       completed:
         enabled: true
         type: nfs
-        server: "freenas.homelab.internal"
+        server: "truenas.homelab.internal"
         path: /mnt/tank/data
         globalMounts:
           - path: /completed

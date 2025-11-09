@@ -55,7 +55,7 @@ spec:
               value: Object.spec.template.spec.volumes{
                 name: "repository",
                 nfs: Object.spec.template.spec.volumes.nfs{
-                  server: "freenas.homelab.internal",
+                  server: "truenas.homelab.internal",
                   path: "/mnt/tank/volsync"
                 }
               }

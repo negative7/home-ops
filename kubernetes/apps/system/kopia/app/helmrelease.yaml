@@ -88,7 +88,7 @@ spec:
       repository:
         type: nfs
         path: /mnt/tank/volsync
-        server: freenas.homelab.internal
+        server: truenas.homelab.internal
         globalMounts:
           - path: /repository
       tmpfs:
