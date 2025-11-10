@@ -6,6 +6,7 @@ namespace: downloads
 resources:
   # Flux-Kustomizations
   - ./autobrr/ks.yaml
+  - ./bazarr/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml
   - ./qui/ks.yaml
