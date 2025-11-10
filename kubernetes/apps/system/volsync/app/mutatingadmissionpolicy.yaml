@@ -102,7 +102,7 @@ spec:
                 name: "repository",
                 nfs: Object.spec.template.spec.volumes.nfs{
                   server: "truenas.homelab.internal",
-                  path: "/mnt/tank/volsync"
+                  path: "/mnt/tank/kopia"
                 }
               }
             },

@@ -87,7 +87,7 @@ spec:
             subPath: repository.config
       repository:
         type: nfs
-        path: /mnt/tank/volsync
+        path: /mnt/tank/kopia
         server: truenas.homelab.internal
         globalMounts:
           - path: /repository
