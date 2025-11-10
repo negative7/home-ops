@@ -67,7 +67,7 @@ spec:
         server: "truenas.homelab.internal"
         path: /mnt/tank/media/tv
         advancedMounts:
-          plex:
+          bazarr:
             app:
               - path: /data/tv
       nfs-movies-media:
@@ -75,7 +75,7 @@ spec:
         server: "truenas.homelab.internal"
         path: /mnt/tank/media/movies
         advancedMounts:
-          plex:
+          bazarr:
             app:
               - path: /data/movies
     route:
