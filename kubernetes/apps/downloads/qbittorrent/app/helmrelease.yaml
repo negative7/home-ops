@@ -70,6 +70,7 @@ spec:
     persistence:
       qbrr:
         type: image
+        image: ghcr.io/buroa/qbrr:0.1.1
       config:
         existingClaim: qbittorrent
         advancedMounts:
