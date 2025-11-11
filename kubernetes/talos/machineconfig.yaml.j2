@@ -47,11 +47,13 @@ machine:
         noatime=True
         nconnect=16
   install:
-    image: factory.talos.dev/metal-installer/4b3cd373a192c8469e859b7a0cfbed3ecc3577c4a2d346a37b0aeff9cd17cdb0:v1.11.3
+    image: factory.talos.dev/metal-installer/4b3cd373a192c8469e859b7a0cfbed3ecc3577c4a2d346a37b0aeff9cd17cdb0:v1.11.5
   kubelet:
     defaultRuntimeSeccompProfileEnabled: true
     disableManifestsDirectory: true
     extraConfig:
+      featureGates:
+        ResourceHealthStatus: true
       maxPods: 150
       serializeImagePulls: false
     image: ghcr.io/siderolabs/kubelet:v1.34.1
@@ -64,6 +66,21 @@ machine:
       - ip: 10.2.0.20
         aliases:
           - k8s.homelab.internal
+    interfaces:
+      - interface: eno1
+        dhcp: true
+        mtu: 9000
+        vlans:
+          - # IOT
+            vlanId: 4
+            dhcp: false
+            mtu: 1500
+          - # VPN
+            vlanId: 770
+            dhcp: false
+            mtu: 1500
+        vip:
+          ip: 10.2.0.20
   sysctls:
     fs.inotify.max_user_instances: "8192"
     fs.inotify.max_user_watches: "1048576"
@@ -93,6 +110,7 @@ cluster:
       runtime-config: admissionregistration.k8s.io/v1beta1=true
     certSANs:
       - k8s.homelab.internal
+      - 10.2.0.20
       - 127.0.0.1 # KubePrism
     disablePodSecurityPolicy: true
   ca:

@@ -5,21 +5,6 @@ machine:
       model: CT1000MX500SSD1
   network:
     hostname: kharkiv.homelab.internal
-    interfaces:
-      - interface: eno1
-        dhcp: true
-        mtu: 9000
-        vlans:
-          - # IOT
-            vlanId: 4
-            dhcp: false
-            mtu: 1500
-          - # VPN
-            vlanId: 770
-            dhcp: false
-            mtu: 1500
-        vip:
-          ip: 10.2.0.20
   nodeLabels:
     node.kubernetes.io/gpu: "true"
 ---
