@@ -1,0 +1,9 @@
+[settings]
+pipx_uvx = true
+
+[env]
+JUST_UNSTABLE = "1"
+KUBECONFIG = '{{config_root}}/kubernetes/kubeconfig'
+MINIJINJA_CONFIG_FILE = "{{config_root}}/.minijinja.toml"
+TALOSCONFIG = '{{config_root}}/kubernetes/talos/talosconfig'
+SOPS_AGE_KEY_FILE = "{{config_root}}/age.key"
