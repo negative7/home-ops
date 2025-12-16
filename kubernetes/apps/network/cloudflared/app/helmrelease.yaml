@@ -85,7 +85,6 @@ spec:
             subPath: credentials.json
             readOnly: true
 
-
     service:
       app:
         ports:

@@ -106,14 +106,14 @@ spec:
           gnetId: 1860
           revision: 42
           datasource:
-            - {name: DS_PROMETHEUS, value: Prometheus}
+            - {name: DS_PROMETHEUS, value: Prometheus,}
 
         smartctl-exporter:
           # renovate: dashboardName="SMARTctl Exporter Dashboard"
           gnetId: 22604
           revision: 2
           datasource:
-            - {name: DS_PROMETHEUS, value: Prometheus}
+            - {name: DS_PROMETHEUS, value: Prometheus,}
 
         spegel:
           # renovate: dashboardName="Spegel"

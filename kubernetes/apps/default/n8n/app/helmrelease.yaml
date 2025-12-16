@@ -69,7 +69,6 @@ spec:
             app:
               - path: /home/node/.n8n
 
-
     route:
       app:
         hostnames:
