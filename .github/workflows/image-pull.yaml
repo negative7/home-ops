@@ -14,6 +14,9 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  HOMEBREW_NO_ANALYTICS: "1"
+
 jobs:
   filter:
     name: Image Pull - Filter
@@ -117,10 +120,13 @@ jobs:
       MATRIX_IMAGE: ${{ matrix.image }}
     steps:
       - name: Install talosctl
-        run: curl -fsSL https://raw.githubusercontent.com/siderolabs/talos/b412ffdbc29d77a81aed88be62f21bc2999afcde/website/static/install | sh
+        run: curl -fsSL https://talos.dev/install | sh
+
+      - name: Try to pull Image
+        run: docker pull "${MATRIX_IMAGE}"
 
       - name: Pull Image
-        run: talosctl --nodes $NODE image pull "${MATRIX_IMAGE}"
+        run: talosctl -n "$NODE_IP" image pull "${MATRIX_IMAGE}"
 
   success:
     if: ${{ !cancelled() }}
