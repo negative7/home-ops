@@ -122,9 +122,6 @@ jobs:
       - name: Install talosctl
         run: curl -fsSL https://talos.dev/install | sh
 
-      - name: Try to pull Image
-        run: docker pull "${MATRIX_IMAGE}"
-
       - name: Pull Image
         run: talosctl -n "$NODE_IP" image pull "${MATRIX_IMAGE}"
 
