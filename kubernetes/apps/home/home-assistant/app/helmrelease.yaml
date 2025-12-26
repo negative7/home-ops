@@ -120,13 +120,13 @@ spec:
                 subPath: code-server-tmp
               - path: /nonexistent
                 subPath: nonexistent
-      backup:
-        enabled: true
-        type: nfs
-        server: 'truenas.homelab.internal'
-        path: /mnt/tank/backups/hass
-        globalMounts:
-          - path: /config/backups
+      # backup:
+      #   enabled: true
+      #   type: nfs
+      #   server: 'truenas.homelab.internal'
+      #   path: /mnt/tank/backups/hass
+      #   globalMounts:
+      #     - path: /config/backups
 
     route:
       app:
