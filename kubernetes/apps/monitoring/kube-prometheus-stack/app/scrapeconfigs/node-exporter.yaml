@@ -7,8 +7,8 @@ metadata:
 spec:
   staticConfigs:
     - targets:
-        - 10.0.1.10:9100
-        - 10.2.0.6:9100
+        - truenas.homelab.internal:9100
+        - pikvm.homelab.internal:9100
   metricsPath: /metrics
   relabelings:
     - action: replace
@@ -23,7 +23,7 @@ metadata:
 spec:
   staticConfigs:
     - targets:
-        - 10.2.0.6
+        - pikvm.homelab.internal
   metricsPath: /api/export/prometheus/metrics
   relabelings:
     - action: replace
@@ -38,7 +38,7 @@ metadata:
 spec:
   staticConfigs:
     - targets:
-        - 10.2.0.10:9633
+        - truenas.homelab.internal:9633
   metricsPath: /metrics
   relabelings:
     - action: replace

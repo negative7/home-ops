@@ -13,7 +13,7 @@ spec:
         - truenas.homelab.internal
         - emporia-vue2.iot.test
         - t9000.iot.test
-        - pikvm.negative7.com
+        - pikvm.homelab.internal
         - livingroom-tv-slzb06p10.iot.test
 ---
 apiVersion: monitoring.coreos.com/v1
