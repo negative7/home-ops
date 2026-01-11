@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: &name headlamp-admin
+  name: &name headlamp
   annotations:
     kubernetes.io/service-account.name: *name
 type: kubernetes.io/service-account-token
