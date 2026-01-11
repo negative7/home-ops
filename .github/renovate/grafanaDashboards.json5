@@ -9,15 +9,15 @@
   },
   customManagers: [
     {
-      description: "Process Grafana dashboards",
       customType: "regex",
-      managerFilePatterns: ["/grafanadashboard\\.yaml(?:\\.j2)?$/",],
+      description: "Process Grafana dashboards",
+      managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml$/"],
       matchStrings: [
         "dashboards\\/(?<depName>\\d+)\\/revisions\\/(?<currentValue>\\d+)\\/download",
       ],
+      autoReplaceStringTemplate: "dashboards/{{depName}}/revisions/{{newValue}}/download",
       datasourceTemplate: "custom.grafana-dashboards",
       versioningTemplate: "regex:^(?<major>\\d+)$",
-      autoReplaceStringTemplate: "dashboards/{{depName}}/revisions/{{newValue}}/download",
     },
   ],
   packageRules: [
@@ -25,8 +25,8 @@
       addLabels: ["renovate/grafana-dashboard"],
       automerge: true,
       automergeType: "branch",
-      commitMessageExtra: "({{currentVersion}} ➔ {{newVersion}})",
-      commitMessageTopic: "dashboard {{sourceDirectory}}",
+      commitMessageExtra: "( {{currentVersion}} ➔ {{newVersion}} )",
+      commitMessageTopic: "dashboard {{depName}}",
       ignoreTests: true,
       matchDatasources: ["custom.grafana-dashboards"],
       matchUpdateTypes: ["major"],
