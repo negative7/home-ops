@@ -1,0 +1,31 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname matter-server
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: matter-server
+  interval: 1h
+  path: "./kubernetes/apps/home/matter-server/app"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: home
+  timeout: 5m
+  wait: false
+  dependsOn:
+    - name: home-assistant
+      namespace: home
+    - name: volsync
+      namespace: system
+  components:
+    - ../../../../components/volsync
+  postBuild:
+    substitute:
+      APP: *appname
+      VOLSYNC_CAPACITY: 15Gi
