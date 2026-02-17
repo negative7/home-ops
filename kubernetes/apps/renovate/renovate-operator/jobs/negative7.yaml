@@ -1,0 +1,66 @@
+---
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: GithubAccessToken
+metadata:
+  name: negative7-bot-auth-token
+spec:
+  appID: "166370"
+  installID: "22493076"
+  auth:
+    privateKey:
+      secretRef:
+        name: negative7-bot-pem # reference secret from step 1.
+        key: private_key_pem
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: negative7-bot-auth-token
+spec:
+  refreshInterval: "30m0s"
+  target:
+    name: negative7-bot-negative7
+    template:
+      type: Opaque
+      engineVersion: v2
+      data:
+        GITHUB_COM_TOKEN: "{{ .token }}"
+        GITHUB_COM_USER: bmVnYXRpdmU3
+        RENOVATE_TOKEN: "{{ .token }}"
+  dataFrom:
+    - sourceRef:
+        generatorRef:
+          apiVersion: generators.external-secrets.io/v1alpha1
+          kind: GithubAccessToken
+          name: negative7-bot-auth-token
+---
+apiVersion: renovate-operator.mogenius.com/v1alpha1
+kind: RenovateJob
+metadata:
+  name: negative7
+  namespace: renovate
+spec:
+  discoveryFilter: negative7/*
+  extraEnv:
+    - name: LOG_LEVEL
+      value: debug
+    - name: RENOVATE_ALLOWED_COMMANDS
+      value: '["pnpm run bundle"]'
+    - name: RENOVATE_ENDPOINT
+      value: https://api.github.com/
+    - name: RENOVATE_PLATFORM
+      value: github
+    - name: RENOVATE_PLATFORM_COMMIT
+      value: "true"
+  image: ghcr.io/renovatebot/renovate:43.0.2
+  parallelism: 5
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  schedule: 0 * * * *
+  secretRef: negative7-bot-negative7
+  webhook:
+    enabled: true
+    authentication:
+      enabled: false
