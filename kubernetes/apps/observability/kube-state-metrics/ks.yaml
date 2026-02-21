@@ -12,7 +12,7 @@ spec:
       app.kubernetes.io/name: *appname
   interval: 30m
   timeout: 5m
-  path: ./kubernetes/apps/monitoring/kube-state-metrics/app
+  path: ./kubernetes/apps/observability/kube-state-metrics/app
   prune: true
   sourceRef:
     kind: GitRepository

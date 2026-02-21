@@ -9,7 +9,7 @@ spec:
     labels:
       app.kubernetes.io/name: fluent-bit
   interval: 1h
-  path: "./kubernetes/apps/monitoring/fluent-bit/app"
+  path: "./kubernetes/apps/observability/fluent-bit/app"
   prune: true
   sourceRef:
     kind: GitRepository
