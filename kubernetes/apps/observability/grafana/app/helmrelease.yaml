@@ -232,18 +232,18 @@ spec:
           - access: proxy
             name: Prometheus
             type: prometheus
-            url: http://prometheus-operated.monitoring.svc.cluster.local:9090
+            url: http://prometheus-operated.observability.svc.cluster.local:9090
             isDefault: true
             jsonData:
               prometheusType: Prometheus
           - name: VictoriaLogs
             type: victoriametrics-logs-datasource
             access: proxy
-            url: http://victoria-logs-server.monitoring.svc.cluster.local:9428
+            url: http://victoria-logs-server.observability.svc.cluster.local:9428
           - name: Alertmanager
             type: alertmanager
             access: proxy
-            url: http://alertmanager-operated.monitoring.svc.cluster.local:9093
+            url: http://alertmanager-operated.observability.svc.cluster.local:9093
             jsonData:
               implementation: prometheus
 
