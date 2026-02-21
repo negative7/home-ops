@@ -11,12 +11,20 @@ spec:
   interval: 30m
   values:
     fullnameOverride: victoria-logs
-    retentionPeriod: 14d
     server:
       persistentVolume:
         enabled: true
         storageClassName: ceph-block
         size: 20Gi
+      retentionPeriod: 14d
+      route:
+        enabled: true
+        hostnames:
+          - victoria-logs.negative7.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+
       serviceMonitor:
         enabled: true
     dashboards:
