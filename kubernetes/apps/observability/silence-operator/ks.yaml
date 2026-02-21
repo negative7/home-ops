@@ -42,4 +42,4 @@ spec:
   wait: false
   dependsOn:
     - name: silence-operator
-      namespace: monitoring
+      namespace: observability
