@@ -83,6 +83,13 @@ spec:
             shelfmark:
               - path: /bookdrop
                 subPath: booklore/bookdrop
+      completed:
+        enabled: true
+        type: nfs
+        server: 'truenas.homelab.internal'
+        path: /mnt/tank/data
+        globalMounts:
+          - path: /completed
       tmpfs:
         type: emptyDir
         sizeLimit: 1Gi
