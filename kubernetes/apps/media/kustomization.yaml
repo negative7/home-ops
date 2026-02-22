@@ -8,6 +8,6 @@ components:
 resources:
   - ./namespace.yaml
   - ./maintainerr/ks.yaml
-  - ./jellyseerr/ks.yaml
   - ./plex/ks.yaml
+  - ./seerr/ks.yaml
   - ./tautulli/ks.yaml

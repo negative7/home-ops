@@ -1,31 +1,24 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: jellyseerr
+  name: seerr
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
-    name: jellyseerr
-  install:
-    remediation:
-      retries: -1
-  upgrade:
-    cleanupOnFail: true
-    remediation:
-      retries: 3
+    name: seerr
+  interval: 1h
   values:
     controllers:
-      jellyseerr:
+      seerr:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
-              repository: ghcr.io/fallenbagel/jellyseerr
-              tag: 2.7.3@sha256:9cc9e9ee6cd5cf5a23feb45c37742ba34cfd6314d81d259cddb373a97ac92cdd
+              repository: ghcr.io/seerr-team/seerr
+              tag: v3.0.1@sha256:1b5fc1ea825631d9d165364472663b817a4c58ef6aa1013f58d82c1570d7c866
             env:
               TZ: America/New_York
               LOG_LEVEL: "info"
@@ -34,18 +27,27 @@ spec:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             probes:
-              liveness: &probes
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
                     path: /api/v1/status
                     port: *port
-                  initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
-              readiness: *probes
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -70,6 +72,7 @@ spec:
     route:
       app:
         hostnames:
+          - "{{ .Release.Name }}.negative7.com"
           - requests.negative7.com
         parentRefs:
           - name: envoy-external
@@ -85,16 +88,5 @@ spec:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /app/config
-      config-cache:
-        existingClaim: "{{ .Release.Name }}-cache"
-        globalMounts:
-          - path: /app/config/cache
-      tmpfs:
+      tmp:
         type: emptyDir
-        advancedMounts:
-          jellyseerr:
-            app:
-              - path: /app/config/logs
-                subPath: logs
-              - path: /tmp
-                subPath: tmp
