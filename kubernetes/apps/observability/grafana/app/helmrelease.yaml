@@ -72,7 +72,7 @@ spec:
               value: Prometheus
           url: https://grafana.com/api/dashboards/1860/revisions/42/download
         nut-exporter:
-          url: https://grafana.com/api/dashboards/19308/revisions/4/download
+          url: https://raw.githubusercontent.com/DRuggeri/nut_exporter/refs/heads/master/dashboard/dashboard.json
           datasource:
             - {name: DS_PROMETHEUS, value: Prometheus}
         prometheus:
