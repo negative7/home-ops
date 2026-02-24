@@ -13,4 +13,3 @@ resources:
   - ./matter-server/ks.yaml
   - ./scrypted/ks.yaml
   - ./zigbee2mqtt/ks.yaml
-

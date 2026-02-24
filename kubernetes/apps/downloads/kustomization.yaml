@@ -18,4 +18,3 @@ resources:
   - ./sabnzbd/ks.yaml
   - ./shelfmark/ks.yaml
   - ./sonarr/ks.yaml
-

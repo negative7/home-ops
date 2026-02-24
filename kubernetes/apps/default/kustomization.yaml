@@ -12,4 +12,3 @@ resources:
   - ./n8n/ks.yaml
   - ./spoolman/ks.yaml
   - ./vikunja/ks.yaml
-

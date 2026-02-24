@@ -1,3 +1,4 @@
+---
 configs:
   poll-config.yml:
     content: |

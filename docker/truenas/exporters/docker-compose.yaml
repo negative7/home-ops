@@ -37,5 +37,4 @@ services:
       - '--nut.server=10.0.1.10'
       - '--log.level=debug'
       - '--nut.vars_enable=battery.charge,battery.runtime,ups.status,ups,input.voltage,battery.voltage'
-    network_mode: "host"
-
+    network_mode: host
