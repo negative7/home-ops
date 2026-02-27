@@ -7,7 +7,6 @@ components:
   - ../../components/flux-alerts
 resources:
   - ./namespace.yaml
-  - ./audiobookshelf/ks.yaml
   - ./maintainerr/ks.yaml
   - ./plex/ks.yaml
   - ./seerr/ks.yaml
