@@ -6,8 +6,6 @@ configs:
       - run_once: true
         url: https://github.com/negative7/home-ops.git
 secrets:
-  sops_age_key:
-    file: /mnt/tank/home/admin/.sops/sops_age_key.txt
   webhook_secret:
     file: /mnt/tank/home/admin/.config/doco-cd/webhook_secret
 services:
@@ -20,7 +18,6 @@ services:
       HTTP_PORT: 8080
       LOG_LEVEL: info
       POLL_CONFIG_FILE: /poll-config.yml
-      SOPS_AGE_KEY_FILE: /run/secrets/sops_age_key
       WEBHOOK_SECRET_FILE: /run/secrets/webhook_secret
       DEPLOY_CONFIG_BASE_DIR: ./docker/truenas/
     healthcheck:
@@ -40,7 +37,6 @@ services:
       - 8080:8080
     restart: unless-stopped
     secrets:
-      - sops_age_key
       - webhook_secret
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
