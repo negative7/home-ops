@@ -9,7 +9,7 @@ resources:
 configMapGenerator:
   - name: recyclarr
     files:
-      - config/recyclarr.yml
+      - config/recyclarr.yaml
 generatorOptions:
   annotations:
     kustomize.toolkit.fluxcd.io/substitute: disabled
