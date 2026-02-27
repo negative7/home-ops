@@ -6,3 +6,4 @@ Thumbs.db
 *.iso
 kubeconfig
 talosconfig
+AGENTS.md
