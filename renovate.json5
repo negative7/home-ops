@@ -22,10 +22,6 @@
     "prEditedNotification",
     "prIgnoreNotification",
   ],
-  ignorePaths: [
-    "**/*.sops.*",
-    "**/resources/**",
-  ],
   flux: {
     managerFilePatterns: ["/^kubernetes/.+\\.yaml(?:\\.j2)?$/"],
   },
