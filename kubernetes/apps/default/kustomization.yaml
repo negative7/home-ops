@@ -9,6 +9,5 @@ resources:
   - ./namespace.yaml
   - ./actual/ks.yaml
   - ./atuin/ks.yaml
-  - ./n8n/ks.yaml
   - ./spoolman/ks.yaml
   - ./vikunja/ks.yaml
