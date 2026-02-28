@@ -44,11 +44,12 @@ spec:
     defaultPodOptions:
       securityContext:
         runAsNonRoot: false # Must be run as root user
-        runAsUser: 0        # Must be run as root user
+        runAsUser: 0 # Must be run as root user
         runAsGroup: 0
         fsGroup: 0
         fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups: [34]
+        supplementalGroups:
+          - 34
 
     service:
       app:
@@ -57,7 +58,8 @@ spec:
             port: *port
     route:
       app:
-        hostnames: [*host]
+        hostnames:
+          - *host
         parentRefs:
           - name: envoy-internal
             namespace: network
