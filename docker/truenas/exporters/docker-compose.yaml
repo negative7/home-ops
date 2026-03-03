@@ -30,7 +30,7 @@ services:
     user: root
 
   nut_exporter:
-    image: ghcr.io/druggeri/nut_exporter:3.2.3
+    image: ghcr.io/druggeri/nut_exporter:3.2.4
     container_name: nut_exporter
     restart: unless-stopped
     command:
