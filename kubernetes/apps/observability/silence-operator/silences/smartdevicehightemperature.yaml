@@ -2,7 +2,7 @@
 apiVersion: observability.giantswarm.io/v1alpha2
 kind: Silence
 metadata:
-  name: nodememoryhighutilization-nas
+  name: temp-silence
 spec:
   matchers:
     - name: alertname
