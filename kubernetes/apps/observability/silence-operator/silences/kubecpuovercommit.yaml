@@ -7,4 +7,3 @@ spec:
   matchers:
     - name: alertname
       value: KubeCPUOvercommit
-      isRegex: false

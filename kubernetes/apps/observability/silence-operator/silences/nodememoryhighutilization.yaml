@@ -7,7 +7,5 @@ spec:
   matchers:
     - name: alertname
       value: NodeMemoryHighUtilization
-      isRegex: false
     - name: instance
       value: truenas.homelab.internal:9100
-      isRegex: false

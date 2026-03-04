@@ -7,7 +7,5 @@ spec:
   matchers:
     - name: alertname
       value: SmartDeviceHighTemperature
-      isRegex: false
     - name: instance
       value: vinnytsia.homelab.internal
-      isRegex: false
