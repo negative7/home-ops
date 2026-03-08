@@ -5,17 +5,12 @@ kind: HelmRelease
 metadata:
   name: externaldns-unifi
 spec:
+  chartRef:
+    kind: OCIRepository
+    name: externaldns-unifi
   interval: 30m
-  chart:
-    spec:
-      chart: external-dns
-      version: 1.15.2
-      sourceRef:
-        kind: HelmRepository
-        name: external-dns-unifi
-      interval: 30m
   values:
-    fullnameOverride: &name externaldns-unifi
+    fullnameOverride: externaldns-unifi
     logLevel: &logLevel info
     domainFilters:
       - negative7.com
@@ -33,13 +28,11 @@ spec:
             value: *logLevel
           - name: UNIFI_HOST
             value: https://10.0.1.1
-          - name: UNIFI_USER
-            value: external-dns
-          - name: UNIFI_PASS
+          - name: UNIFI_API_KEY
             valueFrom:
               secretKeyRef:
                 name: external-dns-unifi-secret
-                key: external_dns_password
+                key: external_dns_api_key
         livenessProbe:
           httpGet:
             path: /healthz
