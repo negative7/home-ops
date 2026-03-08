@@ -6,3 +6,5 @@ namespace: networking
 resources:
   - ./adguard.yaml
   - ./doco.yaml
+  - ./voron0.yaml
+  - ./voron2.yaml
