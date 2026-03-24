@@ -77,7 +77,7 @@ spec:
             - {name: DS_PROMETHEUS, value: Prometheus}
         prometheus:
           datasource: Prometheus
-          url: https://grafana.com/api/dashboards/19105/revisions/8/download
+          url: https://grafana.com/api/dashboards/19105/revisions/9/download
         smartctl-exporter:
           datasource:
             - name: DS_PROMETHEUS
