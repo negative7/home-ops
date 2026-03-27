@@ -8,7 +8,7 @@ metadata:
 spec:
   staticConfigs:
     - targets:
-        - 10.0.1.10:9199
+        - 10.2.0.10:9199
       labels:
         ups: "primary"
   metricsPath: /ups_metrics

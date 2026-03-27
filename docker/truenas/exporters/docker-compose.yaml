@@ -34,7 +34,7 @@ services:
     container_name: nut_exporter
     restart: unless-stopped
     command:
-      - '--nut.server=10.0.1.10'
+      - '--nut.server=10.2.0.10'
       - '--log.level=debug'
       - '--nut.vars_enable=battery.charge,battery.runtime,ups.status,ups,input.voltage,battery.voltage'
     network_mode: host
