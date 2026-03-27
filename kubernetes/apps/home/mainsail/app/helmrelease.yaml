@@ -31,11 +31,11 @@ spec:
               tag: edge-unprivileged@sha256:d630aee48d2136accd8d37c047c6b15fe679bfde3fc1756e9178d60d050371d1
             probes:
               liveness:
-                enabled: true
+                enabled: false
               readiness:
-                enabled: true
+                enabled: false
               startup:
-                enabled: true
+                enabled: false
             resources:
               requests:
                 cpu: 100m
