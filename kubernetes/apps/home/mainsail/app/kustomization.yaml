@@ -8,7 +8,7 @@ resources:
 configMapGenerator:
   - name: mainsail
     files:
-      - config/config.json=config.json
+      - config/config.json
 generatorOptions:
   annotations:
     kustomize.toolkit.fluxcd.io/substitute: disabled
