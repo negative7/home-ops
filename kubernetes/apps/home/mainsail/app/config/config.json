@@ -1,0 +1,8 @@
+{
+    "defaultLocale": "en",
+    "instancesDB": "json",
+    "instances": [
+        { "hostname": "10.0.1.15", "port": 7125 },
+        { "hostname": "10.0.1.12", "port": 7125 }
+    ]
+}
