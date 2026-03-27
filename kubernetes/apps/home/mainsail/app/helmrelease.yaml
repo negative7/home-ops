@@ -26,8 +26,9 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/mainsail-org/mainsail
-              tag: v2.13.1
+              repository: ghcr.io/mainsail-crew/mainsail
+              # mainsail doesnt tag docker tags
+              tag: latest@sha256:079e20b9c7a783c072b2aa50c7033e313aedea71bb5f46f577cef463b5d5e3d2
             probes:
               liveness:
                 enabled: true
