@@ -70,7 +70,7 @@ spec:
           datasource:
             - name: DS_PROMETHEUS
               value: Prometheus
-          url: https://grafana.com/api/dashboards/1860/revisions/42/download
+          url: https://grafana.com/api/dashboards/1860/revisions/43/download
         nut-exporter:
           url: https://raw.githubusercontent.com/DRuggeri/nut_exporter/refs/heads/master/dashboard/dashboard.json
           datasource:
