@@ -40,7 +40,7 @@ metadata:
   name: negative7
   namespace: renovate
 spec:
-  discoveryFilters: 
+  discoveryFilters:
     - negative7/*
   extraEnv:
     - name: LOG_LEVEL
