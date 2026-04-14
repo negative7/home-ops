@@ -28,7 +28,7 @@ spec:
             image:
               repository: ghcr.io/mainsail-crew/mainsail
               # mainsail doesnt tag docker tags
-              tag: edge-unprivileged@sha256:7926bf4afb52bd89beab2f63615acbbadcfbde0840dba1c9e23a3d8c7a98e914
+              tag: edge-unprivileged@sha256:9ad19515a01b62ef1b748fefa234d3adfbe62c3e584761bbcba6ca8dbe50148f
             probes:
               liveness:
                 enabled: false
