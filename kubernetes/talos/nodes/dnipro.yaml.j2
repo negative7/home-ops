@@ -3,23 +3,10 @@ machine:
   install:
     diskSelector:
       model: CT1000MX500SSD1
-  network:
-    hostname: dnipro.homelab.internal
+  type: controlplane
   nodeLabels:
     node.kubernetes.io/gpu: "true"
 ---
 apiVersion: v1alpha1
-kind: VolumeConfig
-name: EPHEMERAL
-provisioning:
-  diskSelector:
-    match: system_disk
-  maxSize: 512GiB
----
-apiVersion: v1alpha1
-kind: UserVolumeConfig
-name: local-hostpath
-provisioning:
-  diskSelector:
-    match: system_disk
-  maxSize: 256GiB
+kind: HostnameConfig
+hostname: dnipro
