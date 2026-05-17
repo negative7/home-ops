@@ -61,7 +61,7 @@ spec:
               - --enable-bearer
             env:
               ACTUAL_DATA_DIR: /config
-              ACTUAL_SERVER_URL: http://actual.default.svc.cluster.local:5006
+              ACTUAL_SERVER_URL: http://actual-app.default.svc.cluster.local:5006
               ACTUAL_PASSWORD: 
                 valueFrom:
                   secretKeyRef:
