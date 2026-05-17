@@ -85,13 +85,11 @@ spec:
 
     service:
       app:
-        controller: actual
         ports:
           http:
             port: *httpPort
         primary: true
       mcp:
-        controller: mcp
         ports:
           http:
             port: 3000
