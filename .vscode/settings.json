@@ -4,4 +4,5 @@
   "yaml.schemas": {
     "kubernetes": ["kubernetes/*.yml", "kubernetes/*.yaml"]
   },
+  "sarif-viewer.connectToGithubCodeScanning": "on",
 }
