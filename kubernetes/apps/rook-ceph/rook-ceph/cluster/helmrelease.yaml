@@ -59,9 +59,9 @@ spec:
         useAllNodes: false
         useAllDevices: false
         nodes:
-          - name: kharkiv
-            devices:
-              - name: nvme0n1
+          # - name: kharkiv
+          #   devices:
+          #     - name: nvme0n1
           - name: dnipro
             devices:
               - name: nvme0n1
@@ -108,11 +108,11 @@ spec:
         spec:
           metadataPool:
             replicated:
-              size: 3
+              size: 2
           dataPools:
             - failureDomain: host
               replicated:
-                size: 3
+                size: 2
               name: data0
           metadataServer:
             activeCount: 1
