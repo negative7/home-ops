@@ -17,7 +17,7 @@ spec:
   values:
     namespace: system-controllers
 
-    replicaCount: 2
+    replicaCount: 1
 
     timezone: America/New_York
     cronJobTimeZone: true
@@ -28,17 +28,6 @@ spec:
         issuerRef:
           name: k8tz-webhook-selfsign
           kind: Issuer
-
-    affinity:
-      podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 1
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: k8tz
-              topologyKey: kubernetes.io/hostname
-
   postRenderers:
     - kustomize:
         patches:
