@@ -59,23 +59,12 @@ releases:
     needs:
       - kube-system/coredns
 
-  - name: cert-manager-webhook-ovh
-    namespace: cert-manager
-    chart: oci://ghcr.io/home-operations/charts-mirror/cert-manager-webhook-ovh
-    version: 0.9.2
-    values:
-      - templates/values.yaml.gotmpl
-    needs:
-      - cert-manager/cert-manager
-
   - name: external-secrets
     namespace: external-secrets
     chart: oci://ghcr.io/external-secrets/charts/external-secrets
     version: 2.5.0
     values:
       - templates/values.yaml.gotmpl
-    needs:
-      - cert-manager/cert-manager-webhook-ovh
 
   - name: onepassword-connect
     namespace: external-secrets
