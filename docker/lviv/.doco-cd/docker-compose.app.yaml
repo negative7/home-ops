@@ -2,11 +2,11 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/refs/heads/main/schema/compose-spec.json
 secrets:
   1pw_token:
-    file: /home/truenas_admin/.config/doco-cd/1pw_token
+    file: /home/nasadmin/.config/doco-cd/1pw_token
   api_secret:
-    file: /home/truenas_admin/.config/doco-cd/api_secret
+    file: /home/nasadmin/.config/doco-cd/api_secret
   webhook_secret:
-    file: /home/truenas_admin/.config/doco-cd/webhook_secret
+    file: /home/nasadmin/.config/doco-cd/webhook_secret
 services:
   app:
     container_name: doco-cd
