@@ -28,6 +28,12 @@ spec:
           - name: pg_autoscaler
             enabled: true
       network:
+        provider: host
+        addressRanges:
+          public:
+            - 10.2.0.0/24
+          cluster:
+            - 10.2.0.0/24
         connections:
           requireMsgr2: true
       resources:
