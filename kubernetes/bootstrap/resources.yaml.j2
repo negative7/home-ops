@@ -2,8 +2,15 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: onepassword-secret
+  name: onepassword-connect-credentials-secret
   namespace: external-secrets
 stringData:
   1password-credentials.json: op://home-cluster/1password/OP_CREDENTIALS_JSON
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: onepassword-connect-vault-secret
+  namespace: external-secrets
+stringData:
   token: op://home-cluster/1password/OP_CONNECT_TOKEN
