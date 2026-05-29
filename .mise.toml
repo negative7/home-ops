@@ -1,13 +1,19 @@
+[env]
+JUST_UNSTABLE = "1"
+KUBECONFIG = '{{config_root}}/kubeconfig'
+MINIJINJA_CONFIG_FILE = "{{config_root}}/.minijinja.toml"
+TALOSCONFIG = '{{config_root}}/talosconfig'
+
 [settings]
 pipx.uvx = true
 
-[env]
-JUST_UNSTABLE = "1"
-KUBECONFIG = '{{config_root}}/kubernetes/kubeconfig'
-MINIJINJA_CONFIG_FILE = "{{config_root}}/.minijinja.toml"
-TALOSCONFIG = '{{config_root}}/kubernetes/talosconfig'
-
 [tools]
-"aqua:astral-sh/uv" = ["latest"]
-"aqua:google/yamlfmt" = ["latest"]
-"pipx:flux-local" = ["latest"]
+"aqua:astral-sh/uv" = "latest"
+"aqua:google/yamlfmt" = "latest"
+"aqua:rhysd/actionlint" = "latest"
+"pipx:flux-local" = "latest"
+"pipx:ansible" = "latest"
+"pipx:ansible-core" = "latest"
+
+[hooks]
+postinstall = "ansible-galaxy install -r {{config_root}}/ansible/requirements.yaml"

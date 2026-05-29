@@ -19,7 +19,3 @@ indent_size = 2
 
 [{*.just,*.justfile}]
 indent_size = 2
-
-[{Dockerfile,*.bash,*.sh}]
-indent_style = space
-indent_size = 2

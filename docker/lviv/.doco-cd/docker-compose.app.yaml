@@ -6,20 +6,28 @@ configs:
       - run_once: true
         url: https://github.com/negative7/home-ops.git
 secrets:
+  1pw_token:
+    file: /home/truenas_admin/.config/doco-cd/1pw_token
+  api_secret:
+    file: /home/truenas_admin/.config/doco-cd/api_secret
   webhook_secret:
-    file: /mnt/tank/home/admin/.config/doco-cd/webhook_secret
+    file: /home/truenas_admin/.config/doco-cd/webhook_secret
 services:
   app:
-    configs:
-      - source: poll-config.yml
-        target: /poll-config.yml
     container_name: doco-cd
     environment:
-      HTTP_PORT: 8080
+      API_SECRET_FILE: /run/secrets/api_secret
+      DEPLOY_CONFIG_BASE_DIR: ./docker/lviv/
+      HTTP_PORT: 8880
       LOG_LEVEL: info
-      POLL_CONFIG_FILE: /poll-config.yml
+      POLL_CONFIG: |-
+        - url: https://github.com/negative7/home-ops.git
+          reference: refs/heads/main
+          interval: 3600
+      SECRET_PROVIDER: 1password
+      SECRET_PROVIDER_ACCESS_TOKEN_FILE: /run/secrets/1pw_token
+      TZ: America/New_York
       WEBHOOK_SECRET_FILE: /run/secrets/webhook_secret
-      DEPLOY_CONFIG_BASE_DIR: ./docker/truenas/
     healthcheck:
       test:
         - CMD
@@ -31,9 +39,11 @@ services:
       retries: 3
     image: ghcr.io/kimdre/doco-cd:0.89.1@sha256:1da6393b7517b267c05036c36343dce7e1d2a0382b9acdd042287f332a5111a8
     ports:
-      - 8080:8080
+      - 8880:8880
     restart: unless-stopped
     secrets:
+      - 1pw_token
+      - api_secret
       - webhook_secret
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
