@@ -8,6 +8,7 @@ components:
 resources:
   - ./namespace.yaml
   - ./jellyfin/ks.yaml
+  - ./jellyplex-watched/ks.yaml 
   - ./maintainerr/ks.yaml
   - ./plex/ks.yaml
   - ./seerr/ks.yaml
