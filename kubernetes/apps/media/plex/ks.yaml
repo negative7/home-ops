@@ -27,7 +27,7 @@ spec:
   components:
     - ../../../../components/gpu
     - ../../../../components/volsync
-    - ../../../../components/keda/nas-nfs-scaler
+    - ../../../../components/zeroscaler
   postBuild:
     substitute:
       APP: *appname

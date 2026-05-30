@@ -26,7 +26,7 @@ spec:
       namespace: system
   components:
     - ../../../../components/volsync
-    - ../../../../components/keda/nas-nfs-scaler
+    - ../../../../components/zeroscaler
   postBuild:
     substitute:
       APP: *appname
