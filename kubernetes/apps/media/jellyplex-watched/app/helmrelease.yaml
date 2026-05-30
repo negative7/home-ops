@@ -33,7 +33,7 @@ spec:
               DRYRUN: false
               DEBUG_LEVEL: "DEBUG"
               PLEX_BASEURL: http://plex.media.svc.cluster.local:32400
-              EMBY_TOKEN:
+              PLEX_TOKEN:
                 valueFrom:
                   secretKeyRef:
                     name: jellyplex-watched-secret
