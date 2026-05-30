@@ -4,7 +4,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./cephnodediskspacewarning.yaml
-  - ./keda_hpa_maxed_out.yaml
+  - ./hpa_maxed_out.yaml
   - ./kubecpuovercommit.yaml
   - ./nodememoryhighutilization.yaml
   - ./smartdevicehightemperature.yaml
