@@ -81,7 +81,7 @@ spec:
             subPath: metadata
           - path: /config/data/introskipper
             subPath: introskipper
-      nfs-tv-media:
+      nfs-tv-media-jellyfin:
         type: nfs
         server: "truenas.homelab.internal"
         path: /mnt/tank/media/tv
@@ -89,7 +89,7 @@ spec:
           plex:
             app:
               - path: /media/tv
-      nfs-movies-media:
+      nfs-movies-media-jellyfin:
         type: nfs
         server: "truenas.homelab.internal"
         path: /mnt/tank/media/movies
