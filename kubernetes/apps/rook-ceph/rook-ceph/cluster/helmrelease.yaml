@@ -75,15 +75,15 @@ spec:
         useAllNodes: false
         useAllDevices: false
         nodes:
-          # - name: kharkiv
-          #   devices:
-          #     - name: nvme0n1
+          - name: kharkiv
+            devices:
+              - name: /dev/disk/by-partlabel/r-csi-data
           - name: dnipro
             devices:
               - name: nvme0n1
-          # - name: kyiv
-          #   devices:
-          #     - name: nvme0n1
+          - name: kyiv
+            devices:
+              - name: /dev/disk/by-partlabel/r-csi-data
           - name: vinnytsia
             devices:
               - name: nvme0n1
