@@ -47,9 +47,8 @@ spec:
                 - name: gpu
               requests:
                 cpu: 136m
-                memory: 1024Mi
               limits:
-                memory: 8192Mi
+                memory: 4096Mi
     service:
       app:
         type: LoadBalancer
