@@ -55,7 +55,7 @@ spec:
           mcp:
             image:
               repository: sstefanov/actual-mcp
-              tag: v1.11.2
+              tag: v1.11.3
             args:
               - --sse
               - --enable-bearer
