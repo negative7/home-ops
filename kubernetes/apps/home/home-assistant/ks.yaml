@@ -6,7 +6,7 @@ metadata:
   name: home-assistant
 spec:
   interval: 1h
-  path: "./kubernetes/apps/home-automation/home-assistant/app"
+  path: "./kubernetes/apps/home/home-assistant/app"
   postBuild:
     substitute:
       APP: home-assistant
