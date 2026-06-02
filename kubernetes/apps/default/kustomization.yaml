@@ -10,4 +10,3 @@ resources:
   - ./actual/ks.yaml
   - ./atuin/ks.yaml
   - ./spoolman/ks.yaml
-  - ./vikunja/ks.yaml
