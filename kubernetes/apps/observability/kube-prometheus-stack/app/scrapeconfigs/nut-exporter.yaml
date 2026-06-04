@@ -7,10 +7,9 @@ metadata:
   namespace: observability
 spec:
   staticConfigs:
-    - targets:
-        - 10.2.0.10:9199
+    - targets: [10.2.0.10:9199]
       labels:
-        ups: "primary"
+        ups: primary
   metricsPath: /ups_metrics
   relabelings:
     - action: replace

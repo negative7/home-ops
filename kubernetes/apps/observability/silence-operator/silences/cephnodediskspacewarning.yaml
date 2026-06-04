@@ -20,4 +20,4 @@ spec:
       value: CephNodeDiskspaceWarning
     - name: device
       value: /dev/sd.*
-      matchType: "=~"
+      matchType: =~

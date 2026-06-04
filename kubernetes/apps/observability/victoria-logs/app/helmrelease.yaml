@@ -19,8 +19,7 @@ spec:
       retentionPeriod: 14d
       route:
         enabled: true
-        hostnames:
-          - victoria-logs.negative7.com
+        hostnames: [victoria-logs.negative7.com]
         parentRefs:
           - name: envoy-internal
             namespace: network

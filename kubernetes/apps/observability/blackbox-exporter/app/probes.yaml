@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
 apiVersion: monitoring.coreos.com/v1
 kind: Probe
 metadata:
@@ -15,20 +16,6 @@ spec:
         - pikvm.homelab.internal
         - livingroom-tv-slzb06p10.iot.test
 ---
-apiVersion: monitoring.coreos.com/v1
-kind: Probe
-metadata:
-  name: nfstemp
-spec:
-  module: tcp_connect
-  prober:
-    url: blackbox-exporter.observability.svc.cluster.local:9115
-  targets:
-    staticConfig:
-      static:
-        - truenas.homelab.internal:2049
-        
----
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
 apiVersion: monitoring.coreos.com/v1
 kind: Probe
@@ -41,5 +28,4 @@ spec:
     url: blackbox-exporter.observability.svc.cluster.local:9115
   targets:
     staticConfig:
-      static:
-        - truenas.homelab.internal:2049
+      static: [truenas.homelab.internal:2049]

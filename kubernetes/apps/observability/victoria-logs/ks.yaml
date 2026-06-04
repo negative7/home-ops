@@ -9,7 +9,7 @@ spec:
     labels:
       app.kubernetes.io/name: victoria-logs
   interval: 1h
-  path: "./kubernetes/apps/observability/victoria-logs/app"
+  path: ./kubernetes/apps/observability/victoria-logs/app
   prune: true
   sourceRef:
     kind: GitRepository
@@ -31,7 +31,7 @@ spec:
   dependsOn:
     - name: victoria-logs
   interval: 1h
-  path: "./kubernetes/apps/observability/victoria-logs/collector"
+  path: ./kubernetes/apps/observability/victoria-logs/collector
   prune: true
   sourceRef:
     kind: GitRepository

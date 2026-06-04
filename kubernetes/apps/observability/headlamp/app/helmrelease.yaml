@@ -12,10 +12,10 @@ spec:
   values:
     fullnameOverride: headlamp
     initContainers:
-      - # Generate kubeconfig file. Can be removed when https://github.com/kubernetes-sigs/headlamp/issues/1826 is resolved
-        command:
+      # Generate kubeconfig file. Can be removed when https://github.com/kubernetes-sigs/headlamp/issues/1826 is resolved
+      - command:
           - /bin/sh
-          - "-c"
+          - -c
           - |
             kubectl config set-cluster main --server=https://kubernetes.default.svc --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
             kubectl config set-credentials main --token=$(cat /tmp/sa-token/token)
@@ -27,15 +27,14 @@ spec:
               fieldRef:
                 fieldPath: status.hostIP
           - name: KUBERNETES_SERVICE_PORT
-            value: "6443"
+            value: '6443'
           - name: KUBECONFIG
             value: /home/headlamp/.config/Headlamp/kubeconfigs/config
         image: docker.io/rancher/shell:v7.0.0
         name: create-kubeconfig
         securityContext:
           capabilities:
-            drop:
-              - ALL
+            drop: [ALL]
           privileged: false
           readOnlyRootFilesystem: true
           runAsGroup: 1001
@@ -61,9 +60,9 @@ spec:
     config:
       pluginsDir: /build/plugins
       # Bypasses: https://github.com/kubernetes-sigs/headlamp/issues/4883
-      sessionTTL: null
+      sessionTTL:
     podAnnotations:
-      reloader.stakater.com/auto: "true"
+      reloader.stakater.com/auto: 'true'
     service:
       port: 80
     serviceAccount:

@@ -6,9 +6,7 @@ metadata:
   name: &name node-exporter
 spec:
   staticConfigs:
-    - targets:
-        - truenas.homelab.internal:9100
-        - pikvm.homelab.internal:9100
+    - targets: [truenas.homelab.internal:9100, pikvm.homelab.internal:9100]
   metricsPath: /metrics
   relabelings:
     - action: replace
@@ -22,24 +20,8 @@ metadata:
   name: &name pikvm
 spec:
   staticConfigs:
-    - targets:
-        - pikvm.homelab.internal
+    - targets: [pikvm.homelab.internal]
   metricsPath: /api/export/prometheus/metrics
-  relabelings:
-    - action: replace
-      targetLabel: job
-      replacement: *name
----
-# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/monitoring.coreos.com/scrapeconfig_v1alpha1.json
-apiVersion: monitoring.coreos.com/v1alpha1
-kind: ScrapeConfig
-metadata:
-  name: &name smartctl-exporter
-spec:
-  staticConfigs:
-    - targets:
-        - truenas.homelab.internal:9633
-  metricsPath: /metrics
   relabelings:
     - action: replace
       targetLabel: job

@@ -1,21 +1,19 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: node-exporter
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: node-exporter
+  interval: 30m
   values:
     fullnameOverride: node-exporter
-
     image:
       registry: quay.io
       repository: prometheus/node-exporter
-
     prometheus:
       monitor:
         enabled: true
@@ -36,16 +34,14 @@ spec:
             targetLabel: nodename
           - action: replace
             regex: (.*)
-            replacement: $1.negative7.com.internal:9100
+            replacement: $1.bjw-s.internal:9100
             sourceLabels:
               - kubernetes_node
             targetLabel: instance
-
     resources:
       requests:
         cpu: 23m
         memory: 64M
       limits:
         memory: 64M
-
     hostNetwork: false

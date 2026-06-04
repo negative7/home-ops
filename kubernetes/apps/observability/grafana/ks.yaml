@@ -1,24 +1,42 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname grafana
-  namespace: &namespace observability
+  name: grafana-operator
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
-  interval: 30m
-  timeout: 5m
-  path: "./kubernetes/apps/observability/grafana/app"
+      app.kubernetes.io/name: grafana-operator
+  interval: 1h
+  path: ./kubernetes/apps/observability/grafana/operator
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  wait: false
+  targetNamespace: observability
+  timeout: 5m
+  wait: true
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: grafana-instance
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: grafana-instance
   dependsOn:
-    - name: onepassword-connect
-      namespace: external-secrets
+    - name: grafana-operator
+  interval: 1h
+  path: ./kubernetes/apps/observability/grafana/instance
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: observability
+  timeout: 5m
+  wait: true

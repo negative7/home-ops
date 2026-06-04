@@ -12,33 +12,22 @@ spec:
   values:
     controllers:
       kromgo:
-        replicas: 1
-        strategy: RollingUpdate
         annotations:
-          reloader.stakater.com/auto: "true"
+          reloader.stakater.com/auto: 'true'
         pod:
           securityContext:
             runAsGroup: 2000
             runAsNonRoot: true
             runAsUser: 2000
-          topologySpreadConstraints:
-            - maxSkew: 1
-              topologyKey: kubernetes.io/hostname
-              whenUnsatisfiable: DoNotSchedule
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: kromgo
         containers:
           kromgo:
             image:
-              repository: ghcr.io/kashalls/kromgo
-              tag: v0.10.0
+              repository: ghcr.io/home-operations/kromgo
+              tag: 0.14.0@sha256:94ee0e2561048dc4637ca21b9926b76d87c15baf951678c7febb852269b7e10b
             env:
               PROMETHEUS_URL: http://prometheus-operated.observability.svc.cluster.local:9090
-              SERVER_HOST: 0.0.0.0
               SERVER_PORT: &port 8080
-              HEALTH_HOST: 0.0.0.0
-              HEALTH_PORT: &hport 8888
+              HEALTH_PORT: &healthPort 8888
             probes:
               liveness: &probes
                 enabled: true
@@ -46,7 +35,7 @@ spec:
                 spec:
                   httpGet:
                     path: /readyz
-                    port: *hport
+                    port: *healthPort
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
@@ -56,33 +45,31 @@ spec:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities:
-                drop:
-                  - "ALL"
+                drop: [ALL]
             resources:
               requests:
                 cpu: 5m
                 memory: 10M
               limits:
                 memory: 64M
-    service:
-      app:
-        ports:
-          http:
-            primary: true
-            port: *port
-          health:
-            port: *hport
     persistence:
       config-file:
         type: configMap
         name: kromgo-configmap
         globalMounts:
-          - path: /kromgo/config.yaml
+          - path: /config/config.yaml
             subPath: config.yaml
     route:
       app:
-        hostnames:
-          - kromgo.negative7.com
+        hostnames: [kromgo.negative7.com]
         parentRefs:
           - name: envoy-external
             namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+            primary: true
+          health:
+            port: *healthPort
