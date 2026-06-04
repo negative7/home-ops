@@ -70,25 +70,25 @@ spec:
       resources:
         mon:
           requests:
-            cpu: 250m
+            cpu: 150m
             memory: 512Mi
           limits:
             memory: 1Gi
         mgr:
           requests:
-            cpu: 250m
+            cpu: 150m
             memory: 512Mi
           limits:
             memory: 1Gi
         osd:
           requests:
-            cpu: 500m
+            cpu: 400m
             memory: 2Gi
           limits:
             memory: 4Gi
         logcollector:
           requests:
-            cpu: 100m
+            cpu: 50m
             memory: 100Mi
           limits:
             memory: 512Mi
