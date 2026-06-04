@@ -48,7 +48,7 @@ spec:
               requests:
                 cpu: 136m
               limits:
-                memory: 4096Mi
+                memory: 2Gi
     service:
       app:
         type: LoadBalancer
