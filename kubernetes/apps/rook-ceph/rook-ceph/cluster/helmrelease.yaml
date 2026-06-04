@@ -86,6 +86,12 @@ spec:
             memory: 2Gi
           limits:
             memory: 4Gi
+        logcollector:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            memory: 512Mi
       storage:
         useAllNodes: false
         useAllDevices: false
