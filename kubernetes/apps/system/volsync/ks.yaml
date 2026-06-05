@@ -7,9 +7,9 @@ metadata:
 spec:
   dependsOn:
     - name: openebs
-      namespace: openebs-system
+      namespace: openebs
     - name: snapshot-controller
-      namespace: kube-system
+      namespace: system-controllers
   interval: 1h
   path: "./kubernetes/apps/system/volsync/app"
   prune: true
