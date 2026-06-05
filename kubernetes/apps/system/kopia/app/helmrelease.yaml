@@ -8,8 +8,68 @@ spec:
   chartRef:
     kind: OCIRepository
     name: kopia
-  interval: 30m
+  interval: 1h
   values:
+    controllers:
+      kopia:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/home-operations/kopia
+              tag: 0.23.0@sha256:76865b421548b1d7bb26a8268f0f0bc828be4eec3f8d8b9c8ece991c99878f94
+            env:
+              KOPIA_WEB_ENABLED: true
+              KOPIA_WEB_PORT: &port 80
+              TZ: America/New_York
+            envFrom:
+              - secretRef:
+                  name: kopia-secret
+            args:
+              - --refresh-interval=5m
+              - --without-password
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 1Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        hostnames:
+          - kopia.negative7.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
     configMaps:
       config:
         data:
@@ -26,67 +86,6 @@ spec:
               "description": "volsync",
               "enableActions": false
             }
-    controllers:
-      kopia:
-        pod:
-          securityContext:
-            fsGroup: 2000
-            fsGroupChangePolicy: "OnRootMismatch"
-            runAsGroup: 2000
-            runAsNonRoot: true
-            runAsUser: 2000
-        containers:
-          app:
-            image:
-              repository: ghcr.io/home-operations/kopia
-              tag: 0.23.0@sha256:76865b421548b1d7bb26a8268f0f0bc828be4eec3f8d8b9c8ece991c99878f94
-            env:
-              KOPIA_WEB_ENABLED: true
-              KOPIA_WEB_PORT: &port 8080
-            envFrom:
-              - secretRef:
-                  name: kopia-secret
-            args:
-              - --refresh-interval=5m
-              - --without-password
-            probes:
-              liveness:
-                enabled: true
-                spec:
-                  periodSeconds: 30
-                  timeoutSeconds: 5
-                  failureThreshold: 5
-              readiness:
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /
-                    port: *port
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 5
-              startup:
-                enabled: true
-                spec:
-                  failureThreshold: 30
-                  periodSeconds: 10
-            resources:
-              requests:
-                cpu: 15m
-              limits:
-                memory: 1Gi
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
-    service:
-      app:
-        ports:
-          http:
-            port: *port
     persistence:
       config-file:
         type: configMap
@@ -96,8 +95,8 @@ spec:
             subPath: repository.config
       repository:
         type: nfs
-        path: /mnt/tank/kopia
         server: truenas.homelab.internal
+        path: /mnt/tank/kopia
         globalMounts:
           - path: /repository
       tmpfs:
@@ -111,10 +110,3 @@ spec:
                 subPath: logs
               - path: /tmp
                 subPath: tmp
-    route:
-      app:
-        hostnames:
-          - kopia.negative7.com
-        parentRefs:
-          - name: envoy-internal
-            namespace: network
