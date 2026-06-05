@@ -51,37 +51,37 @@ spec:
                 cpu: 12m
               limits:
                 memory: 256Mi
-          mcp:
-            image:
-              repository: sstefanov/actual-mcp
-              tag: v1.11.3
-            args:
-              - --sse
-              - --enable-bearer
-            env:
-              ACTUAL_DATA_DIR: /config
-              ACTUAL_SERVER_URL: http://actual-app.default.svc.cluster.local:5006
-              ACTUAL_PASSWORD: 
-                valueFrom:
-                  secretKeyRef:
-                    name: actual-secret
-                    key: password
-              ACTUAL_BUDGET_SYNC_ID: 
-                valueFrom:
-                  secretKeyRef:
-                    name: actual-secret
-                    key: sync_id
-              BEARER_TOKEN: 
-                valueFrom:
-                  secretKeyRef:
-                    name: actual-secret
-                    key: bearer_token
-            resources:
-              requests:
-                cpu: 12m
-                memory: 128M
-              limits:
-                memory: 512M
+          # mcp:
+          #   image:
+          #     repository: sstefanov/actual-mcp
+          #     tag: v1.11.3
+          #   args:
+          #     - --sse
+          #     - --enable-bearer
+          #   env:
+          #     ACTUAL_DATA_DIR: /config
+          #     ACTUAL_SERVER_URL: http://actual-app.default.svc.cluster.local:5006
+          #     ACTUAL_PASSWORD: 
+          #       valueFrom:
+          #         secretKeyRef:
+          #           name: actual-secret
+          #           key: password
+          #     ACTUAL_BUDGET_SYNC_ID: 
+          #       valueFrom:
+          #         secretKeyRef:
+          #           name: actual-secret
+          #           key: sync_id
+          #     BEARER_TOKEN: 
+          #       valueFrom:
+          #         secretKeyRef:
+          #           name: actual-secret
+          #           key: bearer_token
+          #   resources:
+          #     requests:
+          #       cpu: 12m
+          #       memory: 128M
+          #     limits:
+          #       memory: 512M
 
     service:
       app:
@@ -89,10 +89,10 @@ spec:
           http:
             port: *httpPort
         primary: true
-      mcp:
-        ports:
-          http:
-            port: 3000
+      # mcp:
+      #   ports:
+      #     http:
+      #       port: 3000
     route:
       app:
         hostnames:
@@ -105,27 +105,27 @@ spec:
           - backendRefs:
               - identifier: app
                 port: *httpPort
-      mcp:
-        hostnames: 
-          - actual-mcp.negative7.com
-        parentRefs:
-          - name: envoy-internal
-            namespace: network
-            sectionName: https
-        rules:
-          - backendRefs:
-              - identifier: mcp
-                port: 3000
+      # mcp:
+      #   hostnames: 
+      #     - actual-mcp.negative7.com
+      #   parentRefs:
+      #     - name: envoy-internal
+      #       namespace: network
+      #       sectionName: https
+      #   rules:
+      #     - backendRefs:
+      #         - identifier: mcp
+      #           port: 3000
 
     persistence:
-      mcp:
-        type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        advancedMounts:
-          actual:
-            mcp:
-              - path: /config
+      # mcp:
+      #   type: persistentVolumeClaim
+      #   accessMode: ReadWriteOnce
+      #   size: 1Gi
+      #   advancedMounts:
+      #     actual:
+      #       mcp:
+      #         - path: /config
       data:
         existingClaim: actual-data
         advancedMounts:
