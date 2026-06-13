@@ -98,6 +98,14 @@ spec:
         type: emptyDir
       tmp:
         type: emptyDir
+      nfs-data:
+        type: nfs
+        server: "truenas.homelab.internal"
+        path: /mnt/tank/data
+        advancedMounts:
+          jellyfin:
+            app:
+              - path: /data
       media:
         type: nfs
         server: "truenas.homelab.internal"

@@ -117,6 +117,14 @@ spec:
                 subPath: log
               - path: /transcode
                 subPath: transcode
+      nfs-data:
+        type: nfs
+        server: "truenas.homelab.internal"
+        path: /mnt/tank/data
+        advancedMounts:
+          jellyfin:
+            app:
+              - path: /data
       nfs-tv-media:
         type: nfs
         server: "truenas.homelab.internal"
