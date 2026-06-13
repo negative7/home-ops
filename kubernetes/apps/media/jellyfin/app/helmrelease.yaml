@@ -88,7 +88,7 @@ spec:
         advancedMounts:
           jellyfin:
             app:
-              - path: /data/tv
+              - path: /data
       nfs-tv-media:
         type: nfs
         server: "truenas.homelab.internal"
