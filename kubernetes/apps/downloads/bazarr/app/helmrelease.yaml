@@ -75,7 +75,7 @@ spec:
         server: "truenas.homelab.internal"
         path: /mnt/tank/data/media
         advancedMounts:
-          jellyfin:
+          bazarr:
             app:
               - path: /data/media
       nfs-tv-media:

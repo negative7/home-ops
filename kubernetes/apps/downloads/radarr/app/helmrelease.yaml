@@ -103,7 +103,7 @@ spec:
         server: "truenas.homelab.internal"
         path: /mnt/tank/data
         advancedMounts:
-          jellyfin:
+          radarr:
             app:
               - path: /data
       media:

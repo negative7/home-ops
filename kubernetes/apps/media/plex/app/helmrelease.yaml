@@ -122,7 +122,7 @@ spec:
         server: "truenas.homelab.internal"
         path: /mnt/tank/data
         advancedMounts:
-          jellyfin:
+          plex:
             app:
               - path: /data
       nfs-tv-media:
