@@ -106,12 +106,6 @@ spec:
           sonarr:
             app:
               - path: /data
-      media:
-        type: nfs
-        server: "truenas.homelab.internal"
-        path: /mnt/tank/media/tv
-        globalMounts:
-          - path: /media
       completed:
         enabled: true
         type: nfs
