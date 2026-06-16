@@ -1,11 +1,17 @@
 ---
-# yaml-language-server: $schema=https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/gateway.networking.k8s.io/gateway_v1.json
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/gateway_v1.json
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: envoy-internal
   annotations:
     external-dns.alpha.kubernetes.io/target: &hostname ingress-int.negative7.com
+    gatus.home-operations.com/endpoint: |-
+      group: internal
+      guarded: true
+      ui:
+        hide-hostname: true
+        hide-url: true
 spec:
   gatewayClassName: envoy
   infrastructure:
@@ -29,21 +35,21 @@ spec:
         certificateRefs:
           - kind: Secret
             name: negative7-com-tls
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: envoy-internal
-  annotations:
-    external-dns.alpha.kubernetes.io/controller: none
-spec:
-  parentRefs:
-    - name: envoy-internal
-      namespace: network
-      sectionName: http
-  rules:
-    - filters:
-        - type: RequestRedirect
-          requestRedirect:
-            scheme: https
-            statusCode: 301
+# ---
+# apiVersion: gateway.networking.k8s.io/v1
+# kind: HTTPRoute
+# metadata:
+#   name: envoy-internal
+#   annotations:
+#     external-dns.alpha.kubernetes.io/controller: none
+# spec:
+#   parentRefs:
+#     - name: envoy-internal
+#       namespace: network
+#       sectionName: http
+#   rules:
+#     - filters:
+#         - type: RequestRedirect
+#           requestRedirect:
+#             scheme: https
+#             statusCode: 301
