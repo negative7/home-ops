@@ -9,7 +9,7 @@ metadata:
       conditions: ["[STATUS] == 404"]
 spec:
   hostnames:
-    - flux-webhook.bjw-s.dev
+    - flux-webhook.negative7.com
   parentRefs:
     - name: envoy-external
       namespace: network
