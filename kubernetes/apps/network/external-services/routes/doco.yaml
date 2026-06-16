@@ -9,10 +9,12 @@ metadata:
   name: doco-cd-proxy
 spec:
   endpoints:
-    - ip:
-        address: 10.2.0.10
+    - fqdn:
+        hostname: truenas.homelab.internal
         port: 8880
+
 ---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/httproute_v1.json
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 annotations:
