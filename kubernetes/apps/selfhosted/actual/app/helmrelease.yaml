@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: actual
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: actual
+  interval: 30m
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -20,10 +20,10 @@ spec:
 
         pod:
           securityContext:
-            runAsUser: 2000
-            runAsGroup: 2000
             fsGroup: 2000
             fsGroupChangePolicy: "OnRootMismatch"
+            runAsGroup: 2000
+            runAsUser: 2000
 
         containers:
           app:
@@ -35,6 +35,10 @@ spec:
             probes:
               liveness:
                 enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
               readiness:
                 enabled: true
                 custom: true
@@ -42,57 +46,29 @@ spec:
                   httpGet:
                     path: /
                     port: *httpPort
-                  initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
             resources:
               requests:
                 cpu: 12m
+                memory: 128M
               limits:
-                memory: 256Mi
-          # mcp:
-          #   image:
-          #     repository: sstefanov/actual-mcp
-          #     tag: v1.11.3
-          #   args:
-          #     - --sse
-          #     - --enable-bearer
-          #   env:
-          #     ACTUAL_DATA_DIR: /config
-          #     ACTUAL_SERVER_URL: http://actual-app.default.svc.cluster.local:5006
-          #     ACTUAL_PASSWORD: 
-          #       valueFrom:
-          #         secretKeyRef:
-          #           name: actual-secret
-          #           key: password
-          #     ACTUAL_BUDGET_SYNC_ID: 
-          #       valueFrom:
-          #         secretKeyRef:
-          #           name: actual-secret
-          #           key: sync_id
-          #     BEARER_TOKEN: 
-          #       valueFrom:
-          #         secretKeyRef:
-          #           name: actual-secret
-          #           key: bearer_token
-          #   resources:
-          #     requests:
-          #       cpu: 12m
-          #       memory: 128M
-          #     limits:
-          #       memory: 512M
+                memory: 256M
 
-    service:
-      app:
-        ports:
-          http:
-            port: *httpPort
-        primary: true
-      # mcp:
-      #   ports:
-      #     http:
-      #       port: 3000
+    persistence:
+      data:
+        existingClaim: actual-data
+        advancedMounts:
+          actual:
+            app:
+              - path: /data
+
     route:
       app:
         hostnames:
@@ -100,30 +76,9 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-      # mcp:
-      #   hostnames: 
-      #     - actual-mcp.negative7.com
-      #   parentRefs:
-      #     - name: envoy-internal
-      #       namespace: network
-      #       sectionName: https
-      #   rules:
-      #     - backendRefs:
-      #         - identifier: mcp
-      #           port: 3000
 
-    persistence:
-      # mcp:
-      #   type: persistentVolumeClaim
-      #   accessMode: ReadWriteOnce
-      #   size: 1Gi
-      #   advancedMounts:
-      #     actual:
-      #       mcp:
-      #         - path: /config
-      data:
-        existingClaim: actual-data
-        advancedMounts:
-          actual:
-            app:
-              - path: /data
+    service:
+      app:
+        ports:
+          http:
+            port: *httpPort
