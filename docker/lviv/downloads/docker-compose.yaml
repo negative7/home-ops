@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/refs/heads/main/schema/compose-spec.json
+# ghcr.io/qdm12/gluetun:v3.41.1
+version: "3.2"
+services:
+  sabnzbd:
+    container_name: sabnzbd
+    hostname: sabnzbd.internal
+    image: ghcr.io/home-operations/sabnzbd:5.0.3
+    user: "2000:2000" 
+    restart: unless-stopped
+    logging:
+      driver: json-file
+    ports:
+      - 6060:6060
+    environment:
+      - SABNZBD__HOST_WHITELIST_ENTRIES=lviv.homelab.internal
+      - SABNZBD__PORT=6060
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /mnt/tank/apps/sabnzbd:/config
+      - /mnt/tank/data/usenet:/data/usenet:rw
