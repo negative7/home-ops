@@ -5,13 +5,10 @@ kind: HelmRelease
 metadata:
   name: atuin
 spec:
-  interval: 30m
   chartRef:
     kind: OCIRepository
     name: atuin
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
+  interval: 30m
   values:
     controllers:
       atuin:
@@ -19,11 +16,11 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           securityContext:
-            runAsNonRoot: true
-            runAsUser: 2000
-            runAsGroup: 2000
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
         containers:
           app:
             image:
@@ -35,36 +32,41 @@ spec:
               ATUIN_DB_URI: sqlite:///config/atuin.db
               ATUIN_HOST: 0.0.0.0
               ATUIN_PORT: &port 8888
-              ATUIN_OPEN_REGISTRATION: true
+              # ATUIN_OPEN_REGISTRATION: true
             probes:
-              liveness: &probes
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
-                    path: /
+                    path: /healthz
                     port: *port
-                  initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
-              readiness: *probes
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
             resources:
               requests:
                 cpu: 10m
-              limits:
                 memory: 128Mi
+              limits:
+                memory: 256Mi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
-    service:
-      app:
-        ports:
-          http:
-            port: *port
     persistence:
       config:
         existingClaim: atuin
@@ -75,4 +77,8 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-            sectionName: https
+    service:
+      app:
+        ports:
+          http:
+            port: *port
