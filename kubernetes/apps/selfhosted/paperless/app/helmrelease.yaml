@@ -44,8 +44,8 @@ spec:
               PAPERLESS_CONSUMER_RECURSIVE: "true"
               PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
               # Configure OCR
-              PAPERLESS_OCR_LANGUAGES: nld
-              PAPERLESS_OCR_LANGUAGE: nld
+              PAPERLESS_OCR_LANGUAGES: eng ukr
+              PAPERLESS_OCR_LANGUAGE: eng
               # Configure redis integration
               PAPERLESS_REDIS: redis://paperless-dragonfly:6379
               # Configure user permissions
