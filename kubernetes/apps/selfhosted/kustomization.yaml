@@ -9,4 +9,5 @@ resources:
   - ./namespace.yaml
   - ./actual/ks.yaml
   - ./atuin/ks.yaml
+  - ./paperless/ks.yaml
   - ./spoolman/ks.yaml
