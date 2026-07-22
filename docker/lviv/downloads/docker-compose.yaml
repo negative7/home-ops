@@ -14,7 +14,7 @@ services:
     ports:
       - 6060:6060
     environment:
-      - SABNZBD__HOST_WHITELIST_ENTRIES=lviv.homelab.internal
+      - SABNZBD__HOST_WHITELIST_ENTRIES=lviv.homelab.internal, sabnzbd.negative7.com
       - SABNZBD__PORT=6060
     volumes:
       - /etc/localtime:/etc/localtime:ro
