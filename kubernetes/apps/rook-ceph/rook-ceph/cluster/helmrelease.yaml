@@ -96,9 +96,6 @@ spec:
           - name: dnipro
             devices:
               - name: nvme0n1
-          - name: kyiv
-            devices:
-              - name: /dev/disk/by-partlabel/r-csi-data
           - name: vinnytsia
             devices:
               - name: nvme0n1
