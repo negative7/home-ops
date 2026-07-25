@@ -96,9 +96,10 @@ spec:
           - name: dnipro
             devices:
               - name: nvme0n1
+              - name: /dev/disk/by-partlabel/r-csi-data
           - name: vinnytsia
             devices:
-              - name: nvme0n1
+              - name: /dev/disk/by-partlabel/r-csi-data
         config:
           osdsPerDevice: "1"
     cephBlockPools:
