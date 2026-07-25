@@ -10,11 +10,3 @@ machine:
 apiVersion: v1alpha1
 kind: HostnameConfig
 hostname: kharkiv
----
-apiVersion: v1alpha1
-kind: RawVolumeConfig
-name: csi-data
-provisioning:
-  diskSelector:
-    match: system_disk
-  maxSize: 512GiB
