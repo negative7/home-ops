@@ -34,6 +34,29 @@
         doco_webhook_secret: "{{ secrets_raw.results[2].stdout }}"
       no_log: true
 
+    - name: apps data
+      vars:
+        apps_data_dir: /mnt/tank/apps
+      block:
+        - name: apps data | Discover app directories referenced by compose files
+          ansible.builtin.set_fact:
+            apps_data_dirs: >-
+              {{ lookup('ansible.builtin.pipe',
+                "grep -rhoE '/mnt/tank/apps/[a-zA-Z0-9_-]+' " ~ playbook_dir ~ "/../../docker/lviv | sort -u | xargs -n1 basename"
+              ).splitlines() }}
+          delegate_to: localhost
+          become: false
+          run_once: true
+
+        - name: apps data | Ensure directories exist with correct ownership
+          ansible.builtin.file:
+            path: "{{ apps_data_dir }}/{{ item }}"
+            state: directory
+            owner: apps
+            group: apps
+            mode: "0755"
+          loop: "{{ apps_data_dirs }}"
+
     - name: doco-cd
       vars:
         dococd_config_dir: /home/nasadmin/.config/doco-cd
