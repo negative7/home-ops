@@ -19,9 +19,13 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/tank/apps/sabnzbd:/config
       - /mnt/tank/data/usenet:/data/usenet:rw
+    healthcheck:
+      test: [CMD, curl, -f, "http://localhost:6060/"]
+      start_period: 30s
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
-  # ProtonVPN WireGuard tunnel for qbittorrent/qui. Gluetun's firewall drops
-  # all non-tunnel traffic by default, acting as the killswitch.
   gluetun:
     container_name: gluetun
     hostname: gluetun.internal
@@ -34,28 +38,19 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
-      - 8080:8080 # qbittorrent webui
-      - 7476:7476 # qui webui
+      - 8080:8080 
+      - 7476:7476 
     environment:
       - TZ=America/New_York
       - VPN_SERVICE_PROVIDER=protonvpn
       - VPN_TYPE=wireguard
       - SERVER_COUNTRIES=United States
-      # Only pick servers that support port forwarding, since we rely on it below.
       - PORT_FORWARD_ONLY=on
-      # Resolved via external_secrets in docker/lviv/.doco-cd.yaml (1Password home-cluster vault).
-      # This key works for all ProtonVPN servers, no special generation flags needed.
       - WIREGUARD_PRIVATE_KEY=${PROTONVPN_WIREGUARD_PRIVATE_KEY}
       - WIREGUARD_ADDRESSES=${PROTONVPN_WIREGUARD_ADDRESSES}
       - VPN_PORT_FORWARDING=on
-      # qBittorrent WebUI must have "Bypass authentication for clients on localhost" enabled
-      # (Settings > WebUI) so these unauthenticated localhost requests from gluetun succeed.
       - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'wget -O- -nv --retry-connrefused --post-data "json={\"listen_port\":{{PORT}},\"current_network_interface\":\"{{VPN_INTERFACE}}\",\"random_port\":false,\"upnp\":false}" http://127.0.0.1:8080/api/v2/app/setPreferences'
       - VPN_PORT_FORWARDING_DOWN_COMMAND=/bin/sh -c 'wget -O- -nv --retry-connrefused --post-data "json={\"listen_port\":0,\"current_network_interface\":\"lo\"}" http://127.0.0.1:8080/api/v2/app/setPreferences'
-      # Opens the WebUI ports through gluetun's own firewall (killswitch blocks everything else)
-      # and allows responses back out to the LAN. Adjust the subnet if lviv's LAN differs.
-      # The forwarded torrent peer port is opened automatically since protonvpn is a native
-      # gluetun integration (no FIREWALL_VPN_INPUT_PORTS needed).
       - FIREWALL_INPUT_PORTS=8080,7476
       - FIREWALL_OUTBOUND_SUBNETS=10.2.0.0/24
     volumes:
@@ -85,9 +80,13 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/tank/apps/qbittorrent:/config
       - /mnt/tank/data/torrents:/data/torrents:rw
+    healthcheck:
+      test: [CMD, curl, -f, "http://localhost:8080/api/v2/app/version"]
+      start_period: 30s
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
-  # Modern qbittorrent WebUI, shares gluetun's network namespace so it can
-  # reach qbittorrent over localhost.
   qui:
     container_name: qui
     image: ghcr.io/autobrr/qui:v1.23.0
@@ -107,8 +106,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/tank/apps/qui:/config
 
-  # Runs directly on the LAN (not through the VPN) since most private
-  # trackers require your real/whitelisted IP for indexer and IRC access.
   autobrr:
     container_name: autobrr
     hostname: autobrr.internal
@@ -124,3 +121,9 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/tank/apps/autobrr:/config
+    healthcheck:
+      test: [CMD, curl, -f, "http://localhost:7474/api/healthz/liveness"]
+      start_period: 15s
+      interval: 30s
+      timeout: 5s
+      retries: 3

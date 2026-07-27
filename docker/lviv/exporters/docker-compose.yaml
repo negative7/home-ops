@@ -19,6 +19,12 @@ services:
       - /:/host/root:ro
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
+    healthcheck:
+      test: [CMD, wget, --no-verbose, --tries=1, --spider, 'http://localhost:9100/metrics']
+      start_period: 15s
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   smartctl-exporter:
     container_name: smartctl-exporter
@@ -28,6 +34,12 @@ services:
     privileged: true
     restart: unless-stopped
     user: root
+    healthcheck:
+      test: [CMD, wget, --no-verbose, --tries=1, --spider, 'http://localhost:9633/metrics']
+      start_period: 15s
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   nut_exporter:
     image: ghcr.io/druggeri/nut_exporter:3.3.0
