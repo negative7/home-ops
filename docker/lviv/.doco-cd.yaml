@@ -4,6 +4,9 @@ auto_discovery:
   enabled: true
   depth: 1
   delete: true
+external_secrets:
+  PROTONVPN_WIREGUARD_PRIVATE_KEY: op://home-cluster/protonvpn/private_key
+  PROTONVPN_WIREGUARD_ADDRESSES: op://home-cluster/protonvpn/addresses
 force_recreate: false
 reconciliation:
   enabled: true
