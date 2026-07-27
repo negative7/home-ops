@@ -1,0 +1,24 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/refs/heads/main/schema/compose-spec.json
+services:
+  garage:
+    container_name: garage
+    image: docker.io/dxflrs/garage:v2.3.0
+    command:
+      - /garage
+      - "-c"
+      - /etc/garage/garage.toml
+      - server
+    user: "3000:4000"
+    restart: unless-stopped
+    logging:
+      driver: json-file
+    network_mode: host
+    environment:
+      - GARAGE_ADMIN_TOKEN=${GARAGE_ADMIN_TOKEN}
+      - GARAGE_RPC_SECRET=${GARAGE_RPC_SECRET}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./config/garage.toml:/etc/garage/garage.toml:ro
+      - /mnt/tank/apps/garage/meta:/var/lib/garage/meta
+      - /mnt/tank/apps/garage/data:/var/lib/garage/data

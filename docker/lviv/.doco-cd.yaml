@@ -7,6 +7,8 @@ auto_discovery:
 external_secrets:
   PROTONVPN_WIREGUARD_PRIVATE_KEY: op://home-cluster/protonvpn/private_key
   PROTONVPN_WIREGUARD_ADDRESSES: op://home-cluster/protonvpn/addresses
+  GARAGE_ADMIN_TOKEN: op://home-cluster/garage/admin_token
+  GARAGE_RPC_SECRET: op://home-cluster/garage/rpc_secret
 force_recreate: false
 reconciliation:
   enabled: true
