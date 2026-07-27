@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://datreeio.github.io/CRDs-catalog/gateway.envoyproxy.io/backend_v1alpha1.json
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: Backend
+metadata:
+  labels:
+    app.kubernetes.io/instance: qui
+    app.kubernetes.io/name: qui
+  name: qui
+spec:
+  appProtocols:
+    - gateway.envoyproxy.io/ws
+    - gateway.envoyproxy.io/wss
+  endpoints:
+    - fqdn:
+        hostname: lviv.homelab.internal
+        port: 7476
