@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/refs/heads/main/schema/compose-spec.json
+services:
+  dockhand:
+    container_name: dockhand
+    hostname: dockhand.internal
+    image: fnsys/dockhand:v1.0.39
+    restart: unless-stopped
+    logging:
+      driver: json-file
+    ports:
+      - 3000:3000
+    environment:
+      - TZ=America/New_York
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /mnt/tank/apps/dockhand:/app/data
