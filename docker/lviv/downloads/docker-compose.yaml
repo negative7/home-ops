@@ -90,7 +90,7 @@ services:
   # reach qbittorrent over localhost.
   qui:
     container_name: qui
-    image: ghcr.io/autobrr/qui:v1.19.0
+    image: ghcr.io/autobrr/qui:v1.23.0
     user: "2000:2000"
     restart: unless-stopped
     logging:
