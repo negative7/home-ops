@@ -38,8 +38,8 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
-      - 8080:8080 
-      - 7476:7476 
+      - 8080:8080
+      - 7476:7476
     environment:
       - TZ=America/New_York
       - VPN_SERVICE_PROVIDER=protonvpn
