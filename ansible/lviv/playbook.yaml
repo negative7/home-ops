@@ -57,6 +57,15 @@
             mode: "0755"
           loop: "{{ apps_data_dirs }}"
 
+        - name: apps data | Recursively fix ownership
+          ansible.builtin.file:
+            path: "{{ apps_data_dir }}/{{ item }}"
+            state: directory
+            owner: apps
+            group: apps
+            recurse: true
+          loop: "{{ apps_data_dirs }}"
+
     - name: doco-cd
       vars:
         dococd_config_dir: /home/nasadmin/.config/doco-cd
