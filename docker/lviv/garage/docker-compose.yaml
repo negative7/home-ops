@@ -9,7 +9,7 @@ services:
       - "-c"
       - /etc/garage/garage.toml
       - server
-    user: "3000:4000"
+    user: "2000:2000"
     restart: unless-stopped
     logging:
       driver: json-file
