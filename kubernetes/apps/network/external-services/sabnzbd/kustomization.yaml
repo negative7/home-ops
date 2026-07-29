@@ -2,10 +2,6 @@
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: home
-components:
-  - ../../components/flux-alerts
-  - ../../components/kopiur/secret
 resources:
-  - ./namespace.yaml
-  - ./scrypted/ks.yaml
+  - ./backend.yaml
+  - ./httproute.yaml

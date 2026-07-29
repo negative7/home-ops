@@ -3,19 +3,118 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &appname external-services-ingress
-  namespace: &namespace network
+  name: external-services-adguard
 spec:
-  targetNamespace: *namespace
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *appname
+      app.kubernetes.io/name: external-services-adguard
   interval: 30m
-  timeout: 5m
-  path: "./kubernetes/apps/network/external-services/routes"
+  path: "./kubernetes/apps/network/external-services/adguard"
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  targetNamespace: network
+  timeout: 5m
+  wait: false
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: external-services-autobrr
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: external-services-autobrr
+  interval: 30m
+  path: "./kubernetes/apps/network/external-services/autobrr"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: network
+  timeout: 5m
+  wait: false
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: external-services-doco
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: external-services-doco
+  interval: 30m
+  path: "./kubernetes/apps/network/external-services/doco"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: network
+  timeout: 5m
+  wait: false
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: external-services-home-assistant
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: external-services-home-assistant
+  interval: 30m
+  path: "./kubernetes/apps/network/external-services/home-assistant"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: network
+  timeout: 5m
+  wait: false
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: external-services-qui
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: external-services-qui
+  interval: 30m
+  path: "./kubernetes/apps/network/external-services/qui"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: network
+  timeout: 5m
+  wait: false
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/kustomization-kustomize-v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: external-services-sabnzbd
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: external-services-sabnzbd
+  interval: 30m
+  path: "./kubernetes/apps/network/external-services/sabnzbd"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: network
+  timeout: 5m
   wait: false
