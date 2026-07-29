@@ -9,9 +9,9 @@ spec:
     labels:
       app.kubernetes.io/name: spoolman
   components:
-    - ../../../../components/volsync
+    - ../../../../components/kopiur/backup
   dependsOn:
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/selfhosted/spoolman/app"
@@ -20,7 +20,7 @@ spec:
       APP: spoolman
       APP_UID: "1000"
       APP_GID: "1000"
-      VOLSYNC_CLAIM: spoolman
+      KOPIUR_CLAIM: spoolman
   prune: true
   sourceRef:
     kind: GitRepository
