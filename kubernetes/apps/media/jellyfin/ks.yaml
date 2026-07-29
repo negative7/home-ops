@@ -10,20 +10,20 @@ spec:
       app.kubernetes.io/name: jellyfin
   components:
     - ../../../../components/gpu
-    - ../../../../components/volsync
+    - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
   dependsOn:
     - name: intel-gpu-resource-driver
       namespace: kube-system
-    - name: volsync
+    - name: kopiur
       namespace: system
   interval: 1h
   path: "./kubernetes/apps/media/jellyfin/app"
   postBuild:
     substitute:
       APP: jellyfin
-      VOLSYNC_CLAIM: jellyfin
-      VOLSYNC_CAPACITY: 20Gi
+      KOPIUR_CLAIM: jellyfin
+      KOPIUR_CAPACITY: 20Gi
   prune: true
   sourceRef:
     kind: GitRepository
