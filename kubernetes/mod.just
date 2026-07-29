@@ -68,7 +68,7 @@ snapshot ns name:
 
 [doc('Trigger a kopiur snapshot for all SnapshotPolicies')]
 snapshot-all:
-    kubectl get snapshotpolicies --no-headers -A | while read -r ns name _; do \
+    kubectl get snapshotpolicies.kopiur.home-operations.com --no-headers -A | while read -r ns name _; do \
       just k8s snapshot "$ns" "$name"; \
     done
 
