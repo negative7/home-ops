@@ -18,8 +18,8 @@ spec:
   postBuild:
     substitute:
       APP: spoolman
-      APP_UID: "1000"
-      APP_GID: "1000"
+      KOPIUR_MOVER_UID: "1000"
+      KOPIUR_MOVER_GID: "1000"
       KOPIUR_CLAIM: spoolman
   prune: true
   sourceRef:

@@ -15,8 +15,8 @@ spec:
       mode: Persistent
       storageClassName: ${KOPIUR_CACHE_STORAGECLASS:=openebs-hostpath}
     securityContext:
-      runAsUser: ${APP_UID:=2000}
-      runAsGroup: ${APP_GID:=2000}
+      runAsUser: ${KOPIUR_MOVER_UID:=2000}
+      runAsGroup: ${KOPIUR_MOVER_GID:=2000}
   repository:
     kind: ClusterRepository
     name: nas

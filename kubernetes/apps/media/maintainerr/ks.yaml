@@ -29,5 +29,5 @@ spec:
   postBuild:
     substitute:
       APP: *appname
-      APP_UID: "1000"
-      APP_GID: "1000"
+      KOPIUR_MOVER_UID: "1000"
+      KOPIUR_MOVER_GID: "1000"
