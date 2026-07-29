@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kopiur.home-operations.com/clusterrepository_v1alpha1.json
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: ClusterRepository
+metadata:
+  name: nas
+spec:
+  allowedNamespaces:
+    all: true
+  backend:
+    filesystem:
+      path: /repository
+      volume:
+        nfs:
+          server: truenas.homelab.internal
+          path: /mnt/tank/kopia
+  encryption:
+    passwordSecretRef:
+      name: kopiur-repository-secret
+      namespace: system
+      key: KOPIA_PASSWORD
+  scheduleDefaults:
+    timezone: America/New_York
