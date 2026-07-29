@@ -4,9 +4,11 @@ apiVersion: kopiur.home-operations.com/v1alpha1
 kind: SnapshotPolicy
 metadata:
   name: ${APP}
+  annotations:
+    kopiur.home-operations.com/allow-identity-change: "true"
 spec:
   compression:
-    compressor: zstd
+    compressor: ${KOPIUR_COMPRESSOR:=zstd-fastest}
   mover:
     cache:
       capacity: ${KOPIUR_CACHE_CAPACITY:=5Gi}
@@ -24,4 +26,6 @@ spec:
   sources:
     - pvc:
         name: "${KOPIUR_CLAIM:-${APP}}"
+  upload:
+    maxParallelFileReads: ${KOPIUR_PARALLELISM:=2}
   volumeSnapshotClassName: ${KOPIUR_SNAPSHOTCLASS:=csi-ceph-blockpool}
