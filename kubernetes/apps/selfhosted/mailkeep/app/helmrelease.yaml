@@ -1,0 +1,99 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mailkeep
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: mailkeep
+  interval: 30m
+  values:
+    controllers:
+      mailkeep:
+        annotations:
+          secret.reloader.stakater.com/reload: mailkeep-secret
+        pod:
+          securityContext:
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
+        containers:
+          app:
+            image:
+              repository: ghcr.io/szinn/mailkeep
+              tag: v0.1.10@sha256:b0e5ab38cd5b388196423aec87bf041b04c2f0f1be3ff190195ade8e8b4eee87
+            env:
+              MAILKEEP__FRONTEND__BASE_URL: https://mailkeep.negative7.com
+              MAILKEEP__METADATA_PATH: /data
+              MAILKEEP__STORAGE_PATH: /storage
+              RUST_LOG: INFO
+              TZ: America/New_York
+            envFrom:
+              - secretRef:
+                  name: mailkeep-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: &port 8080
+                  failureThreshold: 3
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /readyz
+                    port: *port
+                  failureThreshold: 3
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      data:
+        existingClaim: mailkeep
+        globalMounts:
+          - path: /data
+      storage:
+        type: nfs
+        server: truenas.homelab.internal
+        path: /mnt/tank/apps/mailkeep
+        globalMounts:
+          - path: /storage
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    route:
+      app:
+        hostnames:
+          - mailkeep.negative7.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port
