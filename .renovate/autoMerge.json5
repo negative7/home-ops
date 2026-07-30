@@ -24,6 +24,7 @@
       matchUpdateTypes: ["minor", "patch"],
       matchPackageNames: ["/kube-prometheus-stack/", "/grafana/"],
       ignoreTests: false,
+      schedule: ["before 6am on Monday"],
     },
     {
       description: "Auto-merge GitHub Actions",
@@ -67,6 +68,22 @@
       ],
       "minimumReleaseAge": "3 days",
       ignoreTests: false,
+    },
+    {
+      description: "Auto-merge Grafana dashboards",
+      matchDatasources: ["custom.grafana-dashboards"],
+      matchUpdateTypes: ["major"],
+      automerge: true,
+      automergeType: "branch",
+      ignoreTests: true,
+    },
+    {
+      description: "Auto-merge Renovate Presets",
+      matchManagers: ["renovate-config"],
+      matchUpdateTypes: ["minor", "patch"],
+      automerge: true,
+      automergeType: "branch",
+      ignoreTests: true,
     },
   ],
 }

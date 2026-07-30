@@ -25,7 +25,7 @@
     },
     {
       "matchUpdateTypes": ["digest"],
-      "semanticCommitType": "chore",
+      "semanticCommitType": "fix",
       "commitMessageTopic": "{{depName}}",
       "commitMessageExtra": "( {{currentDigestShort}} ➔ {{newDigestShort}} )",
       "commitMessageSuffix": ""
