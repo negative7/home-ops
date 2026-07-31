@@ -6,7 +6,16 @@ machine:
   type: controlplane
   nodeLabels:
     node.kubernetes.io/gpu: "true"
+    storage.miroir.home-operations.com/class: default
 ---
 apiVersion: v1alpha1
 kind: HostnameConfig
 hostname: dnipro
+---
+apiVersion: v1alpha1
+kind: RawVolumeConfig
+name: miroir-data
+provisioning:
+  diskSelector:
+    match: disk.model == "SPCC M.2 PCIe SSD"
+  maxSize: 920GiB
