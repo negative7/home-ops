@@ -7,4 +7,6 @@ components:
   - ../../components/flux-alerts
 resources:
   - ./namespace.yaml
+  - ./barman-cloud-plugin/ks.yaml
+  - ./cnpg-operator/ks.yaml
   - ./dragonfly-operator/ks.yaml
