@@ -9,9 +9,6 @@ spec:
     kind: OCIRepository
     name: outline
   interval: 30m
-  dependsOn:
-    - name: outline-postgresql
-      namespace: selfhosted
   values:
     defaultPodOptions:
       securityContext:
