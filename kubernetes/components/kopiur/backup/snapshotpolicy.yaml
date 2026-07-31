@@ -28,4 +28,4 @@ spec:
         name: "${KOPIUR_CLAIM:-${APP}}"
   upload:
     maxParallelFileReads: ${KOPIUR_PARALLELISM:=2}
-  volumeSnapshotClassName: ${KOPIUR_SNAPSHOTCLASS:=csi-ceph-blockpool}
+  volumeSnapshotClassName: ${KOPIUR_SNAPSHOTCLASS:=miroir}
