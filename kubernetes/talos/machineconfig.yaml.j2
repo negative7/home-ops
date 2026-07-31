@@ -195,20 +195,12 @@ name: EPHEMERAL
 provisioning:
   diskSelector:
     match: system_disk
-  maxSize: 256GiB
----
-apiVersion: v1alpha1
-kind: UserVolumeConfig
-name: local-hostpath
-provisioning:
-  diskSelector:
-    match: system_disk
-  maxSize: 256GiB
+  maxSize: 300GiB
 ---
 apiVersion: v1alpha1
 kind: RawVolumeConfig
-name: csi-data
+name: miroir-sda
 provisioning:
   diskSelector:
     match: system_disk
-  maxSize: 512GiB
+  maxSize: 620GiB

@@ -13,3 +13,6 @@ spec:
       - name: default
         lvmthin:
           device: /dev/disk/by-partlabel/r-miroir-data
+      - name: sda
+        lvmthin:
+          device: /dev/disk/by-partlabel/r-miroir-sda
