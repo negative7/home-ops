@@ -14,6 +14,10 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    drbd:
+      # rook-ceph's mgr dashboard and OSD msgr ports occupy 6800-7300 and 7000
+      # on the host network, colliding with the chart's default portBase: 7000
+      portBase: 7789
     monitoring:
       podMonitor:
         enabled: true
