@@ -19,9 +19,12 @@ spec:
     - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
   dependsOn:
+    - name: miroir
+      namespace: miroir-system
     - name: kopiur
       namespace: system
   postBuild:
     substitute:
       APP: seerr
       KOPIUR_CAPACITY: 5Gi
+      KOPIUR_STORAGECLASS: miroir-replicated

@@ -15,6 +15,8 @@ spec:
   dependsOn:
     - name: intel-gpu-resource-driver
       namespace: kube-system
+    - name: miroir
+      namespace: miroir-system
     - name: kopiur
       namespace: system
   interval: 1h
@@ -24,6 +26,7 @@ spec:
       APP: jellyfin
       KOPIUR_CLAIM: jellyfin
       KOPIUR_CAPACITY: 20Gi
+      KOPIUR_STORAGECLASS: miroir-replicated
   prune: true
   sourceRef:
     kind: GitRepository

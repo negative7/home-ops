@@ -76,6 +76,7 @@ spec:
         size: 10Gi
         accessMode: ReadWriteOnce
         suffix: "metadata"
+        storageClass: miroir-replicated
         globalMounts:
           - path: /metadata
             subPath: metadata
