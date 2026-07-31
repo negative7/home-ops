@@ -13,4 +13,5 @@ resources:
   - ./it-tools/ks.yaml
   - ./karakeep/ks.yaml
   - ./mailkeep/ks.yaml
+  - ./outline/ks.yaml
   - ./spoolman/ks.yaml
