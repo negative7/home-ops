@@ -1,0 +1,33 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: outline
+spec:
+  components:
+    - ../../../../components/dragonfly
+    - ../../../../components/kopiur/backup
+  dependsOn:
+    - name: kopiur
+      namespace: system
+    - name: cnpg-operator
+      namespace: database
+    - name: barman-cloud-plugin
+      namespace: database
+    - name: kanidm
+      namespace: security
+  interval: 1h
+  path: "./kubernetes/apps/selfhosted/outline/app"
+  postBuild:
+    substitute:
+      APP: outline
+      KOPIUR_CAPACITY: 10Gi
+      KOPIUR_MOVER_UID: "1001"
+      KOPIUR_MOVER_GID: "1001"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: selfhosted

@@ -1,0 +1,106 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: outline
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: outline
+  interval: 30m
+  dependsOn:
+    - name: outline-postgresql
+      namespace: selfhosted
+  values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1001
+        runAsNonRoot: true
+        runAsUser: 1001
+    controllers:
+      outline:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: docker.io/outlinewiki/outline
+              tag: 1.9.2
+            env:
+              NODE_ENV: production
+              URL: https://outline.negative7.com
+              PORT: "3000"
+              FILE_STORAGE: local
+              FILE_STORAGE_LOCAL_ROOT_DIR: /var/lib/outline/data
+              REDIS_URL: redis://outline-dragonfly:6379
+              DATABASE_URL:
+                valueFrom:
+                  secretKeyRef:
+                    name: outline-postgresql-app
+                    key: uri
+              SECRET_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: outline-secret
+                    key: SECRET_KEY
+              UTILS_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: outline-secret
+                    key: UTILS_SECRET
+              OIDC_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: outline-secret
+                    key: OIDC_CLIENT_ID
+              OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: outline-secret
+                    key: OIDC_CLIENT_SECRET
+              OIDC_AUTH_URI: https://idm.negative7.com/ui/oauth2
+              OIDC_TOKEN_URI: https://idm.negative7.com/oauth2/token
+              OIDC_USERINFO_URI: https://idm.negative7.com/oauth2/openid/outline/userinfo
+              OIDC_USERNAME_CLAIM: preferred_username
+              OIDC_DISPLAY_NAME: Kanidm
+              OIDC_SCOPES: openid profile email
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 1Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      data:
+        existingClaim: outline
+        globalMounts:
+          - path: /var/lib/outline/data
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    route:
+      app:
+        hostnames:
+          - outline.negative7.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: 3000
