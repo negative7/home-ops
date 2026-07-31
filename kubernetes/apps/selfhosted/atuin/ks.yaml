@@ -11,6 +11,8 @@ spec:
   components:
     - ../../../../components/kopiur/backup
   dependsOn:
+    - name: miroir
+      namespace: miroir-system
     - name: kopiur
       namespace: system
   interval: 1h
@@ -20,6 +22,7 @@ spec:
       APP: atuin
       KOPIUR_CLAIM: atuin
       KOPIUR_CAPACITY: 5Gi
+      KOPIUR_STORAGECLASS: miroir-replicated
   prune: true
   sourceRef:
     kind: GitRepository

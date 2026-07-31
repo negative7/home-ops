@@ -8,6 +8,8 @@ spec:
   components:
     - ../../../../components/kopiur/backup
   dependsOn:
+    - name: miroir
+      namespace: miroir-system
     - name: kopiur
       namespace: system
   interval: 1h
@@ -18,6 +20,7 @@ spec:
       KOPIUR_CLAIM: karakeep-data
       KOPIUR_MOVER_UID: "1000"
       KOPIUR_MOVER_GID: "1000"
+      KOPIUR_STORAGECLASS: miroir-replicated
   prune: true
   sourceRef:
     kind: GitRepository

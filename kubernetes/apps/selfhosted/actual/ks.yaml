@@ -11,6 +11,8 @@ spec:
   components:
     - ../../../../components/kopiur/backup
   dependsOn:
+    - name: miroir
+      namespace: miroir-system
     - name: kopiur
       namespace: system
   interval: 1h
@@ -19,6 +21,7 @@ spec:
     substitute:
       APP: actual
       KOPIUR_CLAIM: actual-data
+      KOPIUR_STORAGECLASS: miroir-replicated
   prune: true
   sourceRef:
     kind: GitRepository

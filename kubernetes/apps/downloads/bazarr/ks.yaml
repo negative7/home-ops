@@ -12,8 +12,8 @@ spec:
     - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
   dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
+    - name: miroir
+      namespace: miroir-system
     - name: kopiur
       namespace: system
   interval: 1h
@@ -22,6 +22,7 @@ spec:
     substitute:
       APP: bazarr
       KOPIUR_CLAIM: bazarr-config
+      KOPIUR_STORAGECLASS: miroir-replicated
   prune: true
   sourceRef:
     kind: GitRepository
