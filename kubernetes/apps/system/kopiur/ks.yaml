@@ -6,8 +6,8 @@ metadata:
   name: kopiur
 spec:
   dependsOn:
-    - name: openebs
-      namespace: openebs
+    - name: miroir-config
+      namespace: miroir-system
     - name: snapshot-controller
       namespace: system-controllers
   interval: 1h

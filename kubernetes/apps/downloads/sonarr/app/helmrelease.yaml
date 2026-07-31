@@ -10,8 +10,8 @@ spec:
     kind: OCIRepository
     name: sonarr
   dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
+    - name: miroir
+      namespace: miroir-system
   values:
     controllers:
       sonarr:
