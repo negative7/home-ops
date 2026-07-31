@@ -4,5 +4,6 @@ customization:
     - initcall_blacklist=algif_aead_init
   systemExtensions:
     officialExtensions:
+      - siderolabs/drbd
       - siderolabs/i915
       - siderolabs/intel-ucode
