@@ -37,6 +37,7 @@ spec:
         storage:
           volumeClaimTemplate:
             spec:
+              storageClassName: miroir-replicated
               resources:
                 requests:
                   storage: 1Gi
@@ -148,6 +149,7 @@ spec:
         storageSpec:
           volumeClaimTemplate:
             spec:
+              storageClassName: miroir-replicated
               resources:
                 requests:
                   storage: 55Gi
