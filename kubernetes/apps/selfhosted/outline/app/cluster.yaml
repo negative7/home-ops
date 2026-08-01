@@ -6,7 +6,7 @@ metadata:
   name: outline-postgresql
 spec:
   description: PostgreSQL cluster for Outline
-  imageName: ghcr.io/cloudnative-pg/postgresql:18.1-standard-trixie
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.4-standard-trixie
   instances: 2
   storage:
     size: 5Gi
