@@ -8,10 +8,6 @@ spec:
   chartRef:
     kind: OCIRepository
     name: kopiur
-  install:
-    crds: CreateReplace
-  upgrade:
-    crds: CreateReplace
   interval: 1h
   values:
     installScope: cluster

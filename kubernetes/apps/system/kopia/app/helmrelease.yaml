@@ -50,7 +50,7 @@ spec:
               requests:
                 cpu: 10m
               limits:
-                memory: 4Gi #remove later
+                memory: 4Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -81,9 +81,9 @@ spec:
                   "path": "/repository"
                 }
               },
-              "hostname": "volsync.{{ .Release.Namespace }}.svc.cluster.local",
-              "username": "volsync",
-              "description": "volsync",
+              "hostname": "kopia.{{ .Release.Namespace }}.svc.cluster.local",
+              "username": "kopia-ui",
+              "description": "kopia web UI",
               "enableActions": false
             }
     persistence:
