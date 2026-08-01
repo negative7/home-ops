@@ -36,5 +36,27 @@
       ],
       datasourceTemplate: "docker",
     },
+    {
+      customType: "regex",
+      description: "Process Talos machine config image references",
+      managerFilePatterns: [
+        "/^kubernetes\\/talos\\/.+\\.ya?ml(?:\\.j2)?$/"
+      ],
+      matchStrings: [
+        "image:\\s+(?<depName>[^:\\s]+):(?<currentValue>\\S+)",
+      ],
+      datasourceTemplate: "docker",
+    },
+    {
+      customType: "regex",
+      description: "Process GitHub release download URLs",
+      managerFilePatterns: [
+        "/^kubernetes/.+\\.yaml(?:\\.j2)?$/"
+      ],
+      matchStrings: [
+        "https://github\\.com/(?<depName>[\\w.-]+/[\\w.-]+)/releases/download/(?<currentValue>[^/\\s]+)/",
+      ],
+      datasourceTemplate: "github-releases",
+    },
   ],
 }
