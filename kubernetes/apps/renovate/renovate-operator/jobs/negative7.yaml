@@ -26,13 +26,15 @@ spec:
       data:
         GITHUB_COM_TOKEN: "{{ .token }}"
         GITHUB_COM_USER: bmVnYXRpdmU3
-        RENOVATE_TOKEN: "{{ .token }}"
+        RENOVATE_TOKEN: "{{ .bot_token }}"
   dataFrom:
     - sourceRef:
         generatorRef:
           apiVersion: generators.external-secrets.io/v1alpha1
           kind: GithubAccessToken
           name: negative7-bot-auth-token
+    - extract:
+        key: forgejo
 ---
 apiVersion: renovate-operator.mogenius.com/v1alpha1
 kind: RenovateJob
@@ -53,7 +55,8 @@ spec:
   image: ghcr.io/renovatebot/renovate:44.2.2@sha256:3813f70a49b1984fccb3b1ee4b24e866ed7c635883c750f2de02ce03efbd8bb5
   parallelism: 5
   provider:
-    name: github
+    name: forgejo
+    endpoint: https://git.negative7.com/api/v1
   resources:
     requests:
       cpu: 100m
