@@ -2,6 +2,8 @@
 customization:
   extraKernelArgs:
     - initcall_blacklist=algif_aead_init
+    - selinux=0
+    - -selinux
   systemExtensions:
     officialExtensions:
       - siderolabs/drbd
