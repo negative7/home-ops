@@ -15,10 +15,23 @@ spec:
     crds: CreateReplace
   values:
     autoDiskfulAfter: 10m
+    # Anything above 1 enables leader election (warm standby, ~15s failover)
+    # instead of a single controller pod being a SPOF for provision/snapshot/resize.
+    replicaCount: 2
+    global:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: miroir
+                  app.kubernetes.io/instance: miroir
+                  app.kubernetes.io/component: controller
+              topologyKey: kubernetes.io/hostname
     drbd:
-      # rook-ceph's mgr dashboard and OSD msgr ports occupy 6800-7300 and 7000
-      # on the host network, colliding with the chart's default portBase: 7000
-      portBase: 7789
+      # Cuts write amplification under the scattered random writes of the
+      # DB/media workloads on miroir-replicated; must be a prime below 65534.
+      alExtents: 6007
     monitoring:
       podMonitor:
         enabled: true

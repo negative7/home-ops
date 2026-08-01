@@ -19,6 +19,7 @@ spec:
   interval: 1h
   path: ./kubernetes/apps/miroir-system/miroir/app
   prune: true
+  retryInterval: 2m
   sourceRef:
     kind: GitRepository
     name: flux-system
@@ -40,6 +41,7 @@ spec:
   interval: 1h
   path: ./kubernetes/apps/miroir-system/miroir/config
   prune: true
+  retryInterval: 2m
   sourceRef:
     kind: GitRepository
     name: flux-system
