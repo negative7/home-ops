@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: node-reboot-rules
+  labels:
+    prometheus: k8s
+    role: alert-rules
+spec:
+  groups:
+    - name: node-reboot.rules
+      rules:
+        - alert: NodeRebooted
+          annotations:
+            summary: Node {{$labels.instance}} rebooted unexpectedly.
+          expr: |
+            resets(node_boot_time_seconds[15m]) > 0
+          labels:
+            severity: warning
