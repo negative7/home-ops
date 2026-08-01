@@ -34,6 +34,7 @@ spec:
               - --config
               - /etc/vector/vector.yaml
             env:
+              TZ: America/New_York
               NODE_NAME:
                 valueFrom:
                   fieldRef:

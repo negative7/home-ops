@@ -39,6 +39,8 @@ spec:
               tag: 8.7.0
             args:
               - sync
+            env:
+              TZ: America/New_York
             envFrom:
               - secretRef:
                   name: recyclarr-secret

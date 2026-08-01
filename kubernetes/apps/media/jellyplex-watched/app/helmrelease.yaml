@@ -30,6 +30,7 @@ spec:
               repository: ghcr.io/luigi311/jellyplex-watched
               tag: 8.5.3@sha256:e23a0d3dc686e4bbc9eeb655aeb96a2a1352bd2a26297ec77e06ef6f8eb2d5e1
             env:
+              TZ: America/New_York
               DRYRUN: false
               DEBUG_LEVEL: "DEBUG"
               PLEX_BASEURL: http://plex.media.svc.cluster.local:32400

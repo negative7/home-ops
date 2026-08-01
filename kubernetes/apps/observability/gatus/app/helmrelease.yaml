@@ -31,6 +31,8 @@ spec:
               - --auto-httproute
               - --enable-httproute
               - --enable-service
+            env:
+              TZ: America/New_York
             resources:
               requests:
                 cpu: 10m
@@ -43,6 +45,7 @@ spec:
               repository: ghcr.io/twin/gatus
               tag: v5.36.0@sha256:c5f210d095fa78e6efaa20ffeb14803f2ba4f10615e16a6d12087697149617f0
             env:
+              TZ: America/New_York
               GATUS_DELAY_START_SECONDS: 5
               GATUS_CONFIG_PATH: /config
               GATUS_WEB_PORT: &httpPort 8080

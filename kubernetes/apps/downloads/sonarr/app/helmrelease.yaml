@@ -34,6 +34,7 @@ spec:
               repository: ghcr.io/home-operations/sonarr
               tag: 4.0.19.2995
             env:
+              TZ: America/New_York
               SONARR__APP__INSTANCENAME: Sonarr
               SONARR__AUTH__APIKEY:
                 valueFrom:

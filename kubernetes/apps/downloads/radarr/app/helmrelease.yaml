@@ -34,6 +34,7 @@ spec:
               repository: ghcr.io/home-operations/radarr
               tag: 6.4.0.10523
             env:
+              TZ: America/New_York
               RADARR__APP__INSTANCENAME: Radarr
               RADARR__AUTH__APIKEY:
                 valueFrom:

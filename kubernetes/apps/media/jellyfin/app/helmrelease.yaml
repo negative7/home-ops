@@ -27,6 +27,7 @@ spec:
               repository: ghcr.io/jellyfin/jellyfin
               tag: 10.11.11
             env:
+              TZ: America/New_York
               DOTNET_SYSTEM_IO_DISABLEFILELOCKING: "true"
               JELLYFIN_PublishedServerUrl: https://jellyfin.negative7.com
             securityContext:

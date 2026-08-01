@@ -29,6 +29,8 @@ spec:
             image:
               repository: ghcr.io/jorenn92/maintainerr
               tag: 2.19.0
+            env:
+              TZ: America/New_York
             probes:
               liveness:
                 enabled: true

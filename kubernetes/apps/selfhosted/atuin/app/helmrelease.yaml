@@ -29,6 +29,7 @@ spec:
             args:
               - start
             env:
+              TZ: America/New_York
               ATUIN_DB_URI: sqlite:///config/atuin.db
               ATUIN_HOST: 0.0.0.0
               ATUIN_PORT: &port 8888

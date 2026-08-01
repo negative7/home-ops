@@ -36,6 +36,7 @@ spec:
               - --host
               - 0.0.0.0
             env:
+              TZ: America/New_York
               SPOOLMAN_PORT: &httpPort 8000
               SPOOLMAN_METRICS_ENABLED: true
             probes:

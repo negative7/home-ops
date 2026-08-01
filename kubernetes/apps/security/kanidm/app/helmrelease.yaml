@@ -29,6 +29,7 @@ spec:
               repository: docker.io/kanidm/server
               tag: 1.10.4
             env:
+              TZ: America/New_York
               KANIDM_ADMIN_BIND_PATH: /var/run/kanidmd.sock
               KANIDM_DOMAIN: idm.negative7.com
               KANIDM_ORIGIN: https://idm.negative7.com
