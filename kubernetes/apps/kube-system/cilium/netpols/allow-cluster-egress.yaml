@@ -1,0 +1,24 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumclusterwidenetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-cluster-egress
+spec:
+  # Excludes forgejo-runner: it already runs default-deny egress with its own
+  # tightly scoped allow-list (kubernetes/apps/dev/forgejo/runner/ciliumnetworkpolicy.yaml).
+  # Policies are additive, so without this exclusion this blanket allow would
+  # union with and defeat that restriction.
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/managed-by
+        operator: NotIn
+        values:
+          - forgejo-runner
+  egress:
+    - toEndpoints:
+        - {}
+    - toEntities:
+        - cluster
+    - toEntities:
+        - world
