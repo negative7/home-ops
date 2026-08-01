@@ -9,7 +9,7 @@ spec:
     - name: miroir-config
       namespace: miroir-system
     - name: snapshot-controller
-      namespace: system-controllers
+      namespace: kube-system
   interval: 1h
   path: "./kubernetes/apps/system/kopiur/app"
   prune: true
