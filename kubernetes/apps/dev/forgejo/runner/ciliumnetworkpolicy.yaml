@@ -33,6 +33,14 @@ spec:
         - ports:
             - protocol: TCP
               port: "3000"
+    - # Forgejo runner controller
+      toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: forgejo-runner
+      toPorts:
+        - ports:
+            - protocol: TCP
+              port: "38809"
     - # Forgejo runner cache & proxy
       toEndpoints:
         - matchLabels:
@@ -43,9 +51,23 @@ spec:
               protocol: TCP
             - port: "8089"
               protocol: TCP
-    - # Internet egress for CI steps (package registries, container images, etc.)
-      toEntities:
-        - world
+    - # Konflate
+      toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: konflate
+            k8s:io.kubernetes.pod.namespace: flux-system
+      toPorts:
+        - ports:
+            - protocol: TCP
+              port: "8080"
+    - # Hairpinned in-cluster external services
+      toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-external
+    - # Internet egress
+      toCIDRSet:
+        - cidrGroupRef: internet
       toPorts:
         - ports:
             - protocol: TCP
