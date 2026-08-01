@@ -13,6 +13,10 @@ spec:
     gitea:
       admin:
         username: ""
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: true
       config:
         cache:
           ENABLED: true
@@ -39,8 +43,11 @@ spec:
         repository:
           DEFAULT_REPO_UNITS: repo.code,repo.releases,repo.issues,repo.pulls,repo.actions
           DISABLED_REPO_UNITS: repo.ext_wiki,repo.ext_issues
+          DISABLE_DOWNLOAD_SOURCE_ARCHIVES: true
+          GO_GET_CLONE_URL_PROTOCOL: https
           ROOT: /data/git/repositories
         repository.pull-request:
+          DEFAULT_DELETE_BRANCH_AFTER_MERGE: true
           DEFAULT_MERGE_STYLE: squash
         repository.signing:
           FORMAT: ssh
@@ -87,6 +94,10 @@ spec:
     extraContainerVolumeMounts:
       - name: signing-key
         mountPath: /data/signing
+        readOnly: true
+      - name: signing-key
+        mountPath: /data/gitea/ssh/ssh_host_ed25519_key
+        subPath: ssh_host_ed25519_key
         readOnly: true
     extraInitVolumeMounts:
       - name: signing-key
