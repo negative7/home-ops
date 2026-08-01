@@ -25,5 +25,16 @@
       ],
       datasourceTemplate: "docker",
     },
+    {
+      customType: "regex",
+      description: "Process CloudNativePG Cluster imageName",
+      managerFilePatterns: [
+        "/^kubernetes/.+\\.yaml(?:\\.j2)?$/"
+      ],
+      matchStrings: [
+        "imageName:\\s+(?<depName>[^:\\s]+):(?<currentValue>\\S+)",
+      ],
+      datasourceTemplate: "docker",
+    },
   ],
 }

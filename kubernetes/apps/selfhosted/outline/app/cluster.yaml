@@ -6,7 +6,6 @@ metadata:
   name: outline-postgresql
 spec:
   description: PostgreSQL cluster for Outline
-  # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql
   imageName: ghcr.io/cloudnative-pg/postgresql:18.1-standard-trixie
   instances: 2
   storage:
