@@ -1,0 +1,9 @@
+---
+area/ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .forgejo/**/*
+          - .github/**/*
+area/kubernetes:
+  - changed-files:
+      - any-glob-to-any-file: "kubernetes/**/*"
