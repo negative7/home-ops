@@ -1,0 +1,35 @@
+---
+sources:
+  talos:
+    type: socket
+    mode: tcp
+    address: 127.0.0.1:13333
+    framing:
+      method: newline_delimited
+    decoding:
+      codec: json
+
+transforms:
+  enrich:
+    type: remap
+    inputs:
+      - talos
+    source: |
+      .node = get_env_var("NODE_NAME") ?? "unknown"
+
+sinks:
+  victoria_logs:
+    type: elasticsearch
+    inputs:
+      - enrich
+    endpoints:
+      - http://victoria-logs-server.observability.svc.cluster.local:9428/insert/elasticsearch/
+    mode: bulk
+    api_version: v8
+    compression: gzip
+    healthcheck:
+      enabled: false
+    query:
+      _msg_field: msg
+      _time_field: talos-time
+      _stream_fields: node,talos-service,facility

@@ -27,6 +27,10 @@ machine:
         - system-upgrade
     {% endif %}
     rbac: true
+  logging:
+    destinations:
+      - endpoint: tcp://127.0.0.1:13333/
+        format: json_lines
   files:
     - op: create
       path: /etc/cri/conf.d/20-customization.part
@@ -198,6 +202,11 @@ config:
                 topologyKey: kubernetes.io/hostname
                 whenUnsatisfiable: ScheduleAnyway
 {% endif %}
+---
+apiVersion: v1alpha1
+kind: KmsgLogConfig
+name: victoria-logs
+url: tcp://127.0.0.1:13333/
 ---
 apiVersion: v1alpha1
 kind: WatchdogTimerConfig
