@@ -41,6 +41,7 @@ spec:
           options:
             namespace: dev
             poll_timeout: 10m
+            labels: "egress.home.arpa/custom-egress=true"
             resources: |
               requests:
                 cpu: 100m
