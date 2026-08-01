@@ -37,6 +37,21 @@ spec:
               KANIDM_DB_PATH: /data/kanidm.db
               KANIDM_TLS_CHAIN: /certs/tls.crt
               KANIDM_TLS_KEY: /certs/tls.key
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - /sbin/kanidmd
+                      - scripting
+                      - healthcheck
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness: *probes
             resources:
               requests:
                 cpu: 10m
