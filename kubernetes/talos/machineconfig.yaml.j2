@@ -155,6 +155,23 @@ cluster:
   proxy:
     disabled: true
     image: registry.k8s.io/kube-proxy:v1.36.3
+  scheduler:
+    extraArgs:
+      bind-address: 0.0.0.0
+    image: registry.k8s.io/kube-scheduler:v1.36.3
+    config:
+      apiVersion: kubescheduler.config.k8s.io/v1
+      kind: KubeSchedulerConfiguration
+      profiles:
+        - schedulerName: default-scheduler
+          pluginConfig:
+            - name: PodTopologySpread
+              args:
+                defaultingType: List
+                defaultConstraints:
+                  - maxSkew: 1
+                    topologyKey: kubernetes.io/hostname
+                    whenUnsatisfiable: ScheduleAnyway
   secretboxEncryptionSecret: op://home-cluster/home-ops/CLUSTER_SECRETBOXENCRYPTIONSECRET
   serviceAccount:
     key: op://home-cluster/home-ops/CLUSTER_SERVICEACCOUNT_KEY
@@ -183,25 +200,6 @@ cluster:
       - 10.96.0.0/12
   secret: op://home-cluster/home-ops/CLUSTER_SECRET
   token: op://home-cluster/home-ops/CLUSTER_TOKEN
-{% if ENV.IS_CONTROLPLANE %}
----
-apiVersion: v1alpha1
-kind: KubeSchedulerConfig
-image: registry.k8s.io/kube-scheduler:v1.36.3
-extraArgs:
-  bind-address: 0.0.0.0
-config:
-  profiles:
-    - schedulerName: default-scheduler
-      pluginConfig:
-        - name: PodTopologySpread
-          args:
-            defaultingType: List
-            defaultConstraints:
-              - maxSkew: 1
-                topologyKey: kubernetes.io/hostname
-                whenUnsatisfiable: ScheduleAnyway
-{% endif %}
 ---
 apiVersion: v1alpha1
 kind: KmsgLogConfig
@@ -228,7 +226,3 @@ provisioning:
   diskSelector:
     match: system_disk
   maxSize: 620GiB
----
-apiVersion: v1alpha1
-kind: FilesystemTrimConfig
-interval: 168h0m0s
