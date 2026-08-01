@@ -78,7 +78,7 @@ spec:
           ALLOWED_HOST_LIST: "*"
       oauth:
         - name: kanidm
-          adminGroup: forgejo_admins@idm.negative7.com
+          adminGroup: forgejo_admins
           autoDiscoverUrl: https://idm.negative7.com/oauth2/openid/forgejo/.well-known/openid-configuration
           existingSecret: forgejo-kanidm-oidc
           groupClaimName: groups
