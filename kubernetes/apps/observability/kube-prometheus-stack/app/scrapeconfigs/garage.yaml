@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: &name garage
+spec:
+  staticConfigs:
+    - targets: [lviv.homelab.internal:9002]
+  metricsPath: /metrics
+  authorization:
+    credentials:
+      name: scrape-secret
+      key: garage_metrics_token
+  relabelings:
+    - action: replace
+      targetLabel: job
+      replacement: *name

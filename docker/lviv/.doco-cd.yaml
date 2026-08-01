@@ -9,6 +9,7 @@ external_secrets:
   PROTONVPN_WIREGUARD_ADDRESSES: op://home-cluster/protonvpn/addresses
   GARAGE_ADMIN_TOKEN: op://home-cluster/garage/admin_token
   GARAGE_RPC_SECRET: op://home-cluster/garage/rpc_secret
+  GARAGE_METRICS_TOKEN: op://home-cluster/garage/metrics_token
 force_recreate: false
 reconciliation:
   enabled: true

@@ -12,3 +12,4 @@ api_bind_addr = "[::]:9000"
 
 [admin]
 api_bind_addr = "[::]:9002"
+metrics_require_token = true
