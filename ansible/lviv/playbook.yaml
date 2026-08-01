@@ -11,6 +11,25 @@
     - name: Check host connectivity
       ansible.builtin.ping:
 
+    - name: network
+      block:
+        - name: network | Route cluster LoadBalancer VIPs via the enp3s0 gateway
+          community.general.nmcli:
+            type: ethernet
+            conn_name: enp3s0
+            ifname: enp3s0
+            method4: auto
+            routes4:
+              - 10.2.0.102/32 10.2.0.1
+              - 10.2.0.103/32 10.2.0.1
+            state: present
+          register: enp3s0_routes
+
+        - name: network | Reapply enp3s0 connection
+          ansible.builtin.command: nmcli connection up enp3s0
+          when: enp3s0_routes.changed
+          changed_when: true
+
     - name: Read secrets from 1Password
       ansible.builtin.shell: "op read 'op://{{ item.key }}' < /dev/null"
       delegate_to: localhost
