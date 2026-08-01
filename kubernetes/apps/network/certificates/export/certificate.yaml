@@ -1,12 +1,12 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/refs/heads/main/cert-manager.io/certificate_v1.json
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/certificate_v1.json
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: "negative7-com"
+  name: negative7-com
 spec:
   dnsNames:
-    - "negative7.com"
+    - negative7.com
     - "*.negative7.com"
   duration: 160h
   issuerRef:
@@ -16,7 +16,6 @@ spec:
     algorithm: ECDSA
     size: 256
     rotationPolicy: Always
-  secretName: "negative7-com-tls"
+  secretName: negative7-com-tls
   usages:
     - digital signature
-  
