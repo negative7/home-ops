@@ -20,6 +20,11 @@ spec:
           - PERFMON
         drop:
           - ALL
+    resources:
+      requests:
+        cpu: 10m
+      limits:
+        memory: 128Mi
     monitoring:
       serviceMonitor:
         enabled: true
