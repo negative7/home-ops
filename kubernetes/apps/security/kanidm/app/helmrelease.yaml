@@ -42,11 +42,10 @@ spec:
                 enabled: true
                 custom: true
                 spec:
-                  exec:
-                    command:
-                      - /sbin/kanidmd
-                      - scripting
-                      - healthcheck
+                  httpGet:
+                    path: /status
+                    port: 8443
+                    scheme: HTTPS
                   initialDelaySeconds: 5
                   periodSeconds: 10
                   timeoutSeconds: 5
@@ -55,8 +54,9 @@ spec:
             resources:
               requests:
                 cpu: 10m
+                memory: 64Mi
               limits:
-                memory: 1Gi
+                memory: 256Mi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
