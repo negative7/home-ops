@@ -22,3 +22,20 @@ services:
       - ./config/garage.toml:/etc/garage/garage.toml:ro
       - /mnt/tank/apps/garage/meta:/var/lib/garage/meta
       - /mnt/tank/apps/garage/data:/var/lib/garage/data
+
+  garage-webui:
+    container_name: garage-webui
+    hostname: garage.internal
+    image: docker.io/khairul169/garage-webui:1.1.0
+    restart: unless-stopped
+    logging:
+      driver: json-file
+    network_mode: host
+    environment:
+      - PORT=3909
+      - API_BASE_URL=http://localhost:9002
+      - S3_ENDPOINT_URL=http://localhost:9000
+      - S3_REGION=us-east-1
+      - API_ADMIN_KEY=${GARAGE_ADMIN_TOKEN}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro

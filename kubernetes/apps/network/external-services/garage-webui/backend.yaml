@@ -1,0 +1,14 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.envoyproxy.io/backend_v1alpha1.json
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: Backend
+metadata:
+  labels:
+    app.kubernetes.io/instance: garage-webui
+    app.kubernetes.io/name: garage-webui
+  name: garage-webui
+spec:
+  endpoints:
+    - fqdn:
+        hostname: lviv.homelab.internal
+        port: 3909
