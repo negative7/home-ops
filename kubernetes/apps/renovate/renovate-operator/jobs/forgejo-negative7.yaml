@@ -1,0 +1,31 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/renovate-operator.mogenius.com/renovatejob_v1alpha1.json
+apiVersion: renovate-operator.mogenius.com/v1alpha1
+kind: RenovateJob
+metadata:
+  name: forgejo-negative7
+  namespace: renovate
+spec:
+  discoveryFilters:
+    - negative7/*
+  extraEnv:
+    - name: LOG_LEVEL
+      value: debug
+    - name: RENOVATE_ALLOWED_COMMANDS
+      value: |-
+        ["pnpm run bundle"]
+  image: ghcr.io/renovatebot/renovate:44.2.2@sha256:3813f70a49b1984fccb3b1ee4b24e866ed7c635883c750f2de02ce03efbd8bb5
+  parallelism: 5
+  provider:
+    name: forgejo
+    endpoint: https://git.negative7.com/api/v1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  schedule: 0 * * * *
+  secretRef: renovate-secret
+  webhook:
+    enabled: true
+    authentication:
+      enabled: false
