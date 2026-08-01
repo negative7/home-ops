@@ -1,0 +1,116 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: jellystat
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: jellystat
+  interval: 30m
+  values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+    controllers:
+      jellystat:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/cyfershepard/jellystat
+              tag: 1.1.11@sha256:c4e2dfa8bddf8d5ac3a675d7202f71a54dcfe3540cc186899d9201e0fe701fa5
+            env:
+              TZ: America/New_York
+              POSTGRES_PORT: "5432"
+              POSTGRES_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: jellystat-postgresql-app
+                    key: username
+              POSTGRES_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: jellystat-postgresql-app
+                    key: password
+              POSTGRES_IP:
+                valueFrom:
+                  secretKeyRef:
+                    name: jellystat-postgresql-app
+                    key: host
+              POSTGRES_DB:
+                valueFrom:
+                  secretKeyRef:
+                    name: jellystat-postgresql-app
+                    key: dbname
+              JWT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: jellystat-secret
+                    key: JWT_SECRET
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /auth/isConfigured
+                    port: &port 3000
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /auth/isConfigured
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      backup-data:
+        type: emptyDir
+        globalMounts:
+          - path: /app/backend/backup-data
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    route:
+      app:
+        hostnames:
+          - jellystat.negative7.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port
