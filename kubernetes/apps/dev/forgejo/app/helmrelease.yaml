@@ -33,7 +33,11 @@ spec:
         lfs:
           PATH: /data/git/lfs
         mailer:
-          ENABLED: false
+          ENABLED: true
+          FROM: "Forgejo <noreply@negative7.com>"
+          PROTOCOL: smtp
+          SMTP_ADDR: smtp-relay.system.svc.cluster.local
+          SMTP_PORT: 25
         openid:
           ENABLE_OPENID_SIGNIN: false
           ENABLE_OPENID_SIGNUP: false
@@ -70,6 +74,7 @@ spec:
           ALLOW_ONLY_EXTERNAL_REGISTRATION: true
           DEFAULT_ENABLE_TIMETRACKING: false
           ENABLE_INTERNAL_SIGNIN: false
+          ENABLE_NOTIFY_MAIL: true
           ENABLE_PASSWORD_SIGNIN_FORM: false
           SHOW_REGISTRATION_BUTTON: false
         service.explore:
