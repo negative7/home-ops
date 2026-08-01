@@ -11,7 +11,7 @@ spec:
   interval: 1h
   values:
     config:
-      repo: github://negative7/home-ops
+      repo: forgejo://git.negative7.com/negative7/home-ops
       statusChecks: true
       prComments: true
       publicUrl: https://konflate.negative7.com
