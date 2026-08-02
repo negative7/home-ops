@@ -7,3 +7,4 @@ resources:
   - ./ocirepository.yaml
   - ./helmrelease.yaml
   - ./backendtlspolicy.yaml
+  - ./externalsecret.yaml
