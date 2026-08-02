@@ -218,7 +218,7 @@ spec:
                   description: Status Page
                   widget:
                     type: gatus
-                    url: http://gatus.observability
+                    url: http://gatus.observability:8080
                     slug: default
               - Grafana:
                   icon: grafana.png
