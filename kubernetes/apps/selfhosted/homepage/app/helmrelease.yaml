@@ -329,3 +329,7 @@ spec:
           - path: /app/config/widgets.yaml
             subPath: widgets.yaml
             readOnly: true
+      logs:
+        type: emptyDir
+        globalMounts:
+          - path: /app/config/logs
