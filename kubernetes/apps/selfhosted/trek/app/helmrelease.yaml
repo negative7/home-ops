@@ -14,9 +14,6 @@ spec:
       securityContext:
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
-        runAsGroup: 1000
-        runAsNonRoot: true
-        runAsUser: 1000
     controllers:
       trek:
         annotations:
@@ -82,10 +79,6 @@ spec:
                 memory: 384Mi
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
     persistence:
       data:
         existingClaim: trek
@@ -97,10 +90,6 @@ spec:
         globalMounts:
           - path: /app/uploads
             subPath: uploads
-      tmp:
-        type: emptyDir
-        globalMounts:
-          - path: /tmp
     service:
       app:
         controller: trek
