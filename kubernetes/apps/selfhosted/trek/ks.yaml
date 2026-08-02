@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: trek
+spec:
+  components:
+    - ../../../../components/anubis
+    - ../../../../components/kopiur/backup
+  dependsOn:
+    - name: kopiur
+      namespace: system
+  interval: 1h
+  path: "./kubernetes/apps/selfhosted/trek/app"
+  postBuild:
+    substitute:
+      APP: trek
+      KOPIUR_CAPACITY: 5Gi
+      KOPIUR_MOVER_UID: "1000"
+      KOPIUR_MOVER_GID: "1000"
+      ANUBIS_TARGET: http://trek.selfhosted.svc.cluster.local:3000
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: selfhosted

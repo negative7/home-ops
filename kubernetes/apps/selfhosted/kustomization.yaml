@@ -15,3 +15,4 @@ resources:
   - ./mailkeep/ks.yaml
   - ./outline/ks.yaml
   - ./spoolman/ks.yaml
+  - ./trek/ks.yaml

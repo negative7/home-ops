@@ -1,0 +1,109 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: trek
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: trek
+  interval: 30m
+  values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+    controllers:
+      trek:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              # renovate: datasource=docker depName=mauriceboe/trek
+              repository: mauriceboe/trek
+              tag: 3.4.1@sha256:ce7fab639b89a6f62d484d1175a7d489a536a8c77291f56c03fec20608d4a3eb
+            env:
+              ALLOWED_ORIGINS: https://travel.negative7.com
+              APP_URL: https://travel.negative7.com
+              FORCE_HTTPS: "true"
+              NODE_ENV: production
+              OIDC_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: trek-kanidm-oidc
+                    key: client-id
+              OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: trek-kanidm-oidc
+                    key: client-secret
+              OIDC_DISCOVERY_URL: https://idm.negative7.com/oauth2/openid/trek/.well-known/openid-configuration
+              OIDC_DISPLAY_NAME: Kanidm
+              OIDC_ISSUER: https://idm.negative7.com/oauth2/openid/trek
+              OIDC_ONLY: "true"
+              OIDC_SCOPE: openid email profile groups
+              PORT: "3000"
+              TRUST_PROXY: "1"
+              TZ: America/New_York
+            envFrom:
+              - secretRef:
+                  name: trek-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: 3000
+                  failureThreshold: 3
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: 3000
+                  failureThreshold: 3
+                  periodSeconds: 10
+                  timeoutSeconds: 3
+            resources:
+              requests:
+                cpu: 100m
+                memory: 192Mi
+              limits:
+                memory: 384Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      data:
+        existingClaim: trek
+        globalMounts:
+          - path: /app/data
+            subPath: data
+      uploads:
+        existingClaim: trek
+        globalMounts:
+          - path: /app/uploads
+            subPath: uploads
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    service:
+      app:
+        controller: trek
+        ports:
+          http:
+            port: 3000
