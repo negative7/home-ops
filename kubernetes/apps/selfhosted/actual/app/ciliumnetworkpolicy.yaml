@@ -9,6 +9,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: actual
       app.kubernetes.io/instance: actual
+      app.kubernetes.io/controller: actual
   ingress:
     - fromEndpoints:
         - matchLabels:
