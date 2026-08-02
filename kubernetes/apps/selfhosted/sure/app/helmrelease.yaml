@@ -123,17 +123,6 @@ spec:
       worker:
         annotations:
           reloader.stakater.com/auto: "true"
-        initContainers:
-          db-prepare:
-            image:
-              repository: ghcr.io/we-promise/sure
-              tag: stable@sha256:12361b7b309f867002b8a1f54200607ca1a321e1b57cf21890caaf83602c3cd0
-            command:
-              - bin/rails
-            args:
-              - db:prepare
-            env: *env
-            securityContext: *initSecurityContext
         containers:
           app:
             image:
