@@ -36,11 +36,11 @@ spec:
               for (const account of accounts) {
                 if (account.closed) continue;
                 try {
-                  console.log(`Syncing account: ${account.name}`);
+                  console.log("Syncing account: " + account.name);
                   await actual.runBankSync({ accountId: account.id });
                 } catch (err) {
                   failures += 1;
-                  console.error(`Failed to sync account ${account.name}: ${err.message}`);
+                  console.error("Failed to sync account " + account.name + ": " + err.message);
                 }
               }
 
