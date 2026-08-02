@@ -13,7 +13,105 @@ spec:
     - name: miroir
       namespace: miroir-system
   values:
+    configMaps:
+      bank-sync-script:
+        data:
+          sync.js: |
+            const actual = require("@actual-app/api");
+
+            const { ACTUAL_SERVER_URL, ACTUAL_PASSWORD, ACTUAL_SYNC_ID } = process.env;
+
+            async function main() {
+              await actual.init({
+                dataDir: "/tmp",
+                serverURL: ACTUAL_SERVER_URL,
+                password: ACTUAL_PASSWORD,
+              });
+
+              await actual.downloadBudget(ACTUAL_SYNC_ID);
+
+              const accounts = await actual.getAccounts();
+              let failures = 0;
+
+              for (const account of accounts) {
+                if (account.closed) continue;
+                try {
+                  console.log(`Syncing account: ${account.name}`);
+                  await actual.runBankSync({ accountId: account.id });
+                } catch (err) {
+                  failures += 1;
+                  console.error(`Failed to sync account ${account.name}: ${err.message}`);
+                }
+              }
+
+              await actual.shutdown();
+
+              if (accounts.length > 0 && failures === accounts.length) {
+                throw new Error("All account syncs failed");
+              }
+            }
+
+            main().catch((err) => {
+              console.error(err);
+              process.exit(1);
+            });
+
     controllers:
+      actual-bank-sync:
+        type: cronjob
+        cronjob:
+          schedule: "0 1 * * *"
+          timeZone: America/New_York
+          concurrencyPolicy: Forbid
+          backoffLimit: 0
+          successfulJobsHistory: 1
+          failedJobsHistory: 3
+          ttlSecondsAfterFinished: 3600
+        pod:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+        containers:
+          app:
+            image:
+              repository: node
+              tag: 22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32
+            command:
+              - sh
+              - -c
+              - |
+                set -e
+                npm install --prefix /app --no-save --no-audit --no-fund @actual-app/api@26.7.0
+                node /scripts/sync.js
+            env:
+              HOME: /app
+              NODE_PATH: /app/node_modules
+              ACTUAL_SERVER_URL: http://actual.selfhosted.svc.cluster.local:5006
+              ACTUAL_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: actual-secret
+                    key: password
+              ACTUAL_SYNC_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: actual-secret
+                    key: sync_id
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128M
+              limits:
+                memory: 512M
+
       actual:
         annotations:
           reloader.stakater.com/auto: "true"
@@ -70,6 +168,29 @@ spec:
             app:
               - path: /data
 
+      bank-sync-script:
+        type: configMap
+        identifier: bank-sync-script
+        advancedMounts:
+          actual-bank-sync:
+            app:
+              - path: /scripts
+                readOnly: true
+
+      bank-sync-app:
+        type: emptyDir
+        advancedMounts:
+          actual-bank-sync:
+            app:
+              - path: /app
+
+      bank-sync-tmp:
+        type: emptyDir
+        advancedMounts:
+          actual-bank-sync:
+            app:
+              - path: /tmp
+
     route:
       app:
         hostnames:
@@ -80,6 +201,7 @@ spec:
 
     service:
       app:
+        controller: actual
         ports:
           http:
             port: *httpPort
