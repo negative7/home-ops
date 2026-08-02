@@ -1,0 +1,331 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: homepage
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: homepage
+  interval: 30m
+  values:
+    defaultPodOptions:
+      automountServiceAccountToken: true
+    controllers:
+      homepage:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+        containers:
+          app:
+            image:
+              repository: ghcr.io/gethomepage/homepage
+              tag: v1.13.2
+            env:
+              HOMEPAGE_ALLOWED_HOSTS: "*"
+              TZ: America/New_York
+            envFrom:
+              - secretRef:
+                  name: homepage-secret
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            resources:
+              requests:
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - "ALL"
+    service:
+      app:
+        controller: homepage
+        ports:
+          http:
+            port: 3000
+    route:
+      app:
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+        hostnames:
+          - homepage.negative7.com
+    configMaps:
+      config:
+        data:
+          docker.yaml: ""
+          kubernetes.yaml: |
+            mode: cluster
+            ingress: false
+            gateway: true
+          bookmarks.yaml: |
+            - Development:
+              - Forgejo:
+                  icon: forgejo.png
+                  href: https://git.negative7.com
+                  description: Git Server
+              - Renovate:
+                  icon: renovate.png
+                  href: https://renovate.negative7.com
+                  description: Dependency Updates
+              - Flux:
+                  icon: flux.png
+                  href: https://flux.negative7.com
+                  description: GitOps
+          settings.yaml: |
+            title: negative7
+            headerStyle: boxed
+            layout:
+              Media:
+                style: row
+                columns: 3
+              Downloads:
+                style: row
+                columns: 3
+              Observability:
+                style: row
+                columns: 3
+              Self-Hosted:
+                style: row
+                columns: 3
+              System:
+                style: row
+                columns: 3
+              Automation:
+                style: row
+                columns: 1
+          widgets.yaml: |
+            - kubernetes:
+                cluster:
+                  show: true
+                  cpu: true
+                  memory: true
+                  showLabel: true
+                  label: "cluster"
+                nodes:
+                  show: true
+                  cpu: true
+                  memory: true
+                  showLabel: true
+            - search:
+                provider: duckduckgo
+                target: _blank
+          services.yaml: |
+            - Media:
+              - Jellyfin:
+                  icon: jellyfin.png
+                  href: https://jellyfin.negative7.com
+                  description: Media Server
+                  widget:
+                    type: jellyfin
+                    url: http://jellyfin.media:8096
+                    key: '{{ "{{" }}HOMEPAGE_VAR_JELLYFIN_KEY{{ "}}" }}'
+              - Plex:
+                  icon: plex.png
+                  href: https://plex.negative7.com
+                  description: Media Server
+                  widget:
+                    type: plex
+                    url: http://plex.media:32400
+                    key: '{{ "{{" }}HOMEPAGE_VAR_PLEX_TOKEN{{ "}}" }}'
+              - Requests:
+                  icon: jellyseerr.png
+                  href: https://requests.negative7.com
+                  description: Media Requests
+                  widget:
+                    type: jellyseerr
+                    url: http://seerr.media
+                    key: '{{ "{{" }}HOMEPAGE_VAR_SEERR_KEY{{ "}}" }}'
+              - Maintainerr:
+                  icon: maintainerr.png
+                  href: https://maintainerr.negative7.com
+                  description: Media Cleanup
+              - Jellystat:
+                  icon: jellyfin.png
+                  href: https://jellystat.negative7.com
+                  description: Jellyfin Statistics
+
+            - Downloads:
+              - Sonarr:
+                  icon: sonarr.png
+                  href: https://sonarr.negative7.com
+                  description: TV Shows
+                  widget:
+                    type: sonarr
+                    url: http://sonarr.downloads:8989
+                    key: '{{ "{{" }}HOMEPAGE_VAR_SONARR_KEY{{ "}}" }}'
+              - Radarr:
+                  icon: radarr.png
+                  href: https://radarr.negative7.com
+                  description: Movies
+                  widget:
+                    type: radarr
+                    url: http://radarr.downloads:7878
+                    key: '{{ "{{" }}HOMEPAGE_VAR_RADARR_KEY{{ "}}" }}'
+              - Prowlarr:
+                  icon: prowlarr.png
+                  href: https://prowlarr.negative7.com
+                  description: Indexer Manager
+                  widget:
+                    type: prowlarr
+                    url: http://prowlarr.downloads:9696
+                    key: '{{ "{{" }}HOMEPAGE_VAR_PROWLARR_KEY{{ "}}" }}'
+              - Bazarr:
+                  icon: bazarr.png
+                  href: https://bazarr.negative7.com
+                  description: Subtitles
+                  widget:
+                    type: bazarr
+                    url: http://bazarr.downloads:6767
+                    key: '{{ "{{" }}HOMEPAGE_VAR_BAZARR_KEY{{ "}}" }}'
+              - SABnzbd:
+                  icon: sabnzbd.png
+                  href: https://sabnzbd.negative7.com
+                  description: NZB Downloader
+                  widget:
+                    type: sabnzbd
+                    url: http://lviv.homelab.internal:6060
+                    key: '{{ "{{" }}HOMEPAGE_VAR_SABNZBD_KEY{{ "}}" }}'
+              - qBittorrent:
+                  icon: qbittorrent.png
+                  href: https://qui.negative7.com
+                  description: Torrent Downloader
+                  widget:
+                    type: qbittorrent
+                    url: http://lviv.homelab.internal:8080
+                    key: '{{ "{{" }}HOMEPAGE_VAR_QBIT_KEY{{ "}}" }}'
+              - Autobrr:
+                  icon: autobrr.png
+                  href: https://autobrr.negative7.com
+                  description: Torrent Automation
+
+            - Observability:
+              - Gatus:
+                  icon: gatus.png
+                  href: https://status.negative7.com
+                  description: Status Page
+                  widget:
+                    type: gatus
+                    url: http://gatus.observability
+                    slug: default
+              - Grafana:
+                  icon: grafana.png
+                  href: https://grafana.negative7.com
+                  description: Dashboards
+              - Prometheus:
+                  icon: prometheus.png
+                  href: https://prometheus.negative7.com
+                  description: Metrics
+              - Alertmanager:
+                  icon: alertmanager.png
+                  href: https://alertmanager.negative7.com
+                  description: Alerting
+              - Headlamp:
+                  icon: headlamp.png
+                  href: https://headlamp.negative7.com
+                  description: Kubernetes Dashboard
+              - Kopia:
+                  icon: kopia.png
+                  href: https://kopia.negative7.com
+                  description: Backup Repository
+
+            - Self-Hosted:
+              - Outline:
+                  icon: outline.png
+                  href: https://outline.negative7.com
+                  description: Wiki
+              - Actual:
+                  icon: actual-budget.png
+                  href: https://actual.negative7.com
+                  description: Budgeting
+              - Karakeep:
+                  icon: karakeep.png
+                  href: https://karakeep.negative7.com
+                  description: Bookmarks
+              - Atuin:
+                  icon: atuin.png
+                  href: https://atuin.negative7.com
+                  description: Shell History
+              - IT Tools:
+                  icon: it-tools.png
+                  href: https://it-tools.negative7.com
+                  description: Developer Tools
+              - Spoolman:
+                  icon: spoolman.png
+                  href: https://spoolman.negative7.com
+                  description: Filament Manager
+              - Trek:
+                  href: https://travel.negative7.com
+                  description: Trip Planner
+              - Sure:
+                  href: https://sure.negative7.com
+                  description: Finances
+              - Mailkeep:
+                  href: https://mailkeep.negative7.com
+                  description: Mail
+
+            - System:
+              - Kanidm:
+                  icon: kanidm.png
+                  href: https://idm.negative7.com
+                  description: Identity Provider
+              - Scrypted:
+                  icon: scrypted.png
+                  href: https://scrypted.negative7.com
+                  description: NVR
+              - Kromgo:
+                  href: https://kromgo.negative7.com
+                  description: Metrics Endpoints
+              - Konflate:
+                  href: https://konflate.negative7.com
+                  description: Flux OCIRepository Consolidation
+
+            - Automation:
+              - Home Assistant:
+                  icon: home-assistant.png
+                  href: https://hass.negative7.com
+                  description: Home Automation
+                  widget:
+                    type: homeassistant
+                    url: http://hass.homelab.internal:8123
+                    key: '{{ "{{" }}HOMEPAGE_VAR_HASS_KEY{{ "}}" }}'
+    persistence:
+      config:
+        type: configMap
+        name: homepage
+        globalMounts:
+          - path: /app/config/bookmarks.yaml
+            subPath: bookmarks.yaml
+            readOnly: true
+          - path: /app/config/docker.yaml
+            subPath: docker.yaml
+            readOnly: true
+          - path: /app/config/kubernetes.yaml
+            subPath: kubernetes.yaml
+            readOnly: true
+          - path: /app/config/services.yaml
+            subPath: services.yaml
+            readOnly: true
+          - path: /app/config/settings.yaml
+            subPath: settings.yaml
+            readOnly: true
+          - path: /app/config/widgets.yaml
+            subPath: widgets.yaml
+            readOnly: true
