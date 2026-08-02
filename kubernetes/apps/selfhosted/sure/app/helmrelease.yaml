@@ -157,15 +157,6 @@ spec:
           worker:
             app:
               - path: /rails/storage
-      tmp:
-        type: emptyDir
-        advancedMounts:
-          web:
-            app:
-              - path: /tmp
-          worker:
-            app:
-              - path: /tmp
 
     route:
       app:
