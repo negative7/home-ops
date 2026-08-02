@@ -15,3 +15,10 @@ spec:
     web:
       networkPolicy:
         create: false
+      httpRoute:
+        enabled: true
+        hostnames:
+          - flux.negative7.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
