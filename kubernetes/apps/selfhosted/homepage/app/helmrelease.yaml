@@ -72,18 +72,18 @@ spec:
             gateway: true
           bookmarks.yaml: |
             - Development:
-              - Forgejo:
-                  icon: forgejo.png
-                  href: https://git.negative7.com
-                  description: Git Server
-              - Renovate:
-                  icon: renovate.png
-                  href: https://renovate.negative7.com
-                  description: Dependency Updates
-              - Flux:
-                  icon: flux.png
-                  href: https://flux.negative7.com
-                  description: GitOps
+                - Forgejo:
+                    - icon: forgejo.png
+                      href: https://git.negative7.com
+                      description: Git Server
+                - Renovate:
+                    - icon: renovate.png
+                      href: https://renovate.negative7.com
+                      description: Dependency Updates
+                - Flux:
+                    - icon: flux.png
+                      href: https://flux.negative7.com
+                      description: GitOps
           settings.yaml: |
             title: negative7
             headerStyle: boxed
