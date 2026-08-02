@@ -18,3 +18,10 @@ spec:
         - ports:
             - port: "5006"
               protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/controller: actual-bank-sync
+      toPorts:
+        - ports:
+            - port: "5006"
+              protocol: TCP
