@@ -81,15 +81,17 @@ spec:
               allowPrivilegeEscalation: false
     persistence:
       data:
-        existingClaim: trek
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: miroir-replicated
         globalMounts:
           - path: /app/data
-            subPath: data
       uploads:
-        existingClaim: trek
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: miroir-replicated
         globalMounts:
           - path: /app/uploads
-            subPath: uploads
     service:
       app:
         controller: trek
