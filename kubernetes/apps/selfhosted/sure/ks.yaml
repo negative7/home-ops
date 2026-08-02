@@ -1,0 +1,41 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: sure
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: sure
+  components:
+    - ../../../../components/dragonfly
+    - ../../../../components/kopiur/backup
+  dependsOn:
+    - name: cnpg-operator
+      namespace: database
+    - name: barman-cloud-plugin
+      namespace: database
+    - name: dragonfly-operator
+      namespace: database
+    - name: kopiur
+      namespace: system
+  healthCheckExprs:
+    - apiVersion: dragonflydb.io/v1alpha1
+      kind: Dragonfly
+      failed: status.phase != 'ready'
+      current: status.phase == 'ready'
+  interval: 1h
+  path: "./kubernetes/apps/selfhosted/sure/app"
+  postBuild:
+    substitute:
+      APP: sure
+      KOPIUR_MOVER_UID: "1000"
+      KOPIUR_MOVER_GID: "1000"
+      KOPIUR_CAPACITY: 5Gi
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: selfhosted

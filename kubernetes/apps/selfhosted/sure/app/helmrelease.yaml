@@ -1,0 +1,198 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: sure
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: sure
+  interval: 30m
+  dependsOn:
+    - name: cnpg-operator
+      namespace: database
+  values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+
+    controllers:
+      web:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          db-prepare:
+            image:
+              repository: ghcr.io/we-promise/sure
+              tag: stable@sha256:12361b7b309f867002b8a1f54200607ca1a321e1b57cf21890caaf83602c3cd0
+            command:
+              - bin/rails
+            args:
+              - db:prepare
+            env: &env
+              TZ: America/New_York
+              PORT: &httpPort 3000
+              SELF_HOSTED: "true"
+              RAILS_ASSUME_SSL: "true"
+              DATABASE_URL:
+                valueFrom:
+                  secretKeyRef:
+                    name: sure-postgresql-app
+                    key: uri
+              REDIS_URL: redis://sure-dragonfly:6379
+              SECRET_KEY_BASE:
+                valueFrom:
+                  secretKeyRef:
+                    name: sure-secret
+                    key: SECRET_KEY_BASE
+              ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: sure-secret
+                    key: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+              ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: sure-secret
+                    key: ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+              ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT:
+                valueFrom:
+                  secretKeyRef:
+                    name: sure-secret
+                    key: ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+            securityContext: &initSecurityContext
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
+        containers:
+          app:
+            image:
+              repository: ghcr.io/we-promise/sure
+              tag: stable@sha256:12361b7b309f867002b8a1f54200607ca1a321e1b57cf21890caaf83602c3cd0
+            env: *env
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /up
+                    port: *httpPort
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /up
+                    port: *httpPort
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /up
+                    port: *httpPort
+                  failureThreshold: 30
+                  periodSeconds: 10
+            resources:
+              requests:
+                cpu: 50m
+                memory: 512Mi
+              limits:
+                memory: 1Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
+
+      worker:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          db-prepare:
+            image:
+              repository: ghcr.io/we-promise/sure
+              tag: stable@sha256:12361b7b309f867002b8a1f54200607ca1a321e1b57cf21890caaf83602c3cd0
+            command:
+              - bin/rails
+            args:
+              - db:prepare
+            env: *env
+            securityContext: *initSecurityContext
+        containers:
+          app:
+            image:
+              repository: ghcr.io/we-promise/sure
+              tag: stable@sha256:12361b7b309f867002b8a1f54200607ca1a321e1b57cf21890caaf83602c3cd0
+            command:
+              - bundle
+            args:
+              - exec
+              - sidekiq
+            env: *env
+            resources:
+              requests:
+                cpu: 25m
+                memory: 256Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
+
+    persistence:
+      storage:
+        existingClaim: sure
+        advancedMounts:
+          web:
+            app:
+              - path: /rails/storage
+          worker:
+            app:
+              - path: /rails/storage
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          web:
+            app:
+              - path: /tmp
+          worker:
+            app:
+              - path: /tmp
+
+    route:
+      app:
+        hostnames:
+          - sure.negative7.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: http
+
+    service:
+      app:
+        controller: web
+        ports:
+          http:
+            port: *httpPort
