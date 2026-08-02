@@ -137,13 +137,45 @@ spec:
           state.json: |
             {
               "groups": {
-                "users": {
-                  "members": [],
-                  "overwriteMembers": false
+                "apps": {
+                  "members": ["negative7"]
                 },
-                "admins": {
-                  "members": [],
-                  "overwriteMembers": false
+                "forgejo_admins": {
+                  "members": ["negative7"]
+                }
+              },
+              "persons": {
+                "negative7": {
+                  "displayName": "Sergiy Shevchenko",
+                  "mailAddresses": ["sergiy@negative7.com"]
+                }
+              },
+              "systems": {
+                "oauth2": {
+                  "forgejo": {
+                    "displayName": "Forgejo",
+                    "originUrl": "https://git.negative7.com/user/oauth2/kanidm/callback",
+                    "originLanding": "https://git.negative7.com/",
+                    "scopeMaps": {
+                      "apps": ["email", "groups", "openid", "profile"]
+                    }
+                  },
+                  "outline": {
+                    "displayName": "Outline",
+                    "originUrl": "https://outline.negative7.com/auth/oidc.callback",
+                    "originLanding": "https://outline.negative7.com/",
+                    "scopeMaps": {
+                      "apps": ["email", "openid", "profile"]
+                    }
+                  },
+                  "trek": {
+                    "displayName": "Trek",
+                    "originUrl": "https://travel.negative7.com/api/auth/oidc/callback",
+                    "originLanding": "https://travel.negative7.com/",
+                    "scopeMaps": {
+                      "apps": ["email", "groups", "openid", "profile"]
+                    }
+                  }
                 }
               }
             }
