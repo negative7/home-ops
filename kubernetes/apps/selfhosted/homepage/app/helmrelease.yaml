@@ -258,6 +258,15 @@ spec:
                   icon: karakeep.png
                   href: https://karakeep.negative7.com
                   description: Bookmarks
+              - Mealie:
+                  icon: mealie.png
+                  href: https://mealie.negative7.com
+                  description: Recipes
+                  widget:
+                    type: mealie
+                    url: http://mealie.selfhosted:9000
+                    key: '{{ "{{" }}HOMEPAGE_VAR_MEALIE_KEY{{ "}}" }}'
+                    version: 2
               - Atuin:
                   icon: atuin.png
                   href: https://atuin.negative7.com
