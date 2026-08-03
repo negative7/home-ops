@@ -16,6 +16,7 @@ resources:
   - ./mailkeep/ks.yaml
   - ./mealie/ks.yaml
   - ./outline/ks.yaml
+  - ./sparkyfitness/ks.yaml
   - ./spoolman/ks.yaml
   - ./sure/ks.yaml
   - ./trek/ks.yaml
