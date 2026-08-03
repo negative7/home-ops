@@ -293,9 +293,11 @@ spec:
                   href: https://scrypted.negative7.com
                   description: NVR
               - Kromgo:
+                  icon: https://avatars.githubusercontent.com/u/152294696?v=4
                   href: https://kromgo.negative7.com
                   description: Metrics Endpoints
               - Konflate:
+                  icon: https://avatars.githubusercontent.com/u/152294696?v=4
                   href: https://konflate.negative7.com
                   description: Flux OCIRepository Consolidation
               - AdGuard Home:
