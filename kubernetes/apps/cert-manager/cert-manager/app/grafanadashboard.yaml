@@ -3,41 +3,26 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaFolder
 metadata:
-  name: node-exporter
+  name: cert-manager
 spec:
+  allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  title: Node Exporter
+  title: Cert Manager
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: node-exporter
+  name: cert-manager
 spec:
   allowCrossNamespaceImport: true
   datasources:
     - datasourceName: prometheus
       inputName: DS_PROMETHEUS
-  folderRef: node-exporter
+  folderRef: cert-manager
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  url: https://grafana.com/api/dashboards/1860/revisions/45/download
----
-# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaDashboard
-metadata:
-  name: zfs
-spec:
-  allowCrossNamespaceImport: true
-  datasources:
-    - datasourceName: prometheus
-      inputName: DS_PROMETHEUS
-  folderRef: node-exporter
-  instanceSelector:
-    matchLabels:
-      dashboards: grafana
-  url: https://grafana.com/api/dashboards/24987/revisions/2/download
+  url: https://grafana.com/api/dashboards/20842/revisions/3/download
