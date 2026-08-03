@@ -30,6 +30,11 @@ spec:
               TZ: America/New_York
               ALLOW_SIGNUP: false
               BASE_URL: https://mealie.negative7.com
+              SMTP_HOST: smtp-relay.system.svc.cluster.local
+              SMTP_PORT: 25
+              SMTP_FROM_NAME: Mealie
+              SMTP_FROM_EMAIL: noreply@negative7.com
+              SMTP_AUTH_STRATEGY: NONE
             probes:
               liveness: &probes
                 enabled: true
