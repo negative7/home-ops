@@ -210,6 +210,10 @@ spec:
                   icon: autobrr.png
                   href: https://autobrr.negative7.com
                   description: Torrent Automation
+                  widget:
+                    type: autobrr
+                    url: http://lviv.homelab.internal:7474
+                    key: '{{ "{{" }}HOMEPAGE_VAR_AUTOBRR_KEY{{ "}}" }}'
 
             - Observability:
               - Gatus:
@@ -291,6 +295,24 @@ spec:
               - Konflate:
                   href: https://konflate.negative7.com
                   description: Flux OCIRepository Consolidation
+              - AdGuard Home:
+                  icon: adguard-home.png
+                  href: https://adguard.negative7.com
+                  description: DNS Ad Blocker
+                  widget:
+                    type: adguard
+                    url: https://adguard.negative7.com
+                    username: '{{ "{{" }}HOMEPAGE_VAR_ADGUARD_USER{{ "}}" }}'
+                    password: '{{ "{{" }}HOMEPAGE_VAR_ADGUARD_PASSWORD{{ "}}" }}'
+              - Proxmox:
+                  icon: proxmox.png
+                  href: https://kyiv.homelab.internal:8006/
+                  description: Virtualization Host
+                  widget:
+                    type: proxmox
+                    url: https://kyiv.homelab.internal:8006
+                    username: '{{ "{{" }}HOMEPAGE_VAR_PROXMOX_TOKEN{{ "}}" }}'
+                    password: '{{ "{{" }}HOMEPAGE_VAR_PROXMOX_TOKEN_SECRET{{ "}}" }}'
 
             - Automation:
               - Home Assistant:
