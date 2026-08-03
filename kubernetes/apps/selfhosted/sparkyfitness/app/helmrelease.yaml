@@ -113,13 +113,6 @@ spec:
       frontend:
         annotations:
           reloader.stakater.com/auto: "true"
-        pod:
-          securityContext:
-            fsGroup: 0
-            fsGroupChangePolicy: OnRootMismatch
-            runAsGroup: 0
-            runAsNonRoot: true
-            runAsUser: 1000
         containers:
           app:
             image:
@@ -179,6 +172,24 @@ spec:
           server:
             app:
               - path: /app/SparkyFitnessServer/backup
+      nginx-run:
+        type: emptyDir
+        advancedMounts:
+          frontend:
+            app:
+              - path: /run
+      nginx-cache:
+        type: emptyDir
+        advancedMounts:
+          frontend:
+            app:
+              - path: /var/cache/nginx
+      nginx-conf:
+        type: emptyDir
+        advancedMounts:
+          frontend:
+            app:
+              - path: /etc/nginx/conf.d
 
     route:
       app:
