@@ -271,12 +271,15 @@ spec:
                   href: https://spoolman.negative7.com
                   description: Filament Manager
               - Trek:
+                  icon: https://raw.githubusercontent.com/liketrek/TREK/main/docs/trek-icon.png
                   href: https://travel.negative7.com
                   description: Trip Planner
               - Sure:
+                  icon: https://raw.githubusercontent.com/we-promise/sure/main/public/android-chrome-512x512.png
                   href: https://sure.negative7.com
                   description: Finances
               - Mailkeep:
+                  icon: https://raw.githubusercontent.com/szinn/mailkeep/main/assets-source/android-chrome-512x512.png
                   href: https://mailkeep.negative7.com
                   description: Mail
 
