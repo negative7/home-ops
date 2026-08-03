@@ -7,3 +7,12 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./ciliumnetworkpolicy.yaml
+configMapGenerator:
+  - name: actual-bank-sync-script
+    files:
+      - scripts/sync.js
+generatorOptions:
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
+configurations:
+  - kustomizeconfig.yaml

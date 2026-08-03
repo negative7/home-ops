@@ -58,5 +58,16 @@
       ],
       datasourceTemplate: "github-releases",
     },
+    {
+      customType: "regex",
+      description: "Process @actual-app/api version pinned in the Actual bank-sync CronJob's runtime npm install",
+      managerFilePatterns: [
+        "/^kubernetes\\/apps\\/selfhosted\\/actual\\/.+\\.ya?ml$/"
+      ],
+      matchStrings: [
+        "npm install[^\\n]*(?<depName>@actual-app/api)@(?<currentValue>[^\\s]+)",
+      ],
+      datasourceTemplate: "npm",
+    },
   ],
 }
