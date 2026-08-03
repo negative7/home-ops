@@ -40,7 +40,7 @@ spec:
               - -c
               - |
                 set -e
-                npm install --prefix /app --no-save --no-audit --no-fund @actual-app/api@26.7.0
+                npm install --prefix /app --no-save --no-audit --no-fund @actual-app/api@26.8.0
                 node /scripts/sync.js
             env:
               HOME: /app
