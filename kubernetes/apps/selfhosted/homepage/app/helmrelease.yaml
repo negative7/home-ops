@@ -130,7 +130,7 @@ spec:
                   description: Media Server
                   widget:
                     type: jellyfin
-                    url: http://jellyfin.media:8096
+                    url: http://jellyfin.media.svc.cluster.local:8096
                     key: '{{ "{{" }}HOMEPAGE_VAR_JELLYFIN_KEY{{ "}}" }}'
               - Plex:
                   icon: plex.png
@@ -138,7 +138,7 @@ spec:
                   description: Media Server
                   widget:
                     type: plex
-                    url: http://plex.media:32400
+                    url: http://plex.media.svc.cluster.local:32400
                     key: '{{ "{{" }}HOMEPAGE_VAR_PLEX_TOKEN{{ "}}" }}'
               - Requests:
                   icon: jellyseerr.png
@@ -146,7 +146,7 @@ spec:
                   description: Media Requests
                   widget:
                     type: jellyseerr
-                    url: http://seerr.media
+                    url: http://seerr.media.svc.cluster.local
                     key: '{{ "{{" }}HOMEPAGE_VAR_SEERR_KEY{{ "}}" }}'
               - Maintainerr:
                   icon: maintainerr.png
@@ -164,7 +164,7 @@ spec:
                   description: TV Shows
                   widget:
                     type: sonarr
-                    url: http://sonarr.downloads:8989
+                    url: http://sonarr.downloads.svc.cluster.local:8989
                     key: '{{ "{{" }}HOMEPAGE_VAR_SONARR_KEY{{ "}}" }}'
               - Radarr:
                   icon: radarr.png
@@ -172,7 +172,7 @@ spec:
                   description: Movies
                   widget:
                     type: radarr
-                    url: http://radarr.downloads:7878
+                    url: http://radarr.downloads.svc.cluster.local:7878
                     key: '{{ "{{" }}HOMEPAGE_VAR_RADARR_KEY{{ "}}" }}'
               - Prowlarr:
                   icon: prowlarr.png
@@ -180,7 +180,7 @@ spec:
                   description: Indexer Manager
                   widget:
                     type: prowlarr
-                    url: http://prowlarr.downloads:9696
+                    url: http://prowlarr.downloads.svc.cluster.local:9696
                     key: '{{ "{{" }}HOMEPAGE_VAR_PROWLARR_KEY{{ "}}" }}'
               - Bazarr:
                   icon: bazarr.png
@@ -188,7 +188,7 @@ spec:
                   description: Subtitles
                   widget:
                     type: bazarr
-                    url: http://bazarr.downloads:6767
+                    url: http://bazarr.downloads.svc.cluster.local:6767
                     key: '{{ "{{" }}HOMEPAGE_VAR_BAZARR_KEY{{ "}}" }}'
               - SABnzbd:
                   icon: sabnzbd.png
@@ -222,7 +222,7 @@ spec:
                   description: Status Page
                   widget:
                     type: gatus
-                    url: http://gatus.observability:8080
+                    url: http://gatus.observability.svc.cluster.local:8080
                     slug: default
               - Grafana:
                   icon: grafana.png
@@ -264,7 +264,7 @@ spec:
                   description: Recipes
                   widget:
                     type: mealie
-                    url: http://mealie.selfhosted:9000
+                    url: http://mealie.selfhosted.svc.cluster.local:9000
                     key: '{{ "{{" }}HOMEPAGE_VAR_MEALIE_KEY{{ "}}" }}'
                     version: 2
               - Atuin:

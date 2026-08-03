@@ -44,7 +44,7 @@ spec:
                   secretKeyRef:
                     name: sure-postgresql-app
                     key: uri
-              REDIS_URL: redis://sure-dragonfly:6379
+              REDIS_URL: redis://sure-dragonfly.selfhosted.svc.cluster.local:6379
               SECRET_KEY_BASE:
                 valueFrom:
                   secretKeyRef:

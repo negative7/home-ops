@@ -33,7 +33,7 @@ spec:
               PORT: "3000"
               FILE_STORAGE: local
               FILE_STORAGE_LOCAL_ROOT_DIR: /var/lib/outline/data
-              REDIS_URL: redis://outline-dragonfly:6379
+              REDIS_URL: redis://outline-dragonfly.selfhosted.svc.cluster.local:6379
               DATABASE_URL:
                 valueFrom:
                   secretKeyRef:
