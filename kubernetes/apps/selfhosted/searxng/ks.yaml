@@ -5,6 +5,11 @@ kind: Kustomization
 metadata:
   name: searxng
 spec:
+  components:
+    - ../../../../components/dragonfly
+  dependsOn:
+    - name: dragonfly-operator
+      namespace: database
   commonMetadata:
     labels:
       app.kubernetes.io/name: searxng
