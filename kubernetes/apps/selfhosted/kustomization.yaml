@@ -7,7 +7,6 @@ components:
   - ../../components/flux-alerts
   - ../../components/kopiur/secret
 resources:
-  - ./namespace.yaml
   - ./actual/ks.yaml
   - ./atuin/ks.yaml
   - ./homepage/ks.yaml
@@ -15,7 +14,9 @@ resources:
   - ./karakeep/ks.yaml
   - ./mailkeep/ks.yaml
   - ./mealie/ks.yaml
+  - ./namespace.yaml
   - ./outline/ks.yaml
+  - ./searxng/ks.yaml
   - ./spoolman/ks.yaml
   - ./sure/ks.yaml
   - ./trek/ks.yaml
