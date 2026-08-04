@@ -25,7 +25,7 @@ spec:
               ENABLE_OAUTH_PERSISTENT_CONFIG: false
               OAUTH_MERGE_ACCOUNTS_BY_EMAIL: true
               OAUTH_PROVIDER_NAME: Kanidm
-              OPENID_PROVIDER_URL: https://idm.negative7.com/oauth2/openid/openwebui/.well-known/openid-configuration
+              OPENID_PROVIDER_URL: https://idm.negative7.com/oauth2/openid/open-webui/.well-known/openid-configuration
               OAUTH_SCOPES: openid email profile
               OPENID_REDIRECT_URI: https://chat.negative7.com/oauth/oidc/callback
               # Features
