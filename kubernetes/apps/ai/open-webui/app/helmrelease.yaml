@@ -32,7 +32,8 @@ spec:
               # Features
               ENABLE_LOGIN_FORM: false
               ENABLE_OLLAMA_API: false
-              ENABLE_OPENAI_API: false
+              ENABLE_OPENAI_API: true
+              OPENAI_API_BASE_URL: http://litellm.ai.svc.cluster.local:4000/v1
               ENABLE_RAG_WEB_SEARCH: true
               ENABLE_SEARCH_QUERY: true
               ENABLE_SIGNUP: false
