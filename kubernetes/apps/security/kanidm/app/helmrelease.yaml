@@ -172,6 +172,7 @@ spec:
                     "displayName": "Outline",
                     "originUrl": "https://outline.negative7.com/auth/oidc.callback",
                     "originLanding": "https://outline.negative7.com/",
+                    "allowInsecureClientDisablePkce": true,
                     "scopeMaps": {
                       "apps": ["email", "openid", "profile"]
                     }
