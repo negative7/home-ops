@@ -10,15 +10,6 @@ spec:
     - Qwen3-Embedding-0.6B-Q8_0.gguf
   format: gguf
   quantization: Q8_0
-  hardware:
-    accelerator: intel
-    gpu:
-      enabled: true
-      vendor: intel
-      layers: 99
-      resourceClaims:
-        - name: gpu
-          resourceClaimTemplateName: llmkube-models-gpu
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/inference.llmkube.dev/inferenceservice_v1alpha1.json
 apiVersion: inference.llmkube.dev/v1alpha1
@@ -29,20 +20,13 @@ spec:
   modelRef: qwen3-embedding-0.6b
   runtime: llamacpp
   # renovate: datasource=docker depName=ghcr.io/ggml-org/llama.cpp
-  image: ghcr.io/ggml-org/llama.cpp:server-vulkan@sha256:938a0fed6f4f83d00e0c2bac0c9ddfef343b2e8b2fd493a0abc442c4edb346ef
+  image: ghcr.io/ggml-org/llama.cpp:server@sha256:9e60dd363798776f451bcca97f22f5d75579480e53b0b46303d061a69ceea4df
   replicas: 1
   priority: normal
   contextSize: 8192
   parallelSlots: 2
   batchSize: 8192
   uBatchSize: 4096
-  env:
-    - name: ZES_ENABLE_SYSMAN
-      value: "1"
-    - name: ONEAPI_DEVICE_SELECTOR
-      value: level_zero:gpu
-    - name: UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS
-      value: "1"
   extraArgs:
     - --alias
     - qwen3-embedding-0.6b
@@ -59,8 +43,8 @@ spec:
     port: 8080
     type: ClusterIP
   resources:
-    cpu: 100m
-    memory: 2Gi
+    cpu: "1"
+    memory: 1Gi
   probeOverrides:
     startup:
       httpGet:
