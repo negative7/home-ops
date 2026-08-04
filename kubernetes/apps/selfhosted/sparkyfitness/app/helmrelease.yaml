@@ -172,6 +172,15 @@ spec:
           server:
             app:
               - path: /app/SparkyFitnessServer/backup
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          server:
+            app:
+              - path: /tmp
+                subPath: tmp
+              - path: /app/SparkyFitnessServer/temp_uploads
+                subPath: temp_uploads
       nginx-run:
         type: emptyDir
         advancedMounts:
