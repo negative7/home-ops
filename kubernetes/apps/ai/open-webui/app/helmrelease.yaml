@@ -29,6 +29,16 @@ spec:
               OAUTH_SCOPES: openid email profile
               OAUTH_CODE_CHALLENGE_METHOD: S256
               OPENID_REDIRECT_URI: https://chat.negative7.com/oauth/oidc/callback
+              OAUTH_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: kanidm-open-webui-oidc
+                    key: client-id
+              OAUTH_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: kanidm-open-webui-oidc
+                    key: client-secret
               # Features
               ENABLE_LOGIN_FORM: false
               ENABLE_OLLAMA_API: false

@@ -8,11 +8,14 @@ spec:
   components:
     - ../../../../components/dragonfly
     - ../../../../components/kopiur/backup
+    - ../../../../components/kanidm-oidc
   dependsOn:
     - name: kopiur
       namespace: system
     - name: dragonfly-operator
       namespace: database
+    - name: kanidm
+      namespace: security
   healthCheckExprs:
     - apiVersion: dragonflydb.io/v1alpha1
       kind: Dragonfly
@@ -23,6 +26,11 @@ spec:
   postBuild:
     substitute:
       APP: open-webui
+      APP_NAMESPACE: ai
+      OIDC_CALLBACK: /oauth/oidc/callback
+      OIDC_DISPLAY_NAME: Open WebUI
+      OIDC_SCOPES: '["openid", "profile", "email"]'
+      SUBDOMAIN: chat
   prune: true
   sourceRef:
     kind: GitRepository
