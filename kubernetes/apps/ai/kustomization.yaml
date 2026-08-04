@@ -11,4 +11,6 @@ resources:
   - ./context7-mcp/ks.yaml
   - ./litellm/ks.yaml
   - ./litellm-operator/ks.yaml
+  - ./llmkube/ks.yaml
+  - ./memini/ks.yaml
   - ./open-webui/ks.yaml
