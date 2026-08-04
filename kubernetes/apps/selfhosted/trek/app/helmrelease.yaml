@@ -32,12 +32,12 @@ spec:
               OIDC_CLIENT_ID:
                 valueFrom:
                   secretKeyRef:
-                    name: trek-kanidm-oidc
+                    name: kanidm-trek-oidc
                     key: client-id
               OIDC_CLIENT_SECRET:
                 valueFrom:
                   secretKeyRef:
-                    name: trek-kanidm-oidc
+                    name: kanidm-trek-oidc
                     key: client-secret
               OIDC_DISCOVERY_URL: https://idm.negative7.com/oauth2/openid/trek/.well-known/openid-configuration
               OIDC_DISPLAY_NAME: Kanidm
