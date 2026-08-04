@@ -27,6 +27,7 @@ spec:
               OAUTH_PROVIDER_NAME: Kanidm
               OPENID_PROVIDER_URL: https://idm.negative7.com/oauth2/openid/open-webui/.well-known/openid-configuration
               OAUTH_SCOPES: openid email profile
+              OAUTH_CODE_CHALLENGE_METHOD: S256
               OPENID_REDIRECT_URI: https://chat.negative7.com/oauth/oidc/callback
               # Features
               ENABLE_LOGIN_FORM: false

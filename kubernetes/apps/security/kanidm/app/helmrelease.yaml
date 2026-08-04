@@ -160,6 +160,14 @@ spec:
                       "apps": ["email", "groups", "openid", "profile"]
                     }
                   },
+                  "open-webui": {
+                    "displayName": "Open WebUI",
+                    "originUrl": "https://chat.negative7.com/oauth/oidc/callback",
+                    "originLanding": "https://chat.negative7.com/",
+                    "scopeMaps": {
+                      "apps": ["email", "openid", "profile"]
+                    }
+                  },
                   "outline": {
                     "displayName": "Outline",
                     "originUrl": "https://outline.negative7.com/auth/oidc.callback",
