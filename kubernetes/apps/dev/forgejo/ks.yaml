@@ -9,11 +9,14 @@ spec:
     - ../../../../components/anubis
     - ../../../../components/dragonfly
     - ../../../../components/kopiur/backup
+    - ../../../../components/kanidm-oidc
   dependsOn:
     - name: kopiur
       namespace: system
     - name: dragonfly-operator
       namespace: database
+    - name: kanidm
+      namespace: security
   healthCheckExprs:
     - apiVersion: dragonflydb.io/v1alpha1
       kind: Dragonfly
@@ -24,11 +27,17 @@ spec:
   postBuild:
     substitute:
       APP: forgejo
+      APP_NAMESPACE: dev
       KOPIUR_MOVER_UID: "1000"
       KOPIUR_MOVER_GID: "1000"
       KOPIUR_CAPACITY: 10Gi
       ANUBIS_TARGET: http://forgejo-http.dev.svc.cluster.local:3000
       ANUBIS_MEM_LIMIT: 384Mi
+      OIDC_CALLBACK: /user/oauth2/kanidm/callback
+      SUBDOMAIN: git
+      OIDC_CLIENT_ID_KEY: key
+      OIDC_CLIENT_SECRET_KEY: secret
+      OIDC_SCOPES: '["openid", "profile", "email", "groups"]'
   prune: true
   sourceRef:
     kind: GitRepository
