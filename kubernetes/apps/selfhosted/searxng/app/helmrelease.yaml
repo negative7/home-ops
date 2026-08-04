@@ -28,7 +28,7 @@ spec:
             env:
               SEARXNG_BASE_URL: https://search.negative7.com
               SEARXNG_PORT: &httpPort 8080
-              SEARXNG_VALKEY_URL: "redis://searxng-dragonfly.svc.cluster.local:6379"
+              SEARXNG_VALKEY_URL: "redis://searxng-dragonfly.selfhosted.svc.cluster.local:6379"
             envFrom:
               - secretRef:
                   name: searxng-secret
