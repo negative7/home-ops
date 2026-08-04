@@ -37,6 +37,7 @@ spec:
               KANIDM_DB_PATH: /data/kanidm.db
               KANIDM_TLS_CHAIN: /certs/tls.crt
               KANIDM_TLS_KEY: /certs/tls.key
+              KANIDM_MAIL_RELAY: smtp-relay.system.svc.cluster.local:25
             probes:
               liveness: &probes
                 enabled: true
@@ -128,66 +129,6 @@ spec:
           provision:
             app:
               - path: /data/icons
-    configMaps:
-      kanidm-provision-state:
-        labels:
-          kanidm_config: "1"
-        includeInChecksum: false
-        data:
-          state.json: |
-            {
-              "groups": {
-                "apps": {
-                  "members": ["negative7"]
-                },
-                "forgejo_admins": {
-                  "members": ["negative7"]
-                }
-              },
-              "persons": {
-                "negative7": {
-                  "displayName": "Sergiy Shevchenko",
-                  "mailAddresses": ["sergiy@negative7.com"]
-                }
-              },
-              "systems": {
-                "oauth2": {
-                  "forgejo": {
-                    "displayName": "Forgejo",
-                    "originUrl": "https://git.negative7.com/user/oauth2/kanidm/callback",
-                    "originLanding": "https://git.negative7.com/",
-                    "scopeMaps": {
-                      "apps": ["email", "groups", "openid", "profile"]
-                    }
-                  },
-                  "open-webui": {
-                    "displayName": "Open WebUI",
-                    "originUrl": "https://chat.negative7.com/oauth/oidc/callback",
-                    "originLanding": "https://chat.negative7.com/",
-                    "scopeMaps": {
-                      "apps": ["email", "openid", "profile"]
-                    }
-                  },
-                  "outline": {
-                    "displayName": "Outline",
-                    "originUrl": "https://outline.negative7.com/auth/oidc.callback",
-                    "originLanding": "https://outline.negative7.com/",
-                    "allowInsecureClientDisablePkce": true,
-                    "scopeMaps": {
-                      "apps": ["email", "openid", "profile"]
-                    }
-                  },
-                  "trek": {
-                    "displayName": "Trek",
-                    "originUrl": "https://travel.negative7.com/api/auth/oidc/callback",
-                    "originLanding": "https://travel.negative7.com/",
-                    "scopeMaps": {
-                      "apps": ["email", "groups", "openid", "profile"]
-                    }
-                  }
-                }
-              }
-            }
     serviceAccount:
       kanidm-provision: {}
     rbac:
@@ -204,7 +145,7 @@ spec:
                 - list
                 - watch
         kanidm-provision-secrets:
-          type: Role
+          type: ClusterRole
           rules:
             - apiGroups:
                 - ""
@@ -221,7 +162,7 @@ spec:
           subjects:
             - identifier: kanidm-provision
         kanidm-provision-secrets:
-          type: RoleBinding
+          type: ClusterRoleBinding
           roleRef:
             identifier: kanidm-provision-secrets
           subjects:
