@@ -8,6 +8,10 @@ spec:
   # renovate: datasource=docker depName=ghcr.io/berriai/litellm
   image: ghcr.io/berriai/litellm:v1.95.0@sha256:af806882b7a6ced41658db5b6a7e98ed7b9b51d03b935e0417bf1c8552d688af
   replicas: 1
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    failureThreshold: 20
   generalSettings:
     health_check_endpoint: /v1/health
   routerSettings:
