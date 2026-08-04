@@ -52,13 +52,13 @@ spec:
               OIDC_CLIENT_ID:
                 valueFrom:
                   secretKeyRef:
-                    name: outline-secret
-                    key: OIDC_CLIENT_ID
+                    name: kanidm-outline-oidc
+                    key: client-id
               OIDC_CLIENT_SECRET:
                 valueFrom:
                   secretKeyRef:
-                    name: outline-secret
-                    key: OIDC_CLIENT_SECRET
+                    name: kanidm-outline-oidc
+                    key: client-secret
               OIDC_AUTH_URI: https://idm.negative7.com/ui/oauth2
               OIDC_TOKEN_URI: https://idm.negative7.com/oauth2/token
               OIDC_USERINFO_URI: https://idm.negative7.com/oauth2/openid/outline/userinfo

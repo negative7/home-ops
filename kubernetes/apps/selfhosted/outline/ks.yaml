@@ -8,6 +8,7 @@ spec:
   components:
     - ../../../../components/dragonfly
     - ../../../../components/kopiur/backup
+    - ../../../../components/kanidm-oidc
   dependsOn:
     - name: kopiur
       namespace: system
@@ -22,9 +23,14 @@ spec:
   postBuild:
     substitute:
       APP: outline
+      APP_NAMESPACE: selfhosted
       KOPIUR_CAPACITY: 10Gi
       KOPIUR_MOVER_UID: "1001"
       KOPIUR_MOVER_GID: "1001"
+      OIDC_CALLBACK: /auth/oidc.callback
+      OIDC_DISABLE_PKCE: "true"
+      OIDC_DISPLAY_NAME: Outline
+      OIDC_SCOPES: '["openid", "profile", "email"]'
   prune: true
   sourceRef:
     kind: GitRepository
