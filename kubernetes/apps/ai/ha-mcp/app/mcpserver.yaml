@@ -5,10 +5,24 @@ kind: LiteLLMMCPServer
 metadata:
   name: ha-mcp
 spec:
-  alias: home-assistant
-  url: http://hass.homelab.internal:8123/api/mcp
-  transport: http
-  authType: bearer_token
-  authTokenRef:
-    name: ha-mcp-secret
-    key: api_key
+  alias: ha_mcp
+  workload:
+    # renovate: datasource=docker depName=ghcr.io/homeassistant-ai/ha-mcp
+    image: ghcr.io/homeassistant-ai/ha-mcp:8.0.0
+    port: 8086
+    command:
+      - ha-mcp-web
+    env:
+      - name: HOMEASSISTANT_URL
+        value: https://hass.negative7.com
+      - name: HOMEASSISTANT_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: ha-mcp-secret
+            key: api_key
+    volumes:
+      - name: tmp
+        emptyDir: {}
+    volumeMounts:
+      - name: tmp
+        mountPath: /tmp
