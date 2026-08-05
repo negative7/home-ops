@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/evilmartians/lefthook/master/schema.json
+---
+pre-commit:
+  skip:
+    - merge
+    - rebase
+  jobs:
+    - name: yamlfmt
+      glob: "*.{yaml,yml}"
+      run: yamlfmt {staged_files}
+      stage_fixed: true
+
+    - name: yamllint
+      glob: "*.{yaml,yml}"
+      run: yamllint --config-file .yamllint.yaml {staged_files}
+
+    - name: actionlint
+      glob: ".forgejo/workflows/*.{yaml,yml}"
+      run: actionlint -config-file .forgejo/actionlint.yaml {staged_files}
+
+    - name: markdownlint
+      glob: "*.md"
+      run: markdownlint-cli2 {staged_files}
