@@ -9,6 +9,7 @@ spec:
     - ../../../../components/dragonfly
     - ../../../../components/kopiur/backup
     - ../../../../components/kanidm-oidc
+    - ../../../../components/postgres/pass
   dependsOn:
     - name: kopiur
       namespace: system
@@ -30,7 +31,7 @@ spec:
       OIDC_CALLBACK: /auth/oidc.callback
       OIDC_DISABLE_PKCE: "true"
       OIDC_DISPLAY_NAME: Outline
-      OIDC_SCOPES: '["openid", "profile", "email"]'
+      OIDC_SCOPES: "[\"openid\", \"profile\", \"email\"]"
   prune: true
   sourceRef:
     kind: GitRepository
