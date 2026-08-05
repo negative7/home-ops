@@ -10,3 +10,4 @@ resources:
   - ./barman-cloud-plugin/ks.yaml
   - ./cnpg-operator/ks.yaml
   - ./dragonfly-operator/ks.yaml
+  - ./postgres/ks.yaml

@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/barmancloud.cnpg.io/objectstore_v1.json
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: postgres-backup
+spec:
+  configuration:
+    destinationPath: s3://cnpg-backups/postgres
+    endpointURL: http://lviv.homelab.internal:9000
+    s3Credentials:
+      accessKeyId:
+        name: postgres-garage-secret
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: postgres-garage-secret
+        key: SECRET_ACCESS_KEY
+      region:
+        name: postgres-garage-secret
+        key: REGION
+    wal:
+      compression: zstd
+      maxParallel: 2
+    data:
+      compression: gzip
+      jobs: 2
+  retentionPolicy: 14d

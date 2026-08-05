@@ -9,3 +9,4 @@ resources:
   - ./helmrelease.yaml
   - ./prometheusRule.yaml
   - ./grafanadashboard.yaml
+  - ./postgres-client-ca.yaml

@@ -1,0 +1,50 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres
+spec:
+  description: Shared PostgreSQL cluster
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.4-standard-trixie
+  instances: 2
+  storage:
+    size: 20Gi
+    storageClass: miroir-local
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
+  certificates:
+    serverTLSSecret: postgres-server-cert
+    serverCASecret: postgres-server-cert
+    clientCASecret: postgres-client-ca
+    replicationTLSSecret: postgres-replication-cert
+  postgresql:
+    pg_hba:
+      - hostssl all all all cert clientcert=verify-full map=pooler-map
+      - host all all all scram-sha-256
+    pg_ident:
+      - pooler-map pooler-rw all
+    parameters:
+      max_connections: "200"
+      shared_buffers: 256MB
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      enabled: true
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: postgres-backup
+  nodeMaintenanceWindow:
+    inProgress: false
+    reusePVC: true
+  primaryUpdateStrategy: unsupervised
+  monitoring:
+    enablePodMonitor: true
+  bootstrap:
+    initdb:
+      database: app
+      owner: app
+      encoding: UTF8

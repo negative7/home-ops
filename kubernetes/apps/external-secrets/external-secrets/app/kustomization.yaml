@@ -8,3 +8,4 @@ resources:
   - ./prometheusrule.yaml
   - ./grafanafolder.yaml
   - ./grafanadashboard.yaml
+  - ./clustergenerator.yaml
