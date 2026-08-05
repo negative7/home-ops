@@ -32,23 +32,23 @@ spec:
               POSTGRES_USER:
                 valueFrom:
                   secretKeyRef:
-                    name: jellystat-postgresql-app
+                    name: jellystat-postgres
                     key: username
               POSTGRES_PASSWORD:
                 valueFrom:
                   secretKeyRef:
-                    name: jellystat-postgresql-app
+                    name: jellystat-postgres
                     key: password
               POSTGRES_IP:
                 valueFrom:
                   secretKeyRef:
-                    name: jellystat-postgresql-app
+                    name: jellystat-postgres
                     key: host
               POSTGRES_DB:
                 valueFrom:
                   secretKeyRef:
-                    name: jellystat-postgresql-app
-                    key: dbname
+                    name: jellystat-postgres
+                    key: database
               JWT_SECRET:
                 valueFrom:
                   secretKeyRef:

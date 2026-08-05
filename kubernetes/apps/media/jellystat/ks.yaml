@@ -10,9 +10,14 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  components:
+    - ../../../../components/postgres/pass
   dependsOn:
     - name: cnpg-operator
       namespace: database
+  postBuild:
+    substitute:
+      APP: *app
   path: ./kubernetes/apps/media/jellystat/app
   prune: true
   sourceRef:
