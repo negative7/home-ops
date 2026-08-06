@@ -6,7 +6,7 @@ metadata:
   name: postgres
 spec:
   description: Shared PostgreSQL cluster
-  imageName: ghcr.io/cloudnative-pg/postgresql:18.4-standard-trixie
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.4-minimal-trixie@sha256:229ab83c0639d294042ca747745fb214db690ade64d5d59131a135825b994391
   instances: 2
   storage:
     size: 20Gi
@@ -37,6 +37,9 @@ spec:
       - vchord.so
       - timescaledb
     extensions:
+      - name: pgvector
+        image:
+          reference: ghcr.io/cloudnative-pg/pgvector:0.8.6-18-trixie@sha256:e8a14094c8d7ccf20d4eb793accae35ea067edda278d659c561d510cd1cea6b1
       - name: vchord
         image:
           reference: ghcr.io/tensorchord/vchord-scratch:pg18-v1.1.1@sha256:bdea43bed2a414e21bbf71767bf6f0739747ac480b267b51772dc214ac28dcb3
