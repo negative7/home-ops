@@ -49,6 +49,17 @@
     },
     {
       customType: "regex",
+      description: "Process CloudNativePG Cluster extension image references",
+      managerFilePatterns: [
+        "/^kubernetes/.+\\.yaml(?:\\.j2)?$/"
+      ],
+      matchStrings: [
+        "reference:\\s+(?<depName>[^:\\s]+):(?<currentValue>\\S+)",
+      ],
+      datasourceTemplate: "docker",
+    },
+    {
+      customType: "regex",
       description: "Process GitHub release download URLs",
       managerFilePatterns: [
         "/^kubernetes/.+\\.yaml(?:\\.j2)?$/"
