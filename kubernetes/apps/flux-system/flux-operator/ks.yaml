@@ -6,9 +6,6 @@ metadata:
   name: &appname flux-operator
   namespace: &namespace flux-system
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *appname
   interval: 1h
   path: ./kubernetes/apps/flux-system/flux-operator/app
   prune: false # Never delete this
@@ -17,5 +14,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: *namespace
-  timeout: 5m
-  wait: false

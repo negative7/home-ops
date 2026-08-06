@@ -7,9 +7,6 @@ metadata:
   namespace: &namespace media
 spec:
   targetNamespace: *namespace
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *app
   components:
     - ../../../../components/postgres/pass
   dependsOn:
@@ -27,4 +24,3 @@ spec:
   wait: true
   interval: 1h
   retryInterval: 1m
-  timeout: 5m

@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: jellyplex-watched
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: jellyplex-watched
   interval: 1h
   path: "./kubernetes/apps/media/jellyplex-watched/app"
   postBuild:
@@ -19,5 +16,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: media
-  timeout: 5m
-  wait: false

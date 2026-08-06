@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: spoolman
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: spoolman
   components:
     - ../../../../components/kopiur/backup
   dependsOn:
@@ -30,5 +27,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: selfhosted
-  timeout: 5m
-  wait: false

@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: external-services-adguard
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: external-services-adguard
   interval: 30m
   path: "./kubernetes/apps/network/external-services/adguard"
   prune: true
@@ -16,8 +13,6 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: network
-  timeout: 5m
-  wait: false
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -25,9 +20,6 @@ kind: Kustomization
 metadata:
   name: external-services-autobrr
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: external-services-autobrr
   interval: 30m
   path: "./kubernetes/apps/network/external-services/autobrr"
   prune: true
@@ -36,8 +28,6 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: network
-  timeout: 5m
-  wait: false
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -45,9 +35,6 @@ kind: Kustomization
 metadata:
   name: external-services-doco
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: external-services-doco
   interval: 30m
   path: "./kubernetes/apps/network/external-services/doco"
   prune: true
@@ -56,8 +43,6 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: network
-  timeout: 5m
-  wait: false
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -65,9 +50,6 @@ kind: Kustomization
 metadata:
   name: external-services-garage-webui
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: external-services-garage-webui
   interval: 30m
   path: "./kubernetes/apps/network/external-services/garage-webui"
   prune: true
@@ -76,8 +58,6 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: network
-  timeout: 5m
-  wait: false
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -85,9 +65,6 @@ kind: Kustomization
 metadata:
   name: external-services-home-assistant
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: external-services-home-assistant
   interval: 30m
   path: "./kubernetes/apps/network/external-services/home-assistant"
   prune: true
@@ -96,8 +73,6 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: network
-  timeout: 5m
-  wait: false
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -105,9 +80,6 @@ kind: Kustomization
 metadata:
   name: external-services-qui
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: external-services-qui
   interval: 30m
   path: "./kubernetes/apps/network/external-services/qui"
   prune: true
@@ -116,8 +88,6 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: network
-  timeout: 5m
-  wait: false
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -125,9 +95,6 @@ kind: Kustomization
 metadata:
   name: external-services-sabnzbd
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: external-services-sabnzbd
   interval: 30m
   path: "./kubernetes/apps/network/external-services/sabnzbd"
   prune: true
@@ -136,5 +103,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: network
-  timeout: 5m
-  wait: false

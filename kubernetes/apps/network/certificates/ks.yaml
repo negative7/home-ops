@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: certificates-export
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: certificates
   interval: 1h
   path: "./kubernetes/apps/network/certificates/export"
   prune: true
@@ -16,5 +13,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: network
-  timeout: 5m
-  wait: false

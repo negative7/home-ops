@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: kanidm-${APP}-oidc
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: &app ${APP}
   dependsOn:
     - name: kanidm
       namespace: security
@@ -15,7 +12,7 @@ spec:
   path: ./kubernetes/components/kanidm-oidc/base/configmap
   postBuild:
     substitute:
-      APP: *app
+      APP: ${APP}
       APP_NAMESPACE: ${APP_NAMESPACE}
       SUBDOMAIN: ${SUBDOMAIN:=${APP}}
       DOMAIN: ${q:="}${DOMAIN:=}${q:="}
@@ -55,5 +52,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: security
-  timeout: 5m
-  wait: false

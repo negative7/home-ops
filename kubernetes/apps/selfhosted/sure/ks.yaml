@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: sure
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: sure
   components:
     - ../../../../components/dragonfly
     - ../../../../components/kopiur/backup

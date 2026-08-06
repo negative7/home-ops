@@ -6,7 +6,6 @@ metadata:
   name: seerr
 spec:
   interval: 30m
-  timeout: 5m
   path: "./kubernetes/apps/media/seerr/app"
   prune: true
   sourceRef:
@@ -14,7 +13,6 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: media
-  wait: false
   components:
     - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
