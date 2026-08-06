@@ -47,19 +47,6 @@ spec:
                   memory: 1Gi
                 limits:
                   memory: 2560Mi
-      persistence:
-        postgres-cert:
-          type: secret
-          name: postgres-immich-cert
-          defaultMode: 0400
-          globalMounts:
-            - path: /var/run/secrets/postgresql
-        postgres-client-ca:
-          type: secret
-          name: postgres-client-ca
-          defaultMode: 0440
-          globalMounts:
-            - path: /var/run/secrets/postgres-client-ca
 
     machine-learning:
       controllers:
