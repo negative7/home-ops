@@ -20,8 +20,7 @@ spec:
     substitute:
       APP: ${APP}
       OWNER: ${DATABASE_OWNER:=${APP}}
-      DATABASE_EXTENSIONS: ${DATABASE_EXTENSIONS:=${emptyArray}}
-      emptyArray: "[]"
+      DATABASE_EXTENSIONS: ${DATABASE_EXTENSIONS:=[]}
   prune: true
   retryInterval: 2m
   sourceRef:

@@ -9,4 +9,4 @@ spec:
   owner: ${OWNER}
   cluster:
     name: postgres
-  extensions: ${DATABASE_EXTENSIONS:=${emptyArray}}
+  extensions: ${DATABASE_EXTENSIONS:=[]}
