@@ -8,7 +8,7 @@ spec:
   components:
     - ../../../../components/dragonfly
     - ../../../../components/kopiur/backup
-    - ../../../../components/postgres/pass
+    - ../../../../components/postgres/cert
   dependsOn:
     - name: cnpg-operator
       namespace: database

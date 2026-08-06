@@ -9,7 +9,7 @@ spec:
     - ../../../../components/dragonfly
     - ../../../../components/kopiur/backup
     - ../../../../components/kanidm-oidc
-    - ../../../../components/postgres/pass
+    - ../../../../components/postgres/cert
   dependsOn:
     - name: kopiur
       namespace: system
