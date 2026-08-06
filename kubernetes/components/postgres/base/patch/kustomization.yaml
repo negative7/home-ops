@@ -15,15 +15,15 @@ patches:
       spec:
         values:
           persistence:
-            postgres-cert:
+            postgres-certs:
               type: secret
-              name: postgres-${APP}-cert
-              defaultMode: 0400
+              name: "postgres-{{ .Release.Name }}-cert"
+              defaultMode: 0600
               globalMounts:
                 - path: /var/run/secrets/postgresql
-            postgres-client-ca:
+            root-ca:
               type: secret
-              name: postgres-client-ca
+              name: root-ca
               defaultMode: 0440
               globalMounts:
-                - path: /var/run/secrets/postgres-client-ca
+                - path: /var/run/secrets/root-ca
