@@ -3,19 +3,19 @@
 apiVersion: litellm.home-operations.com/v1alpha1
 kind: LiteLLMModel
 metadata:
-  name: opencode-go-deepseek-v4-flash
+  name: opencode-go-minimax-m2-7
 spec:
-  modelName: opencode-go/deepseek-v4-flash
+  modelName: opencode-go/minimax-m2.7
   params:
-    model: openai/deepseek-v4-flash
-    apiBase: https://opencode.ai/zen/go/v1
+    model: anthropic/minimax-m2.7
+    apiBase: https://opencode.ai/zen/go
     apiKeyRef:
       name: litellm
       key: OPENCODE_GO_API_KEY
     dropParams: true
   info:
-    maxInputTokens: 1000000
-    maxOutputTokens: 384000
+    maxInputTokens: 204800
+    maxOutputTokens: 131072
     supportsFunctionCalling: true
     supportsPromptCaching: true
     extra:

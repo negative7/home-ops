@@ -15,7 +15,7 @@ spec:
     dropParams: true
   info:
     maxInputTokens: 262128
-    maxOutputTokens: 131072
+    maxOutputTokens: 262144
     supportsFunctionCalling: true
     supportsPromptCaching: true
     supportsVision: true

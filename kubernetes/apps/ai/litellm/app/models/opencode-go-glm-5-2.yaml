@@ -14,7 +14,7 @@ spec:
       key: OPENCODE_GO_API_KEY
     dropParams: true
   info:
-    maxInputTokens: 1048560
+    maxInputTokens: 1000000
     maxOutputTokens: 131072
     supportsFunctionCalling: true
     supportsPromptCaching: true

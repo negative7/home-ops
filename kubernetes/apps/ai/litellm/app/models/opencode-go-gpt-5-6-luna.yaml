@@ -3,20 +3,21 @@
 apiVersion: litellm.home-operations.com/v1alpha1
 kind: LiteLLMModel
 metadata:
-  name: opencode-go-deepseek-v4-flash
+  name: opencode-go-gpt-5-6-luna
 spec:
-  modelName: opencode-go/deepseek-v4-flash
+  modelName: opencode-go/gpt-5.6-luna
   params:
-    model: openai/deepseek-v4-flash
+    model: openai/gpt-5.6-luna
     apiBase: https://opencode.ai/zen/go/v1
     apiKeyRef:
       name: litellm
       key: OPENCODE_GO_API_KEY
     dropParams: true
   info:
-    maxInputTokens: 1000000
-    maxOutputTokens: 384000
+    maxInputTokens: 1050000
+    maxOutputTokens: 128000
     supportsFunctionCalling: true
     supportsPromptCaching: true
+    supportsVision: true
     extra:
       supports_reasoning: true

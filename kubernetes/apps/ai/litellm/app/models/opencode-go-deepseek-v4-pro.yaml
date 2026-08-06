@@ -3,11 +3,11 @@
 apiVersion: litellm.home-operations.com/v1alpha1
 kind: LiteLLMModel
 metadata:
-  name: opencode-go-deepseek-v4-flash
+  name: opencode-go-deepseek-v4-pro
 spec:
-  modelName: opencode-go/deepseek-v4-flash
+  modelName: opencode-go/deepseek-v4-pro
   params:
-    model: openai/deepseek-v4-flash
+    model: openai/deepseek-v4-pro
     apiBase: https://opencode.ai/zen/go/v1
     apiKeyRef:
       name: litellm

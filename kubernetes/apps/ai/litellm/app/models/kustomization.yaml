@@ -4,10 +4,20 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - opencode-go-deepseek-v4-flash.yaml
+  - opencode-go-deepseek-v4-pro.yaml
+  - opencode-go-glm-5-1.yaml
   - opencode-go-glm-5-2.yaml
+  - opencode-go-gpt-5-6-luna.yaml
+  - opencode-go-grok-4-5.yaml
+  - opencode-go-hy3.yaml
   - opencode-go-kimi-k2-6.yaml
   - opencode-go-kimi-k2-7-code.yaml
+  - opencode-go-kimi-k3.yaml
+  - opencode-go-mimo-v2-5-pro.yaml
   - opencode-go-mimo-v2-5.yaml
+  - opencode-go-minimax-m2-7.yaml
   - opencode-go-minimax-m3.yaml
   - opencode-go-qwen3-6-plus.yaml
   - opencode-go-qwen3-7-max.yaml
+  - opencode-go-qwen3-7-plus.yaml
+  - opencode-go-qwen3-8-max.yaml
