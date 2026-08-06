@@ -10,3 +10,4 @@ kubeconfig
 talosconfig
 AGENTS.md
 CLAUDE.md
+.mcp.json
