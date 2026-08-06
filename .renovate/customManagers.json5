@@ -54,7 +54,7 @@
         "/^kubernetes/.+\\.yaml(?:\\.j2)?$/"
       ],
       matchStrings: [
-        "reference:\\s+(?<depName>[^:\\s]+):(?<currentValue>\\S+)",
+        "reference:\\s+(?<depName>[^:\\s]+):(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:\\w+))?",
       ],
       datasourceTemplate: "docker",
     },
