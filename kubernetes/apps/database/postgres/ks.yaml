@@ -3,29 +3,27 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app postgres
+  name: &app cnpg-cluster
   namespace: &namespace database
 spec:
-  targetNamespace: *namespace
-  dependsOn:
-    - name: cnpg-operator
-      namespace: database
-    - name: barman-cloud-plugin
-      namespace: database
-    - name: cert-manager
-      namespace: cert-manager
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
   healthChecks:
     - apiVersion: postgresql.cnpg.io/v1
       kind: Cluster
       name: postgres
-      namespace: database
-  path: ./kubernetes/apps/database/postgres/app
+      namespace: *namespace
+  interval: 1h
+  path: ./kubernetes/apps/database/postgres/cluster
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: barman-ovh
+        optional: true
   prune: true
   sourceRef:
-    kind: GitRepository
+    kind: OCIRepository
     name: flux-system
     namespace: flux-system
-  wait: true
-  interval: 1h
-  retryInterval: 1m
-  timeout: 10m
+  targetNamespace: *namespace

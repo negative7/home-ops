@@ -7,6 +7,13 @@ metadata:
 spec:
   isCA: true
   commonName: postgres-ca
+  subject:
+    countries:
+      - US
+    organizations:
+      - homelab
+    organizationalUnits:
+      - postgres
   usages:
     - cert sign
     - crl sign
@@ -19,9 +26,6 @@ spec:
         - postgres-rw
         - postgres-ro
         - postgres-r
-        - pooler-rw
-        - pooler-rw.database.svc
-        - pooler-rw.database.svc.cluster.local
   duration: 8766h # 1 year
   privateKey:
     algorithm: ECDSA
@@ -29,7 +33,7 @@ spec:
     encoding: PKCS8
     rotationPolicy: Always
   issuerRef:
-    name: selfsigned
+    name: cluster-ca
     kind: ClusterIssuer
     group: cert-manager.io
   secretName: *name

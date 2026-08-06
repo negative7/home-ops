@@ -4,38 +4,60 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: postgres
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: enabled
 spec:
-  description: Shared PostgreSQL cluster
-  imageName: ghcr.io/cloudnative-pg/postgresql:18.4-minimal-trixie@sha256:229ab83c0639d294042ca747745fb214db690ade64d5d59131a135825b994391
   instances: 2
+
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.4-standard-trixie@sha256:4587df73024408f5b2be9b4dd6ba2ccee8c9e5dc0c9a87c274c292291cc8a68c
+
   storage:
-    size: 20Gi
+    size: 8Gi
     storageClass: miroir-local
+
+  bootstrap:
+    recovery:
+      source: &src source
+
+  plugins:
+    - name: &plugin barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: &store postgres-backup
+  externalClusters:
+    - name: *src
+      plugin:
+        name: *plugin
+        parameters:
+          barmanObjectName: *store
+          serverName: postgres
+
   resources:
     requests:
       cpu: 200m
       memory: 512Mi
     limits:
       memory: 1Gi
+
   certificates:
     serverTLSSecret: postgres-server-cert
     serverCASecret: postgres-server-cert
     clientCASecret: postgres-client-ca
     replicationTLSSecret: postgres-replication-cert
+
   postgresql:
     pg_hba:
       - hostssl all all all cert clientcert=verify-full map=pooler-map
       - host all all all scram-sha-256
     pg_ident:
       - pooler-map pooler-rw all
-    parameters:
-      max_connections: "200"
-      shared_buffers: 256MB
-      max_locks_per_transaction: "128"
-      timescaledb.telemetry_level: "off"
     shared_preload_libraries:
-      - vchord.so
-      - timescaledb
+      - "vchord"
+      - "timescaledb"
+    parameters:
+      timescaledb.telemetry_level: "off"
+      max_locks_per_transaction: "128"
+
     extensions:
       - name: pgvector
         image:
@@ -55,16 +77,6 @@ spec:
       - name: timescaledb-oss
         image:
           reference: ghcr.io/cloudnative-pg/timescaledb-oss:2.29.0-18-trixie@sha256:a00c22ee1fa7cd45635b892b7c053fec1c33411e63a683fbb995cc79bfeb6709
-  plugins:
-    - name: barman-cloud.cloudnative-pg.io
-      enabled: true
-      isWALArchiver: true
-      parameters:
-        barmanObjectName: postgres-backup
+
   monitoring:
     enablePodMonitor: true
-  bootstrap:
-    initdb:
-      database: app
-      owner: app
-      encoding: UTF8

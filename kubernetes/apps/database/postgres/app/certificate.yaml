@@ -16,6 +16,11 @@ spec:
     - postgres-rw.database.svc.cluster.local
     - postgres-ro.database.svc.cluster.local
     - postgres-r.database.svc.cluster.local
+  subject:
+    countries:
+      - US
+    organizations:
+      - homelab
   usages:
     - server auth
   duration: 720h # 1 month
@@ -61,6 +66,11 @@ spec:
   dnsNames:
     - pooler-rw.database.svc
     - pooler-rw.database.svc.cluster.local
+  subject:
+    countries:
+      - FR
+    organizations:
+      - homelab
   usages:
     - server auth
   duration: 720h # 1 month

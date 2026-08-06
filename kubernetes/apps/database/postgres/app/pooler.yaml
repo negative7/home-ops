@@ -7,10 +7,12 @@ metadata:
 spec:
   cluster:
     name: postgres
+
   instances: 2
   type: rw
   pgbouncer:
     poolMode: session
+
     authQuery: "SELECT $1, NULL"
     serverCASecret:
       name: pooler-server-cert
@@ -20,7 +22,9 @@ spec:
       name: pooler-client-cert
     clientTLSSecret:
       name: pooler-server-cert
+
     parameters:
+      # server_tls_protocols: tlsv1.3
       auth_type: cert
       server_tls_sslmode: verify-full
       client_tls_sslmode: verify-full
