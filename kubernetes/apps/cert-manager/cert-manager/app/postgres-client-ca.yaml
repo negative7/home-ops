@@ -11,7 +11,7 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: &name postgres-client-ca
+  name: postgres-client-ca
 spec:
   isCA: true
   commonName: Postgres Client Certificate Authority
@@ -38,13 +38,13 @@ spec:
   secretTemplate:
     labels:
       cnpg.io/reload: ""
-  secretName: *name
+  secretName: root-ca
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/clusterissuer_v1.json
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: &name postgres-client-ca
+  name: postgres-client-ca
 spec:
   ca:
-    secretName: *name
+    secretName: root-ca
