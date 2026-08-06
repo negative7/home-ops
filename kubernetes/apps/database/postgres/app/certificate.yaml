@@ -32,9 +32,6 @@ spec:
   secretTemplate:
     labels:
       cnpg.io/reload: ""
-    annotations:
-      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
   issuerRef:
     name: postgres-server-ca
     kind: Issuer

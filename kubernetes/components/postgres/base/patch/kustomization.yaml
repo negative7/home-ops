@@ -21,9 +21,9 @@ patches:
               defaultMode: 0600
               globalMounts:
                 - path: /var/run/secrets/postgresql
-            postgres-server-ca:
+            root-ca:
               type: secret
-              name: postgres-server-cert
+              name: root-ca
               defaultMode: 0440
               globalMounts:
-                - path: /var/run/secrets/postgres-server-ca
+                - path: /var/run/secrets/root-ca

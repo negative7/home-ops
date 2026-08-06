@@ -10,3 +10,4 @@ resources:
   - ./prometheusRule.yaml
   - ./grafanadashboard.yaml
   - ./postgres-client-ca.yaml
+  - ./cluster-ca.yaml
