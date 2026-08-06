@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+patches:
+  - target:
+      kind: HelmRelease
+      group: helm.toolkit.fluxcd.io
+      version: v2
+    patch: |-
+      apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      metadata:
+        name: not-used
+      spec:
+        values:
+          persistence:
+            postgres-cert:
+              type: secret
+              name: postgres-${APP}-cert
+              defaultMode: 0400
+              globalMounts:
+                - path: /var/run/secrets/postgresql
+            postgres-client-ca:
+              type: secret
+              name: postgres-client-ca
+              defaultMode: 0440
+              globalMounts:
+                - path: /var/run/secrets/postgres-client-ca
