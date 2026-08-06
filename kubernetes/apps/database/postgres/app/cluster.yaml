@@ -31,8 +31,11 @@ spec:
     parameters:
       max_connections: "200"
       shared_buffers: 256MB
+      max_locks_per_transaction: "128"
+      timescaledb.telemetry_level: "off"
     shared_preload_libraries:
       - vchord.so
+      - timescaledb
     extensions:
       - name: vchord
         image:
@@ -41,16 +44,20 @@ spec:
           - /usr/lib/postgresql/18/lib
         extension_control_path:
           - /usr/share/postgresql/18/
+      - name: postgis
+        image:
+          reference: ghcr.io/cloudnative-pg/postgis-extension:3.6.4-18-trixie@sha256:4bdfebf86a7d4e9b186efd74b24ee60798007ffda0f10a5c919eb3ef120e1521
+        ld_library_path:
+          - system
+      - name: timescaledb-oss
+        image:
+          reference: ghcr.io/cloudnative-pg/timescaledb-oss:2.29.0-18-trixie@sha256:a00c22ee1fa7cd45635b892b7c053fec1c33411e63a683fbb995cc79bfeb6709
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       enabled: true
       isWALArchiver: true
       parameters:
         barmanObjectName: postgres-backup
-  nodeMaintenanceWindow:
-    inProgress: false
-    reusePVC: true
-  primaryUpdateStrategy: unsupervised
   monitoring:
     enablePodMonitor: true
   bootstrap:

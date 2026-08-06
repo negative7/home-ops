@@ -4,9 +4,10 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
   name: postgres-${APP}
+  namespace: database
 spec:
   name: ${APP}
   owner: ${OWNER}
   cluster:
     name: postgres
-  extensions: ${DATABASE_EXTENSIONS:=[]}
+  extensions: ${EXTENSIONS:=${emptyArray}}
