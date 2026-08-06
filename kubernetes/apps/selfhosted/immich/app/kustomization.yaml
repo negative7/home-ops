@@ -7,5 +7,4 @@ resources:
   - ./pv.yaml
   - ./pvc.yaml
   - ./httproute.yaml
-  - ./backendtrafficpolicy.yaml
   - ./helmrelease.yaml

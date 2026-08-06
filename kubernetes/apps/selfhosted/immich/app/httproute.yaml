@@ -6,7 +6,7 @@ metadata:
   name: immich
 spec:
   hostnames:
-    - immich.negative7.com
+    - photos.negative7.com
   parentRefs:
     - name: envoy-internal
       namespace: network

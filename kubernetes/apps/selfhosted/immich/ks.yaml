@@ -8,7 +8,7 @@ spec:
   components:
     - ../../../../components/dragonfly
     - ../../../../components/kanidm-oidc
-    - ../../../../components/postgres/pass
+    - ../../../../components/postgres/cert
   dependsOn:
     - name: cnpg-operator
       namespace: database
@@ -29,6 +29,7 @@ spec:
     substitute:
       APP: immich
       APP_NAMESPACE: selfhosted
+      SUBDOMAIN: photos
       DATABASE_EXTENSIONS: |
         [
           { name: vector },
