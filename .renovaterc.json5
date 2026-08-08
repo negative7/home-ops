@@ -18,6 +18,10 @@
     ":timezone(America/New_York)",
   ],
   dependencyDashboardTitle: "Renovate Dashboard 🤖",
+  // Forgejo/Gitea bug: commits/{ref}/statuses 404s when the ref contains a
+  // URL-encoded slash, which breaks resolveBranchStatus for the default
+  // "renovate/" prefix. See https://github.com/go-gitea/gitea/issues/36253
+  branchPrefix: "renovate-",
   commitBodyTable: true,
   suppressNotifications: [
     "prEditedNotification",
