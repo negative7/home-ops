@@ -1,8 +1,5 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: [
-    "github>home-operations/renovate-presets//managers/annotated.json5#4.0.0",
-  ],
   customManagers: [
     {
       customType: "regex",
@@ -13,50 +10,6 @@
         "https:\\/\\/raw.githubusercontent.com\\/(?<depName>\\S+?\\/\\S+?)\\/(?<currentValue>(v|\\d)\\S+?)\\/\\S+",
       ],
       datasourceTemplate: "github-releases",
-    },
-    {
-      customType: "regex",
-      description: "Process OCI dependencies",
-      managerFilePatterns: [
-        "/^kubernetes/.+\\.yaml(?:\\.j2)?$/"
-      ],
-      matchStrings: [
-        "oci://(?<depName>[^:]+):(?<currentValue>\\S+)",
-      ],
-      datasourceTemplate: "docker",
-    },
-    {
-      customType: "regex",
-      description: "Process CloudNativePG Cluster imageName",
-      managerFilePatterns: [
-        "/^kubernetes/.+\\.yaml(?:\\.j2)?$/"
-      ],
-      matchStrings: [
-        "imageName:\\s+(?<depName>[^:\\s]+):(?<currentValue>\\S+)",
-      ],
-      datasourceTemplate: "docker",
-    },
-    {
-      customType: "regex",
-      description: "Process Talos machine config image references",
-      managerFilePatterns: [
-        "/^kubernetes\\/talos\\/.+\\.ya?ml(?:\\.j2)?$/"
-      ],
-      matchStrings: [
-        "image:\\s+(?<depName>[^:\\s]+):(?<currentValue>\\S+)",
-      ],
-      datasourceTemplate: "docker",
-    },
-    {
-      customType: "regex",
-      description: "Process CloudNativePG Cluster extension image references",
-      managerFilePatterns: [
-        "/^kubernetes/.+\\.yaml(?:\\.j2)?$/"
-      ],
-      matchStrings: [
-        "reference:\\s+(?<depName>[^:\\s]+):(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:\\w+))?",
-      ],
-      datasourceTemplate: "docker",
     },
     {
       customType: "regex",
