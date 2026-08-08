@@ -40,7 +40,7 @@ spec:
               - -c
               - |
                 set -e
-                npm install --prefix /app --no-save --no-audit --no-fund @actual-app/api@26.8.0
+                npm install --prefix /app --no-save --no-audit --no-fund @actual-app/api@26.8.1
                 node /scripts/sync.js
             env:
               HOME: /app
@@ -84,7 +84,7 @@ spec:
           app:
             image:
               repository: ghcr.io/actualbudget/actual-server
-              tag: 26.8.0
+              tag: 26.8.1
             env:
               TZ: America/New_York
               ACTUAL_PORT: &httpPort 5006
