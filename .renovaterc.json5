@@ -5,7 +5,6 @@
     "github>home-operations/renovate-presets//apps/cnpg.json5#7.0.0",
     "github>home-operations/renovate-presets//apps/talosFactory.json5#7.0.0",
     "local>negative7/home-ops//.renovate/autoMerge.json5",
-    "local>negative7/home-ops//.renovate/changelogs.json5",
     "local>negative7/home-ops//.renovate/customManagers.json5",
     "local>negative7/home-ops//.renovate/grafanaDashboards.json5",
     "local>negative7/home-ops//.renovate/groups.json5",
