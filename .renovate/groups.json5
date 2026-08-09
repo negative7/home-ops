@@ -11,8 +11,8 @@
       minimumGroupSize: 2,
     },
     {
-      description: "1Password Connect Group",
-      groupName: "1password-connect",
+      description: "1Password Connect group",
+      groupName: "1Password Connect",
       matchDatasources: ["docker"],
       matchPackageNames: ["/1password/"],
       group: {
@@ -21,18 +21,8 @@
       minimumGroupSize: 2,
     },
     {
-      description: "Actions Runner Controller Group",
-      groupName: "actions-runner-controller",
-      matchDatasources: ["docker"],
-      matchPackageNames: ["/gha-runner-scale-set-controller/", "/gha-runner-scale-set/"],
-      group: {
-        commitMessageTopic: "{{{groupName}}} group",
-      },
-      minimumGroupSize: 2,
-    },
-    {
-      description: "Flux Operator Group",
-      groupName: "flux-operator",
+      description: "Flux Operator group",
+      groupName: "Flux Operator",
       matchDatasources: ["docker"],
       matchPackageNames: ["/flux-operator/", "/flux-instance/", "/flux-operator-manifests/"],
       group: {
@@ -51,8 +41,8 @@
       minimumGroupSize: 2,
     },
     {
-      description: "Kubernetes Group",
-      groupName: "kubernetes",
+      description: "Kubernetes group",
+      groupName: "Kubernetes",
       matchDatasources: ["docker"],
       matchPackageNames: [
         "/kube-apiserver/",
@@ -67,14 +57,10 @@
       minimumGroupSize: 5,
     },
     {
-      description: "Rook-Ceph Group",
-      groupName: "rook-ceph",
-      matchDatasources: ["docker"],
-      matchPackageNames: ["/rook-ceph/", "/rook-ceph-cluster/"],
-      group: {
-        commitMessageTopic: "{{{groupName}}} group",
-      },
-      minimumGroupSize: 2,
+      description: "Mise Tools Group",
+      matchManagers: ["mise"],
+      groupName: "mise tools",
+      groupSlug: "mise-tools",
     },
     {
       description: "Talos Group",
