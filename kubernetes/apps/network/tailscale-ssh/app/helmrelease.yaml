@@ -28,6 +28,7 @@ spec:
               TS_HOSTNAME: ssh-jump
               TS_STATE_DIR: /var/lib/tailscale
               TS_KUBE_SECRET: ""
+              TS_SOCKET: /var/run/tailscale/tailscaled.sock
               TS_USERSPACE: "false"
               TS_EXTRA_ARGS: --ssh --accept-dns=false
             envFrom:
@@ -66,6 +67,10 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /tmp
+      run:
+        type: emptyDir
+        globalMounts:
+          - path: /var/run/tailscale
       dev-net-tun:
         type: hostPath
         hostPath: /dev/net/tun
