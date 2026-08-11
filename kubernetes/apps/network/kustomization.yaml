@@ -13,3 +13,4 @@ resources:
   - ./envoy-gateway/ks.yaml
   - ./external-dns/ks.yaml
   - ./external-services/ks.yaml
+  - ./tailscale-ssh/ks.yaml

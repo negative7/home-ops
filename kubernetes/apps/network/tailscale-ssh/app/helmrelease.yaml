@@ -1,0 +1,73 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tailscale-ssh
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: tailscale-ssh
+  values:
+    controllers:
+      tailscale-ssh:
+        replicas: 1
+        strategy: Recreate
+
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        containers:
+          app:
+            image:
+              # renovate: datasource=docker depName=tailscale/tailscale
+              repository: ghcr.io/tailscale/tailscale
+              tag: v1.102.2
+            env:
+              TS_HOSTNAME: ssh-jump
+              TS_STATE_DIR: /var/lib/tailscale
+              TS_USERSPACE: "false"
+              TS_EXTRA_ARGS: --ssh --accept-dns=false
+            envFrom:
+              - secretRef:
+                  name: tailscale-ssh-secret
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                add:
+                  - NET_ADMIN
+                  - NET_RAW
+                drop:
+                  - ALL
+
+    persistence:
+      state:
+        accessMode: ReadWriteOnce
+        size: 128Mi
+        storageClass: miroir-replicated
+        globalMounts:
+          - path: /var/lib/tailscale
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+      dev-net-tun:
+        type: hostPath
+        hostPath: /dev/net/tun
+        hostPathType: CharDevice
+        globalMounts:
+          - path: /dev/net/tun
