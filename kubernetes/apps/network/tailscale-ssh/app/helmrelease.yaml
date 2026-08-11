@@ -18,6 +18,12 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
 
+        pod:
+          dnsPolicy: None
+          dnsConfig:
+            nameservers:
+              - 100.100.100.100
+
         containers:
           app:
             image:
@@ -53,6 +59,26 @@ spec:
                 add:
                   - NET_ADMIN
                   - NET_RAW
+                drop:
+                  - ALL
+
+          shell:
+            image:
+              # renovate: datasource=docker depName=nicolaka/netshoot
+              repository: docker.io/nicolaka/netshoot
+              tag: v0.15
+            command:
+              - sleep
+              - infinity
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
                 drop:
                   - ALL
 
