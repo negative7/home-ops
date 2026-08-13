@@ -9,14 +9,31 @@ pipx.uvx = true
 
 [tools]
 "aqua:astral-sh/uv" = "latest"
-"aqua:evilmartians/lefthook" = "latest"
 "aqua:google/yamlfmt" = "latest"
-"aqua:rhysd/actionlint" = "latest"
 "npm:markdownlint-cli2" = "latest"
 "pipx:flux-local" = "latest"
 "pipx:ansible" = "latest"
 "pipx:ansible-core" = "latest"
 "pipx:yamllint" = "latest"
+
+
+actionlint = "1.7.12"
+"aqua:siderolabs/talos" = "1.13.8"
+kubectl = "1.36.3"
+"aqua:helm/helm" = "4.2.3"
+"aqua:fluxcd/flux2" = "2.9.4"
+"aqua:kubernetes-sigs/kustomize" = "5.8.1"
+"aqua:casey/just" = "1.58.0"
+"aqua:jqlang/jq" = "1.8.2"
+lefthook = "2.1.10"
+"aqua:mikefarah/yq" = "4.53.3"
+"aqua:helmfile/helmfile" = "1.7.3"
+"github:mitsuhiko/minijinja" = "2.24.0"
+"1password-cli" = "2.35.0"
+"aqua:charmbracelet/gum" = "0.17.0"
+node = "26.7.0"
+oxfmt = "0.63.0"
+shellcheck = "0.11.0"
 
 [hooks]
 postinstall = "ansible-galaxy install -r {{config_root}}/ansible/requirements.yaml && lefthook install"
