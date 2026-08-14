@@ -15,7 +15,6 @@ resources:
   - ./karakeep/ks.yaml
   - ./mailkeep/ks.yaml
   - ./mealie/ks.yaml
-  - ./manyfold/ks.yaml
   - ./namespace.yaml
   - ./outline/ks.yaml
   - ./searxng/ks.yaml
