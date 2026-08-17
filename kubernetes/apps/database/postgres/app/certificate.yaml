@@ -23,7 +23,7 @@ spec:
       - homelab
   usages:
     - server auth
-  duration: 720h # 1 month
+  duration: 2160h # 3 months
   privateKey:
     algorithm: ECDSA
     size: 384
@@ -73,7 +73,7 @@ spec:
       - homelab
   usages:
     - server auth
-  duration: 720h # 1 month
+  duration: 2160h # 3 months
   privateKey:
     algorithm: ECDSA
     size: 384
