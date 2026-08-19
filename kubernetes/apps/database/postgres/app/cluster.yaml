@@ -76,7 +76,7 @@ spec:
           - system
       - name: timescaledb-oss
         image:
-          reference: ghcr.io/cloudnative-pg/timescaledb-oss:2.29.1-18-trixie@sha256:c82221f583d33795d022d4f9c5e0283bd93991d30e63f35874e52179795aa26d
+          reference: ghcr.io/cloudnative-pg/timescaledb-oss:2.29.1-18-trixie@sha256:3d217b1df696c22aaff14205733adb342043ba70b0da4499e8d6364dd709892f
 
   monitoring:
     enablePodMonitor: true
