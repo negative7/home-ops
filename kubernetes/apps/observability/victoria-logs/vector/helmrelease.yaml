@@ -29,7 +29,7 @@ spec:
           app:
             image:
               repository: mirror.gcr.io/timberio/vector
-              tag: 0.57.0-distroless-libc@sha256:8a07cbed39054b9e8602917461ae46cf1f506445c16fb0c6c2ad502110e46882
+              tag: 0.58.0-distroless-libc@sha256:d3c25aaf3d095d8eae2b08f1d196a25fb9b72bc9800a948cc2391a8c8837f132
             args:
               - --config
               - /etc/vector/vector.yaml
