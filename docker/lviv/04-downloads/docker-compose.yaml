@@ -112,7 +112,7 @@ services:
   autobrr:
     container_name: autobrr
     hostname: autobrr.internal
-    image: ghcr.io/autobrr/autobrr:v1.84.0
+    image: ghcr.io/autobrr/autobrr:v1.85.0
     user: "2000:2000"
     restart: unless-stopped
     logging:
