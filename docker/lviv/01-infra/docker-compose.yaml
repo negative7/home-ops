@@ -4,7 +4,7 @@ services:
   dockhand:
     container_name: dockhand
     hostname: dockhand.internal
-    image: fnsys/dockhand:v1.0.43
+    image: fnsys/dockhand:v1.0.45
     restart: unless-stopped
     logging:
       driver: json-file
