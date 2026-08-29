@@ -5,7 +5,7 @@ services:
   sabnzbd:
     container_name: sabnzbd
     hostname: sabnzbd.internal
-    image: ghcr.io/home-operations/sabnzbd:5.1.1
+    image: ghcr.io/home-operations/sabnzbd:5.1.2
     user: "2000:2000"
     restart: unless-stopped
     logging:
