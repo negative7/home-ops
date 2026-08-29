@@ -29,7 +29,7 @@ spec:
           db-prepare:
             image:
               repository: ghcr.io/we-promise/sure
-              tag: stable@sha256:12361b7b309f867002b8a1f54200607ca1a321e1b57cf21890caaf83602c3cd0
+              tag: stable@sha256:007adc6541c3f62ba6758d4d68fe85abc7a7ec2ca7fc628d6c29ba27dd8c8e7e
             command:
               - bin/rails
             args:
@@ -75,7 +75,7 @@ spec:
           app:
             image:
               repository: ghcr.io/we-promise/sure
-              tag: stable@sha256:12361b7b309f867002b8a1f54200607ca1a321e1b57cf21890caaf83602c3cd0
+              tag: stable@sha256:007adc6541c3f62ba6758d4d68fe85abc7a7ec2ca7fc628d6c29ba27dd8c8e7e
             env: *env
             probes:
               liveness:
@@ -127,7 +127,7 @@ spec:
           app:
             image:
               repository: ghcr.io/we-promise/sure
-              tag: stable@sha256:12361b7b309f867002b8a1f54200607ca1a321e1b57cf21890caaf83602c3cd0
+              tag: stable@sha256:007adc6541c3f62ba6758d4d68fe85abc7a7ec2ca7fc628d6c29ba27dd8c8e7e
             command:
               - bundle
             args:
