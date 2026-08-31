@@ -33,5 +33,16 @@
       ],
       datasourceTemplate: "npm",
     },
+    {
+      customType: "regex",
+      description: "Track 1Password CLI via the official 1password/op Docker image, since the CLI itself is closed-source with no GitHub releases",
+      managerFilePatterns: ["/^\\.mise\\.toml$/"],
+      matchStrings: [
+        "\"1password-cli\"\\s*=\\s*\"(?<currentValue>[^\"]+)\"",
+      ],
+      depNameTemplate: "1password/op",
+      datasourceTemplate: "docker",
+      extractVersionTemplate: "^(?<version>\\d+\\.\\d+\\.\\d+)$",
+    },
   ],
 }
