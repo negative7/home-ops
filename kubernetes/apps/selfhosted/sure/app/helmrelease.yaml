@@ -123,6 +123,21 @@ spec:
       worker:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - sure
+                      - key: app.kubernetes.io/controller
+                        operator: In
+                        values:
+                          - web
+                  topologyKey: kubernetes.io/hostname
         containers:
           app:
             image:
@@ -137,7 +152,7 @@ spec:
             resources:
               requests:
                 cpu: 25m
-                memory: 256Mi
+                memory: 128Mi
               limits:
                 memory: 512Mi
             securityContext:
