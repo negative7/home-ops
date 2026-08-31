@@ -63,6 +63,13 @@
       groupSlug: "mise-tools",
     },
     {
+      description: "1Password CLI is closed-source and has no GitHub releases for Renovate to resolve",
+      matchManagers: ["mise"],
+      matchDepNames: ["1password-cli"],
+      matchPackageNames: ["1password/cli"],
+      enabled: false,
+    },
+    {
       description: "Talos Group",
       groupName: "talos",
       matchDatasources: ["docker", "custom.talos-factory"],
