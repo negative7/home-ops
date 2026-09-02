@@ -25,7 +25,7 @@ spec:
           app:
             image:
               repository: docker.io/outlinewiki/outline
-              tag: 1.9.2
+              tag: 1.10.0
             env:
               TZ: America/New_York
               NODE_ENV: production
