@@ -18,7 +18,7 @@ pipx.uvx = true
 
 
 actionlint = "1.7.12"
-"aqua:siderolabs/talos" = "1.13.9"
+"aqua:siderolabs/talos" = "1.14.0"
 kubectl = "1.37.0"
 "aqua:helm/helm" = "4.2.4"
 "aqua:fluxcd/flux2" = "2.9.5"
