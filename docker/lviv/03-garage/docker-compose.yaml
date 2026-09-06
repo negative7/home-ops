@@ -3,7 +3,7 @@
 services:
   garage:
     container_name: garage
-    image: docker.io/dxflrs/garage:v2.3.0
+    image: docker.io/dxflrs/garage:v2.4.0
     command:
       - /garage
       - "-c"
