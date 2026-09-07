@@ -327,6 +327,14 @@ spec:
                     url: https://kyiv.homelab.internal:8006
                     username: '{{ "{{" }}HOMEPAGE_VAR_PROXMOX_TOKEN{{ "}}" }}'
                     password: '{{ "{{" }}HOMEPAGE_VAR_PROXMOX_TOKEN_SECRET{{ "}}" }}'
+              - Dockhand:
+                  icon: dockhand.png
+                  href: http://lviv.homelab.internal:3000
+                  description: Docker Management
+              - Garage:
+                  icon: garage.png
+                  href: https://garage.negative7.com
+                  description: S3 Object Storage
 
             - Automation:
               - Home Assistant:
