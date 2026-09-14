@@ -1,37 +1,29 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: externaldns-unifi
+  name: &app externaldns-unifi
 spec:
   chartRef:
     kind: OCIRepository
     name: externaldns-unifi
   interval: 30m
   values:
-    fullnameOverride: externaldns-unifi
-    logLevel: &logLevel info
-    domainFilters:
-      - negative7.com
-    podAnnotations:
-      secret.reloader.stakater.com/reload: externaldns-unifi-secret
-    policy: sync
+    fullnameOverride: *app
     provider:
       name: webhook
       webhook:
         image:
-          repository: ghcr.io/kashalls/external-dns-unifi-webhook
-          tag: v0.9.0
+          repository: ghcr.io/home-operations/external-dns-unifi-webhook
+          tag: 0.10.12@sha256:5338b99662e2e15048b4e14b49e17279d384970fdcb3c29169f509f806f49cbe
         env:
-          - name: LOG_LEVEL
-            value: *logLevel
           - name: UNIFI_HOST
             value: https://10.0.1.1
           - name: UNIFI_API_KEY
             valueFrom:
               secretKeyRef:
-                name: external-dns-unifi-secret
+                name: &secret external-dns-unifi-secret
                 key: external_dns_api_key
         livenessProbe:
           httpGet:
@@ -45,17 +37,16 @@ spec:
             port: http-webhook
           initialDelaySeconds: 10
           timeoutSeconds: 5
-    resources:
-      requests:
-        cpu: 16m
-        memory: 90M
-      limits:
-        memory: 90M
-    serviceMonitor:
-      enabled: true
+    triggerLoopOnEvent: true
+    policy: sync
     sources:
       - gateway-httproute
       - service
-    triggerLoopOnEvent: true
     txtOwnerId: main
-    txtPrefix: "k8s."
+    txtPrefix: k8s.main.%{record_type}-
+    domainFilters:
+      - negative7.com
+    serviceMonitor:
+      enabled: true
+    podAnnotations:
+      secret.reloader.stakater.com/reload: *secret
