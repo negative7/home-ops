@@ -19,6 +19,11 @@ spec:
           secretKeyRef:
             name: &secret externaldns-cloudflare-secrets
             key: cloudflare_api_token
+      - name: CF_ZONE_ID
+        valueFrom:
+          secretKeyRef:
+            name: *secret
+            key: CF_ZONE_ID
     extraArgs:
       - --cloudflare-dns-records-per-page=1000
       - --cloudflare-proxied
