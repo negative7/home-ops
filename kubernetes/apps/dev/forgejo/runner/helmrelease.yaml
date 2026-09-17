@@ -14,9 +14,8 @@ spec:
       url: http://forgejo-http.dev.svc.cluster.local:3000
       existingSecret: forgejo-runner-secret
     image:
-      repository: registry.erwanleboucher.dev/eleboucher/runner
-      tag: "12.13.0"
-      digest: sha256:b71959782cea9cbc86eaeb47e5ba32bf8179fbd117dd849e001c9a13807b1a07
+      repository: data.forgejo.org/forgejo/runner
+      tag: 13.1.0
     plugin:
       image:
         repository: registry.erwanleboucher.dev/eleboucher/runner-k8s-plugin
@@ -33,6 +32,9 @@ spec:
         workdir_parent: shared/workdir
       host:
         workdir_parent: /data/act
+      kubernetes:
+        namespace: forgejo
+        poll_timeout: 10m
       log:
         level: info
       plugins:
@@ -41,7 +43,7 @@ spec:
           options:
             namespace: dev
             poll_timeout: 10m
-            labels: "app.kubernetes.io/name=forgejo-runner-instance,app.kubernetes.io/instance=env-${ENV_ID},egress.home.arpa/custom-egress=true"
+            labels: "app.kubernetes.io/name=forgejo-runner-instance,app.kubernetes.io/instance=env-${ENV_ID},egress.policy.home.arpa/block-all=true"
             resources: |
               requests:
                 cpu: 100m
@@ -49,28 +51,29 @@ spec:
               limits:
                 memory: 1Gi
       runner:
-        capacity: 2
+        capacity: 4
         labels:
-          - ubuntu-latest:k8s:/config/podspec-default.yaml
-          - default:k8s:/config/podspec-default.yaml
-          - docker:k8s:/config/podspec-dind.yaml
+          - ubuntu-latest:k8s:///config/podspec-default.yaml
+          - ubuntu-24.04:k8s:///config/podspec-default.yaml
+          - default:k8s:///config/podspec-default.yaml
+          - docker:k8s:///config/podspec-dind.yaml
         timeout: 3h
         shutdown_timeout: 3m
     podSpecs:
       podspec-default.yaml: |-
         containers:
-          - name: main
-            image: ghcr.io/bjw-s-labs/forgejo-runner:ubuntu-24.04@sha256:fea688b875acdce4e7c786d117b30c1b0203271b23e77d80c306b373d9f5422f
-            imagePullPolicy: IfNotPresent
-            env:
+          - env:
               - name: DEBIAN_FRONTEND
                 value: noninteractive
+            image: ghcr.io/bjw-s-labs/forgejo-runner:ubuntu-24.04@sha256:fea688b875acdce4e7c786d117b30c1b0203271b23e77d80c306b373d9f5422f
+            imagePullPolicy: IfNotPresent
+            name: main
             resources:
+              limits:
+                memory: 2Gi
               requests:
                 cpu: 100m
                 memory: 256Mi
-              limits:
-                memory: 2Gi
         restartPolicy: Never
       podspec-dind.yaml: |-
         initContainers:
@@ -103,10 +106,7 @@ spec:
               periodSeconds: 1
               failureThreshold: 30
         containers:
-          - name: main
-            image: ghcr.io/bjw-s-labs/forgejo-runner:ubuntu-24.04@sha256:fea688b875acdce4e7c786d117b30c1b0203271b23e77d80c306b373d9f5422f
-            imagePullPolicy: IfNotPresent
-            env:
+          - env:
               - name: DEBIAN_FRONTEND
                 value: noninteractive
               - name: DOCKER_HOST
@@ -115,12 +115,15 @@ spec:
                 value: "1"
               - name: DOCKER_CERT_PATH
                 value: /certs/client
+            image: ghcr.io/bjw-s-labs/forgejo-runner:ubuntu-24.04@sha256:fea688b875acdce4e7c786d117b30c1b0203271b23e77d80c306b373d9f5422f
+            imagePullPolicy: IfNotPresent
+            name: main
             resources:
+              limits:
+                memory: 2Gi
               requests:
                 cpu: 100m
                 memory: 256Mi
-              limits:
-                memory: 2Gi
             volumeMounts:
               - name: docker-certs
                 mountPath: /certs
