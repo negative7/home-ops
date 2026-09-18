@@ -20,7 +20,7 @@ spec:
   modelRef: qwen3-embedding-0.6b
   runtime: llamacpp
   # renovate: datasource=docker depName=ghcr.io/ggml-org/llama.cpp
-  image: ghcr.io/ggml-org/llama.cpp:server@sha256:79903855d3de1689e9856219283591be12ba6f40a8e65fc7223824109446ad88
+  image: ghcr.io/ggml-org/llama.cpp:server@sha256:f26a6403915b6131b903717458aeeadd2527d2a6b8bf64bc9264bc6d16a40474
   replicas: 1
   priority: normal
   contextSize: 8192
