@@ -13,11 +13,11 @@ resources:
   - ./immich/ks.yaml
   - ./it-tools/ks.yaml
   - ./karakeep/ks.yaml
-  - ./mailkeep/ks.yaml
-  - ./mealie/ks.yaml
+  # - ./mailkeep/ks.yaml
+  # - ./mealie/ks.yaml
   - ./namespace.yaml
   - ./outline/ks.yaml
-  - ./searxng/ks.yaml
+  # - ./searxng/ks.yaml
   - ./spoolman/ks.yaml
-  - ./sure/ks.yaml
-  - ./trek/ks.yaml
+  # - ./sure/ks.yaml
+  # - ./trek/ks.yaml
