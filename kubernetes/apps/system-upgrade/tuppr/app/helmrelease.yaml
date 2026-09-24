@@ -10,4 +10,15 @@ spec:
     name: tuppr
   interval: 30m
   values:
+    monitoring:
+      serviceMonitor:
+        enabled: true
+      prometheusRule:
+        enabled: true
+      dashboards:
+        enabled: true
+        grafanaOperator:
+          enabled: true
+          matchLabels:
+            dashboards: grafana
     replicaCount: 2
