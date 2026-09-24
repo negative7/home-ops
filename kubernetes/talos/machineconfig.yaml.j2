@@ -150,7 +150,12 @@ cluster:
       crt: op://home-cluster/home-ops/CLUSTER_ETCD_CA_CRT
       key: op://home-cluster/home-ops/CLUSTER_ETCD_CA_KEY
     extraArgs:
+      auto-compaction-mode: revision
+      auto-compaction-retention: "10000"
+      election-timeout: "5000"
+      heartbeat-interval: "500"
       listen-metrics-urls: http://0.0.0.0:2381
+      snapshot-count: "5000"
   proxy:
     disabled: true
     image: registry.k8s.io/kube-proxy:v1.37.1
