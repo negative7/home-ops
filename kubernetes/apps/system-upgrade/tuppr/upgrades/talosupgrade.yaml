@@ -19,3 +19,11 @@ spec:
       kind: Restore
       expr: |-
         !(status.phase in ['Resolving', 'Restoring'])
+    - apiVersion: miroir.home-operations.com/v1alpha1
+      kind: MiroirVolume
+      description: All Miroir volumes Ready, connected, no split-brain, DRBD replicas UpToDate
+      expr: |-
+        status.phase == 'Ready' && has(status.perNode) && status.perNode.all(n,
+          status.perNode[n].connected &&
+          !status.perNode[n].splitBrain &&
+          (!has(status.perNode[n].diskState) || status.perNode[n].diskState in ['UpToDate', 'Diskless']))
