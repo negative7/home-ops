@@ -1,5 +1,6 @@
 [env]
 JUST_UNSTABLE = "1"
+FLATE_PATH = '{{config_root}}/kubernetes/flux/cluster'
 KUBECONFIG = '{{config_root}}/kubeconfig'
 MINIJINJA_CONFIG_FILE = "{{config_root}}/.minijinja.toml"
 TALOSCONFIG = '{{config_root}}/talosconfig'
@@ -11,7 +12,6 @@ pipx.uvx = true
 "aqua:astral-sh/uv" = "latest"
 "aqua:google/yamlfmt" = "latest"
 "npm:markdownlint-cli2" = "latest"
-"pipx:flux-local" = "latest"
 "pipx:ansible" = "latest"
 "pipx:ansible-core" = "latest"
 "pipx:yamllint" = "latest"
@@ -27,6 +27,7 @@ kubectl = "1.37.0"
 "aqua:jqlang/jq" = "1.8.2"
 lefthook = "2.1.14"
 "aqua:mikefarah/yq" = "4.53.6"
+"github:home-operations/flate" = "0.6.5"
 "aqua:helmfile/helmfile" = "1.8.0"
 "github:mitsuhiko/minijinja" = "2.24.0"
 "1password-cli" = "2.39.0"
