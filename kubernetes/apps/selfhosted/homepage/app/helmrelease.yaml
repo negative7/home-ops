@@ -222,7 +222,7 @@ spec:
                   description: Status Page
                   widget:
                     type: gatus
-                    url: http://gatus.observability.svc.cluster.local:8080
+                    url: http://gatus-sidecar.observability.svc.cluster.local:8080
                     slug: default
               - Grafana:
                   icon: grafana.png
