@@ -241,6 +241,14 @@ spec:
                   icon: headlamp.png
                   href: https://headlamp.negative7.com
                   description: Kubernetes Dashboard
+              - Hubble:
+                  icon: cilium.png
+                  href: https://hubble.negative7.com
+                  description: Network Observability
+              - VictoriaLogs:
+                  icon: victoriametrics.png
+                  href: https://victoria-logs.negative7.com
+                  description: Logs
               - Kopia:
                   icon: kopia.png
                   href: https://kopia.negative7.com
@@ -315,6 +323,10 @@ spec:
                   icon: dockhand.png
                   href: http://lviv.homelab.internal:3000
                   description: Docker Management
+              - Doco-CD:
+                  icon: docker.png
+                  href: https://doco.negative7.com
+                  description: Docker GitOps
               - Garage:
                   icon: garage.png
                   href: https://garage.negative7.com
