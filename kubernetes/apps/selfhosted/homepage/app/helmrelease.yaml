@@ -132,6 +132,7 @@ spec:
                     type: jellyfin
                     url: http://jellyfin.media.svc.cluster.local:8096
                     key: '{{ "{{" }}HOMEPAGE_VAR_JELLYFIN_KEY{{ "}}" }}'
+                    version: 2
               - Plex:
                   icon: plex.png
                   href: https://plex.negative7.com
@@ -258,15 +259,10 @@ spec:
                   icon: karakeep.png
                   href: https://karakeep.negative7.com
                   description: Bookmarks
-              - Mealie:
-                  icon: mealie.png
-                  href: https://mealie.negative7.com
-                  description: Recipes
-                  widget:
-                    type: mealie
-                    url: http://mealie.selfhosted.svc.cluster.local:9000
-                    key: '{{ "{{" }}HOMEPAGE_VAR_MEALIE_KEY{{ "}}" }}'
-                    version: 2
+              - Immich:
+                  icon: immich.png
+                  href: https://photos.negative7.com
+                  description: Photos
               - Atuin:
                   icon: atuin.png
                   href: https://atuin.negative7.com
@@ -279,18 +275,6 @@ spec:
                   icon: spoolman.png
                   href: https://spoolman.negative7.com
                   description: Filament Manager
-              - Trek:
-                  icon: https://raw.githubusercontent.com/liketrek/TREK/main/docs/trek-icon.png
-                  href: https://travel.negative7.com
-                  description: Trip Planner
-              - Sure:
-                  icon: https://raw.githubusercontent.com/we-promise/sure/main/public/android-chrome-512x512.png
-                  href: https://sure.negative7.com
-                  description: Finances
-              - Mailkeep:
-                  icon: https://raw.githubusercontent.com/szinn/mailkeep/main/assets-source/android-chrome-512x512.png
-                  href: https://mailkeep.negative7.com
-                  description: Mail
 
             - System:
               - Kanidm:
