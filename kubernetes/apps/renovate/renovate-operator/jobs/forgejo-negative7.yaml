@@ -17,7 +17,7 @@ spec:
     - name: RENOVATE_HOST_RULES
       value: |-
         [{"matchHost": "git.negative7.com", "allowInternal": true}]
-  image: ghcr.io/renovatebot/renovate:44.105.2@sha256:c228cb22c79e102143aeb5c3a07ce787d0ba814d92b5e1fbbbfc2be7873f4a31
+  image: ghcr.io/renovatebot/renovate:44.115.13@sha256:0c04185c9e7ea5284da22ea0b2a2c88dcd3687badd8feb6c71691659b380df9b
   parallelism: 5
   provider:
     name: forgejo
