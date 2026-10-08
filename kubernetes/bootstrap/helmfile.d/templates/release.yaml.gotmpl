@@ -1,0 +1,4 @@
+{{- $path := (index .Release.Labels "ocirepository") | default (printf "%s/%s/app/ocirepository.yaml" .Release.Namespace .Release.Name) -}}
+{{- $oci := fromYaml (readFile (printf "../../../kubernetes/apps/%s" $path)) -}}
+chart: {{ $oci.spec.url }}
+version: {{ $oci.spec.ref.tag }}
