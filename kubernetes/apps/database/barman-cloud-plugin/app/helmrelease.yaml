@@ -11,3 +11,5 @@ spec:
   interval: 1h
   values:
     fullnameOverride: barman-cloud
+    certificate:
+      renewBefore: 720h
