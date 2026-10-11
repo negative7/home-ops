@@ -91,7 +91,7 @@ spec:
         hostnames:
           - plex.negative7.com
         parentRefs:
-          - name: envoy-external
+          - name: envoy-internal
             namespace: network
         rules:
           - # Ref: https://forums.plex.tv/t/external-srt-subtitles-are-not-working-w-reverse-proxy/886540
