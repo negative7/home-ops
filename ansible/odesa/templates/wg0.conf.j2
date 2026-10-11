@@ -1,0 +1,10 @@
+[Interface]
+Address = {{ wg_address }}
+ListenPort = {{ wg_listen_port }}
+PrivateKey = {{ wg_private_key }}
+
+[Peer]
+# UniFi gateway (dials in; dynamic home IP, so no Endpoint)
+PublicKey = {{ wg_unifi_public_key }}
+PresharedKey = {{ wg_preshared_key }}
+AllowedIPs = {{ wg_peer_allowed_ips | join(', ') }}

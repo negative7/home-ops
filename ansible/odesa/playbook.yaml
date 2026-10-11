@@ -296,6 +296,7 @@
           - KP
           - BY
           - CU
+          - IN
       block:
         - name: geo-block | Create directory
           ansible.builtin.file:
@@ -313,11 +314,6 @@
             group: root
             mode: "0755"
 
-        - name: geo-block | Run initial block update
-          ansible.builtin.shell:
-            cmd: /opt/geo-block/update-country-blocks.sh "{{ blocked_countries | join(' ') }}"
-            creates: /opt/geo-block/zones
-
         - name: geo-block | Create weekly cron job
           ansible.builtin.cron:
             name: "GeoIP country block weekly refresh"
@@ -328,6 +324,7 @@
             weekday: "0"
             job: "/opt/geo-block/update-country-blocks.sh '{{ blocked_countries | join(' ') }}' >> /var/log/geo-block.log 2>&1"
             state: present
+          register: geo_block_cron
 
         - name: geo-block | Create reboot cron job
           ansible.builtin.cron:
@@ -335,6 +332,70 @@
             special_time: reboot
             job: "/opt/geo-block/update-country-blocks.sh '{{ blocked_countries | join(' ') }}' >> /var/log/geo-block.log 2>&1"
             state: present
+
+        - name: geo-block | Check for existing zones
+          ansible.builtin.stat:
+            path: /opt/geo-block/zones
+          register: geo_block_zones
+
+        # Runs on first install and whenever blocked_countries changes (the cron job line changes with it)
+        - name: geo-block | Run block update
+          ansible.builtin.command:
+            cmd: /opt/geo-block/update-country-blocks.sh "{{ blocked_countries | join(' ') }}"
+          when: not geo_block_zones.stat.exists or geo_block_cron.changed
+
+    - name: wireguard
+      tags:
+        - wireguard
+      vars:
+        wg_address: 10.99.0.1/30
+        wg_listen_port: 51820
+        # The UniFi tunnel IP plus envoy-external; the UniFi zone firewall enforces the same limit at home
+        wg_peer_allowed_ips:
+          - 10.99.0.2/32
+          - 10.2.0.102/32
+      block:
+        - name: wireguard | Read keys from 1Password
+          ansible.builtin.shell: "op read 'op://home-cluster/odesa/{{ item }}' < /dev/null"
+          delegate_to: localhost
+          become: false
+          loop:
+            - wg_private_key
+            - wg_unifi_public_key
+            - wg_preshared_key
+          check_mode: false
+          changed_when: false
+          no_log: true
+          register: wg_secrets_raw
+
+        - name: wireguard | Set key facts
+          ansible.builtin.set_fact:
+            wg_private_key: "{{ wg_secrets_raw.results[0].stdout }}"
+            wg_unifi_public_key: "{{ wg_secrets_raw.results[1].stdout }}"
+            wg_preshared_key: "{{ wg_secrets_raw.results[2].stdout }}"
+          no_log: true
+
+        - name: wireguard | Render wg0.conf
+          ansible.builtin.template:
+            src: wg0.conf.j2
+            dest: /etc/wireguard/wg0.conf
+            owner: root
+            group: root
+            mode: "0600"
+          no_log: true
+          notify: Restart wg-quick@wg0
+
+        - name: wireguard | Allow listen port
+          community.general.ufw:
+            rule: allow
+            port: "{{ wg_listen_port | string }}"
+            proto: udp
+
+        - name: wireguard | Enable + start wg-quick@wg0
+          ansible.builtin.systemd:
+            name: wg-quick@wg0
+            enabled: true
+            state: started
 
     # Last on purpose: on the first run Ansible is still connected on port 22
     - name: ssh
@@ -390,4 +451,9 @@
     - name: Restart crowdsec-firewall-bouncer
       ansible.builtin.service:
         name: crowdsec-firewall-bouncer
+        state: restarted
+
+    - name: Restart wg-quick@wg0
+      ansible.builtin.systemd:
+        name: wg-quick@wg0
         state: restarted
