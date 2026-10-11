@@ -1,0 +1,56 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: odesa-node-exporter
+spec:
+  # odesa's 04-exporters gateway, reachable only over WireGuard
+  staticConfigs:
+    - targets:
+        - 10.99.0.1:27419
+      labels:
+        instance: odesa
+  metricsPath: /node/metrics
+  # Untrusted, internet-facing host: cap what it can push into Prometheus
+  sampleLimit: 5000
+  relabelings:
+    - action: replace
+      targetLabel: job
+      replacement: node-exporter
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: odesa-crowdsec
+spec:
+  staticConfigs:
+    - targets:
+        - 10.99.0.1:27419
+      labels:
+        instance: odesa
+  metricsPath: /crowdsec/metrics
+  sampleLimit: 5000
+  relabelings:
+    - action: replace
+      targetLabel: job
+      replacement: crowdsec
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: odesa-caddy
+spec:
+  staticConfigs:
+    - targets:
+        - 10.99.0.1:27419
+      labels:
+        instance: odesa
+  metricsPath: /caddy/metrics
+  sampleLimit: 5000
+  relabelings:
+    - action: replace
+      targetLabel: job
+      replacement: caddy

@@ -8,4 +8,5 @@ resources:
   - ./hass.yaml
   - ./node-exporter.yaml
   - ./nut-exporter.yaml
+  - ./odesa.yaml
   - ./smartctl-exporter.yaml
