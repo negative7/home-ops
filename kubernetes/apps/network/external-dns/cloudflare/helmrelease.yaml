@@ -35,8 +35,6 @@ spec:
       - --managed-record-types=CNAME
       - --managed-record-types=MX
       - --managed-record-types=TXT
-      # one-time takeover of records created before txtOwnerId changed from main → default; remove once migrated
-      - --migrate-from-txt-owner=main
       - --zone-id-filter=$(CF_ZONE_ID)
     triggerLoopOnEvent: true
     policy: sync
