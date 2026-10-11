@@ -1,0 +1,36 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/refs/heads/main/schema/compose-spec.json
+name: caddy-l4
+
+services:
+  caddy:
+    image: ghcr.io/bjw-s-labs/caddy-l4:2.11.7@sha256:b3302c819df78dac2b27f3032d9999add89c23a1259a3422622fcf81610b7dd1
+    container_name: caddy-l4
+    restart: unless-stopped
+    environment:
+      CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL}
+      VPS_LOCAL_HOSTS: >-
+        odesa-doco-cd.negative7.com
+        odesa-gatus.negative7.com
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    configs:
+      - source: caddyfile
+        target: /etc/caddy/Caddyfile
+
+volumes:
+  caddy-data:
+  caddy-config:
+
+configs:
+  caddyfile:
+    file: ./config/Caddyfile
+
+networks:
+  default:
+    name: edge
+    external: true

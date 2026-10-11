@@ -1,0 +1,7 @@
+---
+name: custom/home-allowlist
+description: "Allow home ISP (AT&T - AS7018)"
+whitelist:
+  reason: "home ISP (AT&T)"
+  expression:
+    - evt.Meta.ASNumber == "7018"

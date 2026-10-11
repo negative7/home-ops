@@ -1,0 +1,15 @@
+---
+working_dir: ./docker/odesa
+auto_discovery:
+  enabled: true
+  depth: 1
+  delete: true
+external_secrets:
+  GATUS_PUSHOVER_TOKEN: op://home-cluster/pushover/PUSHOVER_TOKEN
+  GATUS_PUSHOVER_KEY: op://home-cluster/pushover/PUSHOVER_USER_KEY
+  GATUS_HEARTBEAT_TOKEN: op://home-cluster/odesa/heartbeat_token
+  CADDY_ACME_EMAIL: op://home-cluster/odesa/acme_email
+force_recreate: false
+reconciliation:
+  enabled: true
+  interval: 3600

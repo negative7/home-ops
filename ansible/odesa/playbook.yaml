@@ -1,0 +1,393 @@
+---
+# First run (sshd still on 22):  ansible-playbook -i 135.148.43.50, ansible/odesa/playbook.yaml -e ansible_port=22
+# Subsequent runs:               ansible-playbook -i 135.148.43.50, ansible/odesa/playbook.yaml
+- name: Bootstrap Odesa
+  hosts: all
+  become: true
+  gather_facts: false
+  vars:
+    ansible_port: 22222
+    ansible_user: debian
+    ansible_python_interpreter: auto_silent
+    host_ssh_port: 22222
+
+  tasks:
+    - name: Check host connectivity
+      ansible.builtin.ping:
+
+    - name: "update hostnames"
+      tags:
+        - bootstrap
+      ansible.builtin.hostname:
+        name: odesa
+
+    - name: Read secrets from 1Password
+      ansible.builtin.shell: "op read 'op://{{ item.key }}' < /dev/null"
+      delegate_to: localhost
+      become: false
+      loop:
+        - key: home-cluster/doco-cd/1pw_sa_token
+          var: doco_1pw_sa_token
+        - key: home-cluster/doco-cd/api_secret
+          var: doco_api_secret
+        - key: home-cluster/doco-cd/webhook_secret
+          var: doco_webhook_secret
+        - key: home-cluster/odesa/crowdsec_bouncer_key
+          var: crowdsec_api_key
+      check_mode: false
+      changed_when: false
+      no_log: true
+      register: secrets_raw
+
+    - name: Set secret facts
+      ansible.builtin.set_fact:
+        doco_1pw_sa_token: "{{ secrets_raw.results[0].stdout }}"
+        doco_api_secret: "{{ secrets_raw.results[1].stdout }}"
+        doco_webhook_secret: "{{ secrets_raw.results[2].stdout }}"
+        crowdsec_api_key: "{{ secrets_raw.results[3].stdout }}"
+      no_log: true
+
+    - name: packages
+      tags:
+        - packages
+      block:
+        - name: packages | Install base packages
+          ansible.builtin.apt:
+            name:
+              - cron
+              - curl
+              - ipset
+              - jq
+              - python3-requests
+              - ufw
+              - unattended-upgrades
+              - wireguard-tools
+            state: present
+            update_cache: true
+
+        - name: packages | Install Docker
+          ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
+          args:
+            executable: /bin/bash
+            creates: /usr/bin/docker
+
+    - name: unattended-upgrades
+      tags:
+        - unattended-upgrades
+      block:
+        - name: unattended-upgrades | Enable periodic security upgrades
+          ansible.builtin.copy:
+            dest: /etc/apt/apt.conf.d/20auto-upgrades
+            content: |
+              APT::Periodic::Update-Package-Lists "1";
+              APT::Periodic::Unattended-Upgrade "1";
+            owner: root
+            group: root
+            mode: "0644"
+
+        - name: unattended-upgrades | Enable timers
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            enabled: true
+            state: started
+          loop:
+            - apt-daily.timer
+            - apt-daily-upgrade.timer
+
+    - name: firewall
+      tags:
+        - firewall
+      block:
+        - name: firewall | Allow ports
+          community.general.ufw:
+            rule: allow
+            port: "{{ item.port | string }}"
+            proto: "{{ item.protocol | default('tcp') }}"
+          loop:
+            - name: Host SSH
+              port: "{{ host_ssh_port }}"
+            - name: HTTP
+              port: 80
+            - name: HTTPS
+              port: 443
+
+        # Keep the port Ansible is currently connected on open until sshd has moved
+        - name: firewall | Allow bootstrap SSH port
+          community.general.ufw:
+            rule: allow
+            port: "{{ ansible_port | string }}"
+            proto: tcp
+          when: (ansible_port | int) != (host_ssh_port | int)
+
+        - name: firewall | Remove bootstrap SSH port
+          community.general.ufw:
+            rule: allow
+            port: "22"
+            proto: tcp
+            delete: true
+          when: (ansible_port | int) == (host_ssh_port | int)
+
+        - name: firewall | Enable UFW
+          community.general.ufw:
+            state: enabled
+            policy: deny
+
+    - name: docker
+      tags:
+        - docker
+      block:
+        - name: docker | Create edge docker network
+          community.docker.docker_network:
+            name: edge
+            driver: bridge
+            state: present
+
+    - name: doco-cd
+      tags:
+        - doco-cd
+      vars:
+        dococd_config_dir: /opt/doco-cd
+      block:
+        - name: doco-cd | Create directory
+          ansible.builtin.file:
+            path: "{{ dococd_config_dir }}"
+            state: directory
+            owner: debian
+            group: debian
+            mode: "0755"
+
+        - name: doco-cd | Copy docker-compose app file
+          ansible.builtin.copy:
+            src: ../../docker/odesa/.doco-cd/docker-compose.app.yaml
+            dest: "{{ dococd_config_dir }}/docker-compose.yaml"
+            owner: debian
+            group: debian
+            mode: "0644"
+          register: compose_file
+
+        - name: doco-cd | Create secrets
+          ansible.builtin.copy:
+            dest: "{{ dococd_config_dir }}/{{ item.name }}"
+            content: |
+              {{ item.content }}
+            owner: debian
+            group: debian
+            mode: "0600"
+          no_log: true
+          loop:
+            - name: 1pw_token
+              content: "{{ doco_1pw_sa_token }}"
+            - name: api_secret
+              content: "{{ doco_api_secret }}"
+            - name: webhook_secret
+              content: "{{ doco_webhook_secret }}"
+
+        - name: doco-cd | Run docker-compose
+          community.docker.docker_compose_v2:
+            project_src: "{{ dococd_config_dir }}"
+            files:
+              - docker-compose.yaml
+            pull: always
+            state: present
+          when: not ansible_check_mode
+
+        - name: doco-cd | Wait for healthy
+          community.docker.docker_container_info:
+            name: doco-cd
+          register: dococd_info
+          until: dococd_info.container.State.Health.Status == "healthy"
+          retries: 30
+          delay: 10
+          when: not ansible_check_mode
+
+    - name: crowdsec
+      tags:
+        - crowdsec
+      block:
+        # The crowdsec container is deployed by doco-cd from docker/odesa/01-crowdsec
+        - name: crowdsec | Wait for LAPI on loopback
+          ansible.builtin.wait_for:
+            host: 127.0.0.1
+            port: 8088
+            timeout: 300
+
+        - name: crowdsec | Register firewall bouncer (idempotent)
+          ansible.builtin.shell: |
+            set -e
+            if docker exec crowdsec cscli bouncers list -o json | jq -e '.[] | select(.name=="firewall")' >/dev/null; then
+              echo "ALREADY_REGISTERED"
+            else
+              docker exec crowdsec cscli bouncers add firewall --key "{{ crowdsec_api_key }}"
+            fi
+          register: bouncer_reg
+          changed_when: "'ALREADY_REGISTERED' not in bouncer_reg.stdout"
+          no_log: true
+
+        - name: crowdsec | Register CAPI (community blocklist)
+          ansible.builtin.shell: |
+            docker exec crowdsec cscli capi status >/dev/null 2>&1 \
+              || docker exec crowdsec cscli capi register
+          register: capi_reg
+          changed_when: "'Successfully' in capi_reg.stdout"
+
+        - name: crowdsec | Ensure /etc/apt/keyrings exists
+          ansible.builtin.file:
+            path: /etc/apt/keyrings
+            state: directory
+            mode: "0755"
+
+        - name: crowdsec | Download apt signing key
+          ansible.builtin.get_url:
+            url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
+            dest: /etc/apt/keyrings/crowdsec.asc
+            mode: "0644"
+
+        - name: crowdsec | Add apt repository
+          ansible.builtin.deb822_repository:
+            name: crowdsec
+            types: deb
+            uris: https://packagecloud.io/crowdsec/crowdsec/any
+            suites: any
+            components: main
+            signed_by: /etc/apt/keyrings/crowdsec.asc
+            state: present
+          register: crowdsec_repository
+
+        - name: crowdsec | Update apt cache after repository changes
+          ansible.builtin.apt:
+            update_cache: true
+          when: crowdsec_repository.changed
+          changed_when: false
+
+        - name: crowdsec | Install host firewall bouncer
+          ansible.builtin.apt:
+            name: crowdsec-firewall-bouncer-iptables
+            state: present
+
+        - name: crowdsec | Render bouncer config
+          ansible.builtin.template:
+            src: crowdsec-firewall-bouncer.yaml.j2
+            dest: /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml
+            owner: root
+            group: root
+            mode: "0600"
+          no_log: true
+          notify: Restart crowdsec-firewall-bouncer
+
+        - name: crowdsec | Enable + start bouncer
+          ansible.builtin.systemd:
+            name: crowdsec-firewall-bouncer
+            enabled: true
+            state: started
+
+        - name: crowdsec | Verify bouncer is active
+          ansible.builtin.command: systemctl is-active crowdsec-firewall-bouncer
+          changed_when: false
+
+    - name: geo-block
+      tags:
+        - geo-block
+      vars:
+        blocked_countries:
+          - RU
+          - IL
+          - IR
+          - CN
+          - KP
+          - BY
+          - CU
+      block:
+        - name: geo-block | Create directory
+          ansible.builtin.file:
+            path: /opt/geo-block
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: geo-block | Render update script
+          ansible.builtin.template:
+            src: update-country-blocks.sh.j2
+            dest: /opt/geo-block/update-country-blocks.sh
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: geo-block | Run initial block update
+          ansible.builtin.shell:
+            cmd: /opt/geo-block/update-country-blocks.sh "{{ blocked_countries | join(' ') }}"
+            creates: /opt/geo-block/zones
+
+        - name: geo-block | Create weekly cron job
+          ansible.builtin.cron:
+            name: "GeoIP country block weekly refresh"
+            minute: "0"
+            hour: "3"
+            day: "*"
+            month: "*"
+            weekday: "0"
+            job: "/opt/geo-block/update-country-blocks.sh '{{ blocked_countries | join(' ') }}' >> /var/log/geo-block.log 2>&1"
+            state: present
+
+        - name: geo-block | Create reboot cron job
+          ansible.builtin.cron:
+            name: "GeoIP country block restore on reboot"
+            special_time: reboot
+            job: "/opt/geo-block/update-country-blocks.sh '{{ blocked_countries | join(' ') }}' >> /var/log/geo-block.log 2>&1"
+            state: present
+
+    # Last on purpose: on the first run Ansible is still connected on port 22
+    - name: ssh
+      tags:
+        - ssh
+      block:
+        - name: ssh | Move sshd to host port
+          ansible.builtin.copy:
+            dest: /etc/ssh/sshd_config.d/00-port.conf
+            content: |
+              Port {{ host_ssh_port }}
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart ssh
+
+        - name: ssh | Harden sshd_config
+          ansible.builtin.copy:
+            dest: /etc/ssh/sshd_config.d/01-hardening.conf
+            content: |
+              PermitRootLogin no
+              PasswordAuthentication no
+              KbdInteractiveAuthentication no
+              MaxAuthTries 3
+              LoginGraceTime 20
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart ssh
+
+        - name: ssh | Validate sshd config
+          ansible.builtin.command: /usr/sbin/sshd -t
+          changed_when: false
+
+        - name: ssh | Disable socket activation so sshd_config Port applies
+          ansible.builtin.systemd:
+            name: ssh.socket
+            enabled: false
+            state: stopped
+          failed_when: false
+
+        - name: ssh | Enable ssh service
+          ansible.builtin.systemd:
+            name: ssh.service
+            enabled: true
+
+  handlers:
+    - name: Restart ssh
+      ansible.builtin.systemd:
+        name: ssh.service
+        state: restarted
+
+    - name: Restart crowdsec-firewall-bouncer
+      ansible.builtin.service:
+        name: crowdsec-firewall-bouncer
+        state: restarted

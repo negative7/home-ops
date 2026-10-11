@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/externaldns.k8s.io/dnsendpoint_v1alpha1.json
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: odesa
+spec:
+  # DNS-only (not proxied): odesa terminates TLS itself and Caddy layer4 needs raw TCP
+  endpoints:
+    - dnsName: odesa-gatus.negative7.com
+      recordType: A
+      targets:
+        - &vps_ip 135.148.43.50
+      providerSpecific:
+        - &unproxied
+          name: external-dns.alpha.kubernetes.io/cloudflare-proxied
+          value: "false"
+    - dnsName: odesa-doco-cd.negative7.com
+      recordType: A
+      targets:
+        - *vps_ip
+      providerSpecific:
+        - *unproxied

@@ -6,4 +6,5 @@ resources:
   - ./ocirepository.yaml
   - ./helmrelease.yaml
   - ./externalsecret.yaml
+  - ./odesa-dnsendpoint.yaml
   - ./prometheusrule.yaml

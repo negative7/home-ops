@@ -1,0 +1,51 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/refs/heads/main/schema/compose-spec.json
+# Not managed by doco-cd (it can't manage itself); Ansible deploys this file
+secrets:
+  1pw_token:
+    file: /opt/doco-cd/1pw_token
+  api_secret:
+    file: /opt/doco-cd/api_secret
+  webhook_secret:
+    file: /opt/doco-cd/webhook_secret
+services:
+  app:
+    container_name: doco-cd
+    environment:
+      API_SECRET_FILE: /run/secrets/api_secret
+      DEPLOY_CONFIG_BASE_DIR: ./docker/odesa/
+      HTTP_PORT: 8880
+      LOG_LEVEL: info
+      # Forgejo is internal-only, so odesa follows the public GitHub mirror
+      POLL_CONFIG: |-
+        - url: https://github.com/negative7/home-ops.git
+          reference: refs/heads/main
+          interval: 3600
+      SECRET_PROVIDER: 1password
+      SECRET_PROVIDER_ACCESS_TOKEN_FILE: /run/secrets/1pw_token
+      TZ: America/New_York
+      WEBHOOK_SECRET_FILE: /run/secrets/webhook_secret
+    healthcheck:
+      test:
+        - CMD
+        - /doco-cd
+        - healthcheck
+      start_period: 15s
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    image: ghcr.io/kimdre/doco-cd:0.124.0@sha256:31d3755a206ba5c7bc2d12752a9170edf327b2f36f815a8bc992753434f04676
+    restart: unless-stopped
+    secrets:
+      - 1pw_token
+      - api_secret
+      - webhook_secret
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - data:/data
+volumes:
+  data: {}
+networks:
+  default:
+    name: edge
+    external: true
