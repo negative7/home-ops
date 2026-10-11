@@ -1,6 +1,8 @@
 ---
-# First run (sshd still on 22):  ansible-playbook -i 135.148.43.50, ansible/odesa/playbook.yaml -e ansible_port=22
-# Subsequent runs:               ansible-playbook -i 135.148.43.50, ansible/odesa/playbook.yaml
+# First run (sshd still on 22, no tunnel yet):
+#   ansible-playbook -i 135.148.43.50, ansible/odesa/playbook.yaml -e ansible_port=22 -e ssh_public_access=true
+# Subsequent runs (SSH is only reachable over WireGuard; OVH KVM console if the tunnel is down):
+#   ansible-playbook -i 10.99.0.1, ansible/odesa/playbook.yaml
 - name: Bootstrap Odesa
   hosts: all
   become: true
@@ -10,6 +12,11 @@
     ansible_user: debian
     ansible_python_interpreter: auto_silent
     host_ssh_port: 22222
+    # Keep sshd reachable on the public IP (bootstrap/rescue only); otherwise SSH is wg0-only
+    ssh_public_access: false
+    # Unattended-upgrades reboots at this local time when an update needs it
+    timezone: America/New_York
+    auto_reboot_time: "03:00"
 
   tasks:
     - name: Check host connectivity
@@ -20,6 +27,12 @@
         - bootstrap
       ansible.builtin.hostname:
         name: odesa
+
+    - name: Set timezone
+      tags:
+        - bootstrap
+      community.general.timezone:
+        name: "{{ timezone }}"
 
     - name: Read secrets from 1Password
       ansible.builtin.shell: "op read 'op://{{ item.key }}' < /dev/null"
@@ -94,6 +107,47 @@
             - apt-daily.timer
             - apt-daily-upgrade.timer
 
+        # NodeRebootRequired only fires if this didn't happen (see kube-prometheus-stack prometheusrules)
+        - name: unattended-upgrades | Reboot automatically when required
+          ansible.builtin.copy:
+            dest: /etc/apt/apt.conf.d/52unattended-upgrades-reboot
+            content: |
+              Unattended-Upgrade::Automatic-Reboot "true";
+              Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+              Unattended-Upgrade::Automatic-Reboot-Time "{{ auto_reboot_time }}";
+            owner: root
+            group: root
+            mode: "0644"
+
+    - name: sysctl
+      tags:
+        - sysctl
+      block:
+        - name: sysctl | Network hardening
+          ansible.builtin.copy:
+            dest: /etc/sysctl.d/90-hardening.conf
+            content: |
+              net.ipv4.conf.all.accept_redirects = 0
+              net.ipv4.conf.default.accept_redirects = 0
+              net.ipv6.conf.all.accept_redirects = 0
+              net.ipv6.conf.default.accept_redirects = 0
+              net.ipv4.conf.all.send_redirects = 0
+              net.ipv4.conf.default.send_redirects = 0
+              net.ipv4.conf.all.accept_source_route = 0
+              net.ipv4.conf.default.accept_source_route = 0
+              net.ipv6.conf.all.accept_source_route = 0
+              net.ipv6.conf.default.accept_source_route = 0
+              net.ipv4.conf.all.rp_filter = 1
+              net.ipv4.conf.default.rp_filter = 1
+              net.ipv4.conf.all.log_martians = 1
+              net.ipv4.conf.default.log_martians = 1
+              net.ipv4.icmp_echo_ignore_broadcasts = 1
+              net.ipv4.tcp_syncookies = 1
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Reload sysctl
+
     - name: firewall
       tags:
         - firewall
@@ -104,12 +158,28 @@
             port: "{{ item.port | string }}"
             proto: "{{ item.protocol | default('tcp') }}"
           loop:
-            - name: Host SSH
-              port: "{{ host_ssh_port }}"
             - name: HTTP
               port: 80
             - name: HTTPS
               port: 443
+
+        # Home reaches it over WireGuard; UniFi masquerades as 10.99.0.2
+        - name: firewall | Allow SSH over WireGuard
+          community.general.ufw:
+            rule: allow
+            interface: wg0
+            direction: in
+            from_ip: 10.99.0.2
+            to_ip: 10.99.0.1
+            port: "{{ host_ssh_port | string }}"
+            proto: tcp
+
+        - name: firewall | Public SSH
+          community.general.ufw:
+            rule: allow
+            port: "{{ host_ssh_port | string }}"
+            proto: tcp
+            delete: "{{ not ssh_public_access }}"
 
         # Keep the port Ansible is currently connected on open until sshd has moved
         - name: firewall | Allow bootstrap SSH port
@@ -136,6 +206,24 @@
       tags:
         - docker
       block:
+        - name: docker | Daemon defaults
+          ansible.builtin.copy:
+            dest: /etc/docker/daemon.json
+            content: |
+              {
+                "log-driver": "json-file",
+                "log-opts": {
+                  "max-size": "10m",
+                  "max-file": "3"
+                },
+                "live-restore": true,
+                "no-new-privileges": true
+              }
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart docker
+
         - name: docker | Create edge docker network
           community.docker.docker_network:
             name: edge
@@ -462,6 +550,15 @@
     - name: Restart crowdsec-firewall-bouncer
       ansible.builtin.service:
         name: crowdsec-firewall-bouncer
+        state: restarted
+
+    - name: Reload sysctl
+      ansible.builtin.command: sysctl --system
+      changed_when: true
+
+    - name: Restart docker
+      ansible.builtin.systemd:
+        name: docker.service
         state: restarted
 
     - name: Restart wg-quick@wg0
