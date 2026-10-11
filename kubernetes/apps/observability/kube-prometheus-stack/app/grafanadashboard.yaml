@@ -129,3 +129,44 @@ spec:
     matchLabels:
       dashboards: grafana
   url: https://raw.githubusercontent.com/DRuggeri/nut_exporter/refs/heads/master/dashboard/dashboard.json
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanafolder_v1beta1.json
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: odesa
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  title: Odesa
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: crowdsec
+spec:
+  datasources:
+    - datasourceName: prometheus
+      inputName: DS_PROMETHEUS
+  folderRef: odesa
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  url: https://grafana.com/api/dashboards/21419/revisions/6/download
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: caddy
+spec:
+  datasources:
+    - datasourceName: prometheus
+      inputName: DS_PROMETHEUS
+  folderRef: odesa
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  url: https://grafana.com/api/dashboards/22870/revisions/3/download
