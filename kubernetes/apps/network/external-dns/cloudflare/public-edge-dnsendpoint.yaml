@@ -1,0 +1,24 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/externaldns.k8s.io/dnsendpoint_v1alpha1.json
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: public-edge
+spec:
+  # Public ingress enters via odesa (caddy-l4 SNI passthrough over WireGuard to envoy-external).
+  # Every envoy-external HTTPRoute gets a CNAME to ingress-ext; DNS-only so Cloudflare never sees traffic.
+  endpoints:
+    - dnsName: odesa-edge.negative7.com
+      recordType: A
+      targets:
+        - 135.148.43.50
+      providerSpecific:
+        - &unproxied
+          name: external-dns.alpha.kubernetes.io/cloudflare-proxied
+          value: "false"
+    - dnsName: ingress-ext.negative7.com
+      recordType: CNAME
+      targets:
+        - odesa-edge.negative7.com
+      providerSpecific:
+        - *unproxied
