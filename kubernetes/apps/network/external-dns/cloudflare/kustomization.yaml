@@ -7,4 +7,5 @@ resources:
   - ./helmrelease.yaml
   - ./externalsecret.yaml
   - ./odesa-dnsendpoint.yaml
+  - ./zone-records-dnsendpoint.yaml
   - ./prometheusrule.yaml

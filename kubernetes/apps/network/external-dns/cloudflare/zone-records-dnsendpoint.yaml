@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/externaldns.k8s.io/dnsendpoint_v1alpha1.json
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: zone-records
+spec:
+  # Mail auth records (Proton DKIM, Mailgun DKIM, DMARC); DNS-only.
+  # Apex MX/TXT (Proton MX, SPF, site verifications) stay hand-managed in Cloudflare: with
+  # txtPrefix k8s.%{record_type}- the apex ownership record would be k8s.mx-negative7.com,
+  # which is outside the zone, so external-dns can never own apex records.
+  endpoints:
+    - dnsName: _dmarc.negative7.com
+      recordType: TXT
+      targets:
+        - v=DMARC1; p=none; rua=mailto:admin@negative7.com
+      providerSpecific:
+        - &unproxied
+          name: external-dns.alpha.kubernetes.io/cloudflare-proxied
+          value: "false"
+    - dnsName: protonmail._domainkey.negative7.com
+      recordType: CNAME
+      targets:
+        - protonmail.domainkey.dbz4435mxjwd5xosvsnyjrqqa4u526pdcol2qr3oj7xxcfsi3hhsq.domains.proton.ch
+      providerSpecific:
+        - *unproxied
+    - dnsName: protonmail2._domainkey.negative7.com
+      recordType: CNAME
+      targets:
+        - protonmail2.domainkey.dbz4435mxjwd5xosvsnyjrqqa4u526pdcol2qr3oj7xxcfsi3hhsq.domains.proton.ch
+      providerSpecific:
+        - *unproxied
+    - dnsName: protonmail3._domainkey.negative7.com
+      recordType: CNAME
+      targets:
+        - protonmail3.domainkey.dbz4435mxjwd5xosvsnyjrqqa4u526pdcol2qr3oj7xxcfsi3hhsq.domains.proton.ch
+      providerSpecific:
+        - *unproxied
+    # Mailgun DKIM (smtp-relay → smtp.mailgun.org)
+    - dnsName: k1._domainkey.negative7.com
+      recordType: TXT
+      targets:
+        - k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDQy4IgP8LrOHAyWMdiEY2aQrRrapGMs7gLsZYdIc+SaJl0UrGksst58+a+lxn8iZ7wwnP/y4tRVvxvjZiUANh278izKSa4SPQ6Qsmev5UaU0x2ziQfCV/wkBdmgSwkMO5gph2wblbsppgOiQsgeZ2fn5kl/SaKitK2RVa21Fm/awIDAQAB
+      providerSpecific:
+        - *unproxied
