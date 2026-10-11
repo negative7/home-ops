@@ -6,9 +6,16 @@ metadata:
   name: zone-records
 spec:
   # Mail auth records (Proton DKIM, Mailgun DKIM, DMARC); DNS-only.
-  # Apex MX/TXT (Proton MX, SPF, site verifications) stay hand-managed in Cloudflare: with
-  # txtPrefix k8s.%{record_type}- the apex ownership record would be k8s.mx-negative7.com,
-  # which is outside the zone, so external-dns can never own apex records.
+  # Apex records are hand-managed in Cloudflare: with txtPrefix k8s.%{record_type}- the apex
+  # ownership record would be k8s.mx-negative7.com, which is outside the zone, so external-dns
+  # can never own apex records (and it doesn't support CAA at all). Keep Cloudflare in sync:
+  #   negative7.com  MX   10 mail.protonmail.ch
+  #   negative7.com  MX   20 mailsec.protonmail.ch
+  #   negative7.com  TXT  "v=spf1 include:_spf.protonmail.ch include:mailgun.org ~all"
+  #   negative7.com  TXT  "protonmail-verification=6845cfee4eb4ab3a1df22050feeff3f0eb171f7c"
+  #   negative7.com  CAA  0 issue "letsencrypt.org"
+  #   negative7.com  CAA  0 issuewild "letsencrypt.org"
+  #   negative7.com  CAA  0 iodef "mailto:postmaster@negative7.com"
   endpoints:
     - dnsName: _dmarc.negative7.com
       recordType: TXT
