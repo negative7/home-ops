@@ -30,7 +30,7 @@ spec:
     url: blackbox-exporter.observability.svc.cluster.local:9115
   targets:
     staticConfig:
-      static: 
+      static:
         - truenas.homelab.internal:2049
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
@@ -49,3 +49,19 @@ spec:
         - kyiv.homelab.internal:8006
         - lviv.homelab.internal:9090
         - lviv.homelab.internal:9000
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: odesa
+spec:
+  # Watches the VPS edge from home; odesa's own Gatus can't report its own death
+  jobName: odesa
+  module: http_2xx
+  prober:
+    url: blackbox-exporter.observability.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - https://odesa-gatus.negative7.com
