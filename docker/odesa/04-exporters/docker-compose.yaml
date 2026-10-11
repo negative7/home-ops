@@ -1,0 +1,58 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/refs/heads/main/schema/compose-spec.json
+name: exporters
+
+# Everything here runs on the host network so the gateway can bind the wg0 address
+# (it exits and restarts until wg0 is up) and reach the loopback-published exporters.
+services:
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.12.1@sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
+    container_name: node-exporter
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    command:
+      - --path.rootfs=/host
+      - --web.listen-address=127.0.0.1:9101
+      - --collector.textfile.directory=/textfile
+    volumes:
+      - /:/host:ro,rslave
+      - textfile:/textfile:ro
+
+  # Debian's unattended-upgrades drops /run/reboot-required when an update needs a reboot
+  reboot-required:
+    image: quay.io/prometheus/node-exporter:v1.12.1@sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
+    container_name: reboot-required
+    restart: unless-stopped
+    network_mode: none
+    entrypoint:
+      - "/bin/sh"
+      - "-c"
+    command:
+      - |
+        while true; do
+          if [ -f /host/run/reboot-required ]; then v=1; else v=0; fi
+          printf '# HELP node_reboot_required 1 if the host has pending updates that need a reboot.\n# TYPE node_reboot_required gauge\nnode_reboot_required %s\n' "$$v" > /textfile/reboot.prom.tmp
+          mv /textfile/reboot.prom.tmp /textfile/reboot.prom
+          sleep 300
+        done
+    volumes:
+      - /run:/host/run:ro
+      - textfile:/textfile
+
+  # Only metrics endpoint reachable from home: wg0 address only, ufw allows 27419 on wg0 only
+  gateway:
+    image: ghcr.io/bjw-s-labs/caddy-l4:2.11.7@sha256:b3302c819df78dac2b27f3032d9999add89c23a1259a3422622fcf81610b7dd1
+    container_name: exporters-gateway
+    restart: unless-stopped
+    network_mode: host
+    configs:
+      - source: caddyfile
+        target: /etc/caddy/Caddyfile
+
+volumes:
+  textfile:
+
+configs:
+  caddyfile:
+    file: ./config/Caddyfile

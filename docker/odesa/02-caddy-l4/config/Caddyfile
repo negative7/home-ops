@@ -59,6 +59,8 @@
 		}
 	}
 
+	metrics
+
 	log default {
 		output stdout
 		format json
@@ -71,4 +73,9 @@ odesa-doco-cd.negative7.com {
 
 odesa-gatus.negative7.com {
 	reverse_proxy gatus:8080
+}
+
+# Prometheus metrics, proxied to home by 04-exporters
+http://:9180 {
+	metrics
 }

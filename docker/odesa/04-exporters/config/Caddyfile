@@ -1,0 +1,20 @@
+{
+	admin off
+	auto_https off
+}
+
+# Home Prometheus scrapes /<exporter>/metrics over WireGuard
+http://:27419 {
+	bind 10.99.0.1
+
+	handle_path /node/* {
+		reverse_proxy 127.0.0.1:9101
+	}
+	handle_path /crowdsec/* {
+		reverse_proxy 127.0.0.1:6060
+	}
+	handle_path /caddy/* {
+		reverse_proxy 127.0.0.1:9180
+	}
+	respond 404
+}

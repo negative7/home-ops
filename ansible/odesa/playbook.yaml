@@ -391,6 +391,17 @@
             port: "{{ wg_listen_port | string }}"
             proto: udp
 
+        # Home Prometheus scrapes the 04-exporters gateway; UniFi masquerades it as 10.99.0.2
+        - name: wireguard | Allow metrics scrape from home
+          community.general.ufw:
+            rule: allow
+            interface: wg0
+            direction: in
+            from_ip: 10.99.0.2
+            to_ip: 10.99.0.1
+            port: "27419"
+            proto: tcp
+
         - name: wireguard | Enable + start wg-quick@wg0
           ansible.builtin.systemd:
             name: wg-quick@wg0

@@ -17,6 +17,8 @@ services:
     ports:
       - 80:80
       - 443:443
+      # Prometheus metrics, proxied to home by 04-exporters
+      - 127.0.0.1:9180:9180
     volumes:
       - caddy-data:/data
       - caddy-config:/config
