@@ -3,8 +3,8 @@
 	http_port 8080
 	https_port 8443
 
-	# Only hosts served by odesa itself are routed for now. Public ingress to home
-	# (WireGuard tunnel to envoy-external) is added later as a fallback route per port.
+	# Hosts served by odesa itself match first; every other negative7.com host is
+	# passed through (TLS untouched) over WireGuard to envoy-external at home.
 	layer4 {
 		:443 {
 			matching_timeout 15s
@@ -15,6 +15,13 @@
 					upstream 127.0.0.1:8443
 				}
 			}
+			@home tls sni negative7.com *.negative7.com
+			route @home {
+				proxy {
+					proxy_protocol v2
+					upstream {$HOME_EDGE_UPSTREAM}:443
+				}
+			}
 		}
 		:80 {
 			@local_http http host {$VPS_LOCAL_HOSTS}
@@ -22,6 +29,13 @@
 				proxy {
 					proxy_protocol v2
 					upstream 127.0.0.1:8080
+				}
+			}
+			@home_http http host negative7.com *.negative7.com
+			route @home_http {
+				proxy {
+					proxy_protocol v2
+					upstream {$HOME_EDGE_UPSTREAM}:80
 				}
 			}
 		}
