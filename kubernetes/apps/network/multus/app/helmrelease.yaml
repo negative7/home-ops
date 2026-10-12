@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: multus
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: multus
+  interval: 30m
+  values:
+    cni-plugins:
+      image:
+        repository: ghcr.io/home-operations/cni-plugins
+        tag: 1.9.1@sha256:e17cc64a81579a163646425d25d2e48065cfb0dc449d2de447b1fd29e9c2ca0f
+    multus:
+      image:
+        repository: ghcr.io/k8snetworkplumbingwg/multus-cni
+        tag: v4.3.1@sha256:9dc8ca645a78552ed4151cf67c2998d18f260f172cc541580d8acce2ee3495c2
+      resources:
+        requests:
+          cpu: 10m
+        limits:
+          memory: 32Mi
+    cni:
+      netPath: /etc/cni/net.d
+      binPath: /opt/cni/bin
