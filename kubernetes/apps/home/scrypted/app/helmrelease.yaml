@@ -35,8 +35,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/bjw-s-labs/scrypted
-              tag: 0.141.0@sha256:c9e82faec2e27debeba03fd8d4bdb2aa53cdaf0f3f8aa77c04312a047db4c2ea
+              repository: ghcr.io/koush/scrypted
+              tag: v0.147.0-noble-intel@sha256:b59d42515263aa757fd111a104a03526b8dafc27fe36dd2dd5521bfc7d0ceb99
             env:
               TZ: America/New_York
             probes:
@@ -49,8 +49,9 @@ spec:
                 - name: gpu
               requests:
                 cpu: 136m
+                memory: 1Gi
               limits:
-                memory: 2Gi
+                memory: 4Gi
     service:
       app:
         type: LoadBalancer
