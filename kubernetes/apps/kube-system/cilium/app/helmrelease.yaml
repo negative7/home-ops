@@ -20,6 +20,8 @@ spec:
       datapathMode: netkit
       masquerade: true
       preallocateMaps: true
+      vlanBypass:
+        - 4 # IOT (multus)
     bpfClockProbe: true
     cgroup:
       autoMount:
