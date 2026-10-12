@@ -21,6 +21,8 @@ spec:
       namespace: miroir-system
     - name: kopiur
       namespace: system
+    - name: multus-networks
+      namespace: network
   components:
     - ../../../../components/gpu
     - ../../../../components/kopiur/backup
