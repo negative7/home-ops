@@ -61,7 +61,7 @@ spec:
     extensions:
       - name: pgvector
         image:
-          reference: ghcr.io/cloudnative-pg/pgvector:0.8.7-18-trixie@sha256:f4007eb83db8e67d0b42e2ddf11d3368b490b1d35f02cc34b99a9c200877b104
+          reference: ghcr.io/cloudnative-pg/pgvector:0.8.7-18-trixie@sha256:b91173442f11a53454cda93b0a962afc6b5ad95dfbb70a65f5143c7082543651
       - name: vchord
         image:
           reference: ghcr.io/tensorchord/vchord-scratch:pg18-v1.1.1@sha256:bdea43bed2a414e21bbf71767bf6f0739747ac480b267b51772dc214ac28dcb3
