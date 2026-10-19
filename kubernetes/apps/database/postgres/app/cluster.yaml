@@ -71,7 +71,7 @@ spec:
           - /usr/share/postgresql/18/
       - name: postgis
         image:
-          reference: ghcr.io/cloudnative-pg/postgis-extension:3.6.4-18-trixie@sha256:dabdd1b0432a9d31223ddc6b2d9e3b67b3d92a6c336caf676ecc129e751c66d2
+          reference: ghcr.io/cloudnative-pg/postgis-extension:3.6.4-18-trixie@sha256:2401cbae15a15c0273cb437521c7e05ef8534fa30c17413bd886db7c531ae908
         ld_library_path:
           - system
       - name: timescaledb-oss
