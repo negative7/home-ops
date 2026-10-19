@@ -12,9 +12,9 @@ spec:
     staticConfig:
       static:
         - truenas.homelab.internal
-        - emporia-vue2.iot.test
+        - emporia-vue2.iot.internal
         - pikvm.homelab.internal
-        - slzb-ultima.iot.test
+        - slzb-ultima.iot.internal
         - lviv.homelab.internal
         - kyiv.homelab.internal
 ---
