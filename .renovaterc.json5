@@ -31,4 +31,12 @@
   kubernetes: {
     managerFilePatterns: ["/^kubernetes/.+\\.yaml(?:\\.j2)?$/"],
   },
+  packageRules: [
+    {
+      // Upstream advises against 17.0.0 (push/merge breakage); drop once 17.0.1+ ships
+      description: "Hold Forgejo 17.0.0",
+      matchPackageNames: ["code.forgejo.org/forgejo/forgejo"],
+      allowedVersions: "!/^v?17\\.0\\.0$/",
+    },
+  ],
 }
