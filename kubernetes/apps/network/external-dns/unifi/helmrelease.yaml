@@ -40,12 +40,18 @@ spec:
     triggerLoopOnEvent: true
     policy: sync
     sources:
+      - crd
       - gateway-httproute
       - service
+    # Skip DNSEndpoints meant for Cloudflare; unlabeled routes and services still match
+    labelFilter: dns.negative7.com/provider!=cloudflare
     txtOwnerId: main
     txtPrefix: k8s.main.%{record_type}-
     domainFilters:
       - negative7.com
+      - homelab.internal
+      - home.internal
+      - iot.internal
     serviceMonitor:
       enabled: true
     podAnnotations:

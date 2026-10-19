@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/externaldns.k8s.io/dnsendpoint_v1alpha1.json
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: homelab-hosts
+  labels:
+    dns.negative7.com/provider: unifi
+spec:
+  # Internal-only host records, served by UniFi; AdGuard forwards these zones to it
+  endpoints:
+    - dnsName: lviv.homelab.internal
+      recordType: A
+      targets:
+        - "10.0.1.10"
+    - dnsName: truenas.homelab.internal
+      recordType: A
+      targets:
+        - "10.2.0.10"
+    - dnsName: nas.home.internal
+      recordType: A
+      targets:
+        - "10.0.1.10"
+    - dnsName: k8s.homelab.internal
+      recordType: A
+      targets:
+        - "10.2.0.20"
+    - dnsName: kyiv.homelab.internal
+      recordType: A
+      targets:
+        - "10.2.0.24"
+    - dnsName: hass.homelab.internal
+      recordType: A
+      targets:
+        - "10.0.4.12"
+    - dnsName: voron2.home.internal
+      recordType: A
+      targets:
+        - "10.0.1.12"
+    - dnsName: unifi.negative7.com
+      recordType: A
+      targets:
+        - "10.0.1.1"
