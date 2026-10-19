@@ -4,6 +4,8 @@ apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
   name: public-edge
+  labels:
+    dns.negative7.com/provider: cloudflare
 spec:
   # Public ingress enters via odesa (caddy-l4 SNI passthrough over WireGuard to envoy-external).
   # Every envoy-external HTTPRoute gets a CNAME to ingress-ext; DNS-only so Cloudflare never sees traffic.

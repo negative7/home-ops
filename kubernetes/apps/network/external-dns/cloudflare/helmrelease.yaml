@@ -39,6 +39,8 @@ spec:
     sources:
       - crd
       - gateway-httproute
+    # Keep internal-only DNSEndpoints (UniFi) out of public DNS
+    labelFilter: dns.negative7.com/provider!=unifi
     txtOwnerId: default
     txtPrefix: k8s.%{record_type}-
     domainFilters:
