@@ -8,12 +8,19 @@ spec:
   allowedNamespaces:
     all: true
   backend:
-    filesystem:
-      path: /repository
-      volume:
-        nfs:
-          server: truenas.homelab.internal
-          path: /mnt/tank/kopia
+    s3:
+      auth:
+        secretRef:
+          name: kopiur-repository-secret
+          namespace: system
+      bucket: kopiur
+      endpoint: lviv.homelab.internal:9000
+      region: us-east-1
+      tls:
+        disableTls: true
+  # Repository is migrated with `kopia repository sync-to`; never bootstrap an empty one
+  create:
+    enabled: false
   encryption:
     passwordSecretRef:
       name: kopiur-repository-secret

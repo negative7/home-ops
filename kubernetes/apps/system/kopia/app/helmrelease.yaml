@@ -45,7 +45,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
@@ -70,35 +70,13 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-    configMaps:
-      config:
-        data:
-          repository.config: |-
-            {
-              "storage": {
-                "type": "filesystem",
-                "config": {
-                  "path": "/repository"
-                }
-              },
-              "hostname": "kopia.{{ .Release.Namespace }}.svc.cluster.local",
-              "username": "kopia-ui",
-              "description": "kopia web UI",
-              "enableActions": false
-            }
     persistence:
       config-file:
-        type: configMap
-        identifier: config
+        type: secret
+        name: kopia-secret
         globalMounts:
           - path: /config/repository.config
             subPath: repository.config
-      repository:
-        type: nfs
-        server: truenas.homelab.internal
-        path: /mnt/tank/kopia
-        globalMounts:
-          - path: /repository
       tmpfs:
         type: emptyDir
         advancedMounts:
