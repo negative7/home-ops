@@ -6,7 +6,8 @@ metadata:
   name: &name smartctl-exporter
 spec:
   staticConfigs:
-    - targets: [truenas.homelab.internal:9633]
+    - targets:
+        - lviv.homelab.internal:9633
   metricsPath: /metrics
   relabelings:
     - action: replace

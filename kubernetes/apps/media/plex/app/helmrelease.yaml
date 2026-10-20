@@ -135,7 +135,7 @@ spec:
                 subPath: transcode
       nfs-data:
         type: nfs
-        server: "truenas.homelab.internal"
+        server: "lviv.homelab.internal"
         path: /mnt/tank/data
         advancedMounts:
           plex:
@@ -143,7 +143,7 @@ spec:
               - path: /data
       nfs-backup:
         type: nfs
-        server: "truenas.homelab.internal"
+        server: "lviv.homelab.internal"
         path: /mnt/tank/backups/plex
         advancedMounts:
           plex:

@@ -11,7 +11,6 @@ spec:
   targets:
     staticConfig:
       static:
-        - truenas.homelab.internal
         - emporia-vue2.iot.internal
         - pikvm.homelab.internal
         - slzb-ultima.iot.internal
@@ -31,7 +30,7 @@ spec:
   targets:
     staticConfig:
       static:
-        - truenas.homelab.internal:2049
+        - lviv.homelab.internal:2049
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
 apiVersion: monitoring.coreos.com/v1

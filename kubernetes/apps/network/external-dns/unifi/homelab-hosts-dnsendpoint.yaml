@@ -12,7 +12,7 @@ spec:
     - dnsName: lviv.homelab.internal
       recordType: A
       targets:
-        - "10.0.1.10"
+        - "10.2.0.10"
     - dnsName: truenas.homelab.internal
       recordType: A
       targets:

@@ -11,5 +11,5 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
   nfs:
-    server: truenas.homelab.internal
+    server: lviv.homelab.internal
     path: /mnt/tank/data/immich

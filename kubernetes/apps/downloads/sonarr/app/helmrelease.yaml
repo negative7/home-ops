@@ -105,7 +105,7 @@ spec:
         type: emptyDir
       nfs-data:
         type: nfs
-        server: "truenas.homelab.internal"
+        server: "lviv.homelab.internal"
         path: /mnt/tank/data
         advancedMounts:
           sonarr:
@@ -114,7 +114,7 @@ spec:
       completed:
         enabled: true
         type: nfs
-        server: "truenas.homelab.internal"
+        server: "lviv.homelab.internal"
         path: /mnt/tank/data
         globalMounts:
           - path: /completed

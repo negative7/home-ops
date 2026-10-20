@@ -6,7 +6,9 @@ metadata:
   name: &name node-exporter
 spec:
   staticConfigs:
-    - targets: [truenas.homelab.internal:9100, pikvm.homelab.internal:9100]
+    - targets:
+        - lviv.homelab.internal:9100
+        - pikvm.homelab.internal:9100
   metricsPath: /metrics
   relabelings:
     - action: replace
@@ -20,7 +22,8 @@ metadata:
   name: &name pikvm
 spec:
   staticConfigs:
-    - targets: [pikvm.homelab.internal]
+    - targets:
+        - pikvm.homelab.internal
   metricsPath: /api/export/prometheus/metrics
   relabelings:
     - action: replace

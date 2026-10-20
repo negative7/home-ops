@@ -10,5 +10,5 @@ metadata:
 spec:
   endpoints:
     - fqdn:
-        hostname: truenas.homelab.internal
+        hostname: lviv.homelab.internal
         port: 8880

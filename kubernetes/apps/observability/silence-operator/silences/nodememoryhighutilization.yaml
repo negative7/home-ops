@@ -8,4 +8,4 @@ spec:
     - name: alertname
       value: NodeMemoryHighUtilization
     - name: instance
-      value: truenas.homelab.internal:9100
+      value: lviv.homelab.internal:9100
