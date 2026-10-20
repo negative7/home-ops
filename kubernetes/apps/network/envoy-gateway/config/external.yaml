@@ -15,7 +15,8 @@ spec:
   infrastructure:
     annotations:
       external-dns.kubernetes.io/hostname: *hostname
-      lbipam.cilium.io/ips: 10.2.0.102
+      # Both VIPs during the move to the off-subnet pool; drop 10.2.0.102 once odesa uses 10.2.1.102
+      lbipam.cilium.io/ips: 10.2.0.102,10.2.1.102
   listeners:
     - name: http
       protocol: HTTP

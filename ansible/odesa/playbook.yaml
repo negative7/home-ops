@@ -445,6 +445,7 @@
         wg_peer_allowed_ips:
           - 10.99.0.2/32
           - 10.2.0.102/32
+          - 10.2.1.102/32
       block:
         - name: wireguard | Read keys from 1Password
           ansible.builtin.shell: "op read 'op://home-cluster/odesa/{{ item }}' < /dev/null"
