@@ -8,9 +8,6 @@ spec:
   blocks:
     # Off-subnet range: reachable only via BGP /32s, so VLAN20 hosts need no static routes
     - cidr: 10.2.1.0/24
-    # Legacy in-subnet range; remove once every service has moved to 10.2.1.0/24
-    - start: 10.2.0.80
-      stop: 10.2.0.200
 
 ---
 apiVersion: cilium.io/v2
