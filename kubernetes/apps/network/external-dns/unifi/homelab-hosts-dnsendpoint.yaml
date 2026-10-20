@@ -13,10 +13,6 @@ spec:
       recordType: A
       targets:
         - "10.2.0.10"
-    - dnsName: truenas.homelab.internal
-      recordType: A
-      targets:
-        - "10.2.0.10"
     - dnsName: nas.home.internal
       recordType: A
       targets:
