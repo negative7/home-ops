@@ -444,7 +444,6 @@
         # The UniFi tunnel IP plus envoy-external; the UniFi zone firewall enforces the same limit at home
         wg_peer_allowed_ips:
           - 10.99.0.2/32
-          - 10.2.0.102/32
           - 10.2.1.102/32
       block:
         - name: wireguard | Read keys from 1Password
