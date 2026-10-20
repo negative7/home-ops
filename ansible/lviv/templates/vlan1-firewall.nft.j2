@@ -9,6 +9,14 @@ table inet vlan1_firewall {
 		iifname "{{ vlan1_interface }}" jump vlan1
 	}
 
+	# Docker DNATs published ports in prerouting, so they bypass the input hook; nothing
+	# should be forwarded from VLAN1, which also covers ports accidentally bound to 0.0.0.0
+	chain forward {
+		type filter hook forward priority filter - 1; policy accept;
+		iifname "{{ vlan1_interface }}" ct state established,related accept
+		iifname "{{ vlan1_interface }}" counter drop
+	}
+
 	# VLAN1 exposes only SSH and Samba (+ discovery)
 	chain vlan1 {
 		ct state established,related accept
