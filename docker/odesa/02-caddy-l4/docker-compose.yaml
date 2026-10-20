@@ -10,7 +10,7 @@ services:
     environment:
       CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL}
       # envoy-external VIP, reached over the wg0 tunnel to the UniFi gateway
-      HOME_EDGE_UPSTREAM: 10.2.0.102
+      HOME_EDGE_UPSTREAM: 10.2.1.102
       VPS_LOCAL_HOSTS: >-
         odesa-doco-cd.negative7.com
         odesa-gatus.negative7.com
