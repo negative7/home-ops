@@ -1,12 +1,18 @@
 ---
 machine:
-  install:
-    diskSelector:
-      model: CT1000MX500SSD1
   type: controlplane
-  nodeLabels:
-    node.kubernetes.io/gpu: "true"
-    storage.miroir.home-operations.com/class: default
+---
+apiVersion: v1alpha1
+kind: UnattendedInstallConfig
+provisioning:
+  diskSelector:
+    match: disk.model == "CT1000MX500SSD1"
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+labels:
+  node.kubernetes.io/gpu: "true"
+  storage.miroir.home-operations.com/class: default
 ---
 apiVersion: v1alpha1
 kind: HostnameConfig
