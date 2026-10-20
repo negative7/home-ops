@@ -5,6 +5,9 @@ set quiet
 set script-interpreter := ['bash', '-euo', 'pipefail']
 set shell := ['bash', '-euo', 'pipefail', '-c']
 
+[group: 'ansible']
+mod ansible "ansible"
+
 [group: 'k8s-bootstrap']
 mod k8s-bootstrap "kubernetes/bootstrap"
 
