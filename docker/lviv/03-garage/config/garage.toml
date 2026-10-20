@@ -5,6 +5,8 @@ db_engine = "lmdb"
 replication_factor = 1
 
 rpc_bind_addr = "10.2.0.10:9001"
+# The CLI and peers reach the node here; the default (127.0.0.1) no longer listens
+rpc_public_addr = "10.2.0.10:9001"
 
 [s3_api]
 s3_region = "us-east-1"
