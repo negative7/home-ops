@@ -12,8 +12,6 @@ services:
     container_name: node-exporter
     image: quay.io/prometheus/node-exporter:v1.12.1
     network_mode: host
-    ports:
-      - 9100:9100
     restart: unless-stopped
     volumes:
       - /:/host/root:ro
@@ -36,7 +34,7 @@ services:
     container_name: smartctl-exporter
     image: quay.io/prometheuscommunity/smartctl-exporter:v0.15.0
     ports:
-      - 9633:9633
+      - 10.2.0.10:9633:9633
     privileged: true
     restart: unless-stopped
     user: root
@@ -58,7 +56,7 @@ services:
     container_name: nut_exporter
     restart: unless-stopped
     ports:
-      - 9199:9199
+      - 10.2.0.10:9199:9199
     command:
       - '--nut.server=10.2.0.10'
       - '--log.level=debug'

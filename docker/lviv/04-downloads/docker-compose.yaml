@@ -11,7 +11,7 @@ services:
     logging:
       driver: json-file
     ports:
-      - 6060:6060
+      - 10.2.0.10:6060:6060
     environment:
       - SABNZBD__HOST_WHITELIST_ENTRIES=lviv.homelab.internal, sabnzbd.negative7.com
       - SABNZBD__PORT=6060
@@ -20,7 +20,11 @@ services:
       - /mnt/tank/apps/sabnzbd:/config
       - /mnt/tank/data/usenet:/data/usenet:rw
     healthcheck:
-      test: [CMD, curl, -f, "http://localhost:6060/"]
+      test:
+        - CMD
+        - curl
+        - -f
+        - "http://localhost:6060/"
       start_period: 30s
       interval: 30s
       timeout: 5s
@@ -41,8 +45,8 @@ services:
       - net.ipv6.conf.all.disable_ipv6=1
       - net.ipv6.conf.default.disable_ipv6=1
     ports:
-      - 8080:8080
-      - 7476:7476
+      - 10.2.0.10:8080:8080
+      - 10.2.0.10:7476:7476
     environment:
       - TZ=America/New_York
       - VPN_SERVICE_PROVIDER=protonvpn
@@ -60,7 +64,10 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/tank/apps/gluetun:/gluetun
     healthcheck:
-      test: [CMD, /gluetun-entrypoint, healthcheck]
+      test:
+        - CMD
+        - /gluetun-entrypoint
+        - healthcheck
       start_period: 30s
       interval: 30s
       timeout: 5s
@@ -84,7 +91,11 @@ services:
       - /mnt/tank/apps/qbittorrent:/config
       - /mnt/tank/data/torrents:/data/torrents:rw
     healthcheck:
-      test: [CMD, curl, -f, "http://localhost:8080/api/v2/app/version"]
+      test:
+        - CMD
+        - curl
+        - -f
+        - "http://localhost:8080/api/v2/app/version"
       start_period: 30s
       interval: 30s
       timeout: 5s
@@ -118,14 +129,18 @@ services:
     logging:
       driver: json-file
     ports:
-      - 7474:7474
+      - 10.2.0.10:7474:7474
     environment:
       - TZ=America/New_York
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/tank/apps/autobrr:/config
     healthcheck:
-      test: [CMD, curl, -f, "http://localhost:7474/api/healthz/liveness"]
+      test:
+        - CMD
+        - curl
+        - -f
+        - "http://localhost:7474/api/healthz/liveness"
       start_period: 15s
       interval: 30s
       timeout: 5s

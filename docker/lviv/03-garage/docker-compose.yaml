@@ -31,9 +31,9 @@ services:
     restart: unless-stopped
     logging:
       driver: json-file
-    # Bridge networking so Docker publishes it on VLAN20 only (daemon.json "ip")
+    # Bridge networking, published on VLAN20 only
     ports:
-      - 3909:3909
+      - 10.2.0.10:3909:3909
     environment:
       - PORT=3909
       - API_BASE_URL=http://10.2.0.10:9002

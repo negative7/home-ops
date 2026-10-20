@@ -9,7 +9,7 @@ services:
     logging:
       driver: json-file
     ports:
-      - 3000:3000
+      - 10.2.0.10:3000:3000
     environment:
       - TZ=America/New_York
     volumes:
