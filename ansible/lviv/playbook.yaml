@@ -11,6 +11,86 @@
     - name: Check host connectivity
       ansible.builtin.ping:
 
+    # NetworkManager is the only network manager. VLAN20 (enp3s0) owns the main table and the
+    # default route; VLAN1 (eno1) routes live in table 1, used only for traffic sourced from
+    # 10.0.1.10, so replies leave the NIC they arrived on
+    - name: network
+      vars:
+        legacy_nm_profiles:
+          - "Wired connection 1"
+          - "Wired connection 2"
+          - "enp3s0"
+          - "enp3s0.4"
+      block:
+        - name: network | Leave only loopback to ifupdown
+          ansible.builtin.copy:
+            dest: /etc/network/interfaces
+            content: |
+              # Managed by ansible; NICs are managed by NetworkManager
+              source /etc/network/interfaces.d/*
+
+              auto lo
+              iface lo inet loopback
+            owner: root
+            group: root
+            mode: "0644"
+
+        - name: network | Stop NetworkManager creating "Wired connection" profiles
+          ansible.builtin.copy:
+            dest: /etc/NetworkManager/conf.d/no-auto-default.conf
+            content: |
+              [main]
+              no-auto-default=*
+            owner: root
+            group: root
+            mode: "0644"
+
+        - name: network | VLAN20 profile (main table, default route)
+          community.general.nmcli:
+            type: ethernet
+            conn_name: vlan20
+            ifname: enp3s0
+            method4: auto
+            route_metric4: 100
+            method6: disabled
+            autoconnect: true
+            state: present
+
+        - name: network | VLAN1 profile (table 1, source-routed)
+          community.general.nmcli:
+            type: ethernet
+            conn_name: vlan1
+            ifname: eno1
+            method4: auto
+            never_default4: true
+            route_metric4: 200
+            routes4_extended:
+              - ip: 0.0.0.0/0
+                next_hop: 10.0.1.1
+                table: 1
+              - ip: 10.0.1.0/24
+                table: 1
+            routing_rules4:
+              - priority 100 from 10.0.1.10 table 1
+            method6: disabled
+            autoconnect: true
+            state: present
+
+        - name: network | Find legacy profiles still present
+          ansible.builtin.command: nmcli -g NAME connection show
+          register: nm_profiles
+          changed_when: false
+
+        # Deleting the active profiles drops both links (and this SSH session), so a transient
+        # unit does the delete and the reboot outside the session
+        - name: network | Remove legacy profiles and reboot onto the new ones
+          ansible.builtin.reboot:
+            reboot_command: >-
+              systemd-run --no-block --unit=lviv-network-cutover sh -c
+              "nmcli connection delete {{ legacy_nm_profiles | select('in', nm_profiles.stdout_lines) | map('quote') | join(' ') }}; systemctl reboot"
+            reboot_timeout: 600
+          when: legacy_nm_profiles | select("in", nm_profiles.stdout_lines) | list | length > 0
+
     - name: Read secrets from 1Password
       ansible.builtin.shell: "op read 'op://{{ item.key }}' < /dev/null"
       delegate_to: localhost
