@@ -1,0 +1,5 @@
+# Managed by ansible. NFSv4 only, served on VLAN20; the eno1 firewall blocks NFS on VLAN1.
+# fsid values are kept from the previous Cockpit exports so existing client handles stay valid.
+{% for export in nfs_exports %}
+{{ export.path }} -fsid={{ export.fsid }} {{ export.clients }}({{ export.options }})
+{% endfor %}

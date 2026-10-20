@@ -1,0 +1,23 @@
+#!/usr/sbin/nft -f
+# Managed by ansible. Own table so Docker's iptables-nft rules are never touched.
+table inet vlan1_firewall
+delete table inet vlan1_firewall
+
+table inet vlan1_firewall {
+	chain input {
+		type filter hook input priority filter; policy accept;
+		iifname "{{ vlan1_interface }}" jump vlan1
+	}
+
+	# VLAN1 exposes only SSH and Samba (+ discovery)
+	chain vlan1 {
+		ct state established,related accept
+		ct state invalid drop
+		ip protocol icmp accept
+		udp sport 67 udp dport 68 accept comment "DHCP"
+		tcp dport { 22, 139, 445, 5357 } accept comment "SSH, SMB, WSD HTTP"
+		tcp dport { 3702, 5355 } accept comment "wsdd2, LLMNR"
+		udp dport { 137, 138, 3702, 5355 } accept comment "NetBIOS, WS-Discovery, LLMNR"
+		counter drop
+	}
+}

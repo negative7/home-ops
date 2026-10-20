@@ -91,6 +91,182 @@
             reboot_timeout: 600
           when: legacy_nm_profiles | select("in", nm_profiles.stdout_lines) | list | length > 0
 
+    # Services listen on VLAN20 only; VLAN1 (eno1) carries SSH and Samba, enforced by its own nftables table
+    - name: services
+      vars:
+        vlan20_ip: 10.2.0.10
+        vlan1_interface: eno1
+        nfs_exports:
+          - path: /mnt/tank/data
+            fsid: aa97f48c-9715-4e14-9a52-0517f1ed5438
+            clients: 10.2.0.0/24
+            options: rw,sync,no_subtree_check
+          - path: /mnt/tank/backups/plex
+            fsid: 86a3b8c1-486d-4dba-9c87-a1c1496707ea
+            clients: 10.2.0.0/24
+            options: rw,sync,no_subtree_check
+          # Removed after the kopiur → Garage migration (Phase 8)
+          - path: /mnt/tank/kopia
+            fsid: cbbc97c9-3dcf-44ce-92eb-d9f9aea2bffe
+            clients: 10.2.0.0/24
+            options: rw,sync,no_subtree_check,all_squash,anonuid=2000,anongid=2000
+          - path: /mnt/tank/backups/adguard
+            fsid: f11a6dff-f103-4386-8de0-2673ea390f12
+            clients: 10.0.5.3
+            options: rw,sync,no_subtree_check,all_squash,anonuid=1000,anongid=1000
+        smb_shares:
+          - {name: data, path: /mnt/tank/data}
+          - {name: backups, path: /mnt/tank/backups}
+          - {name: docs, path: /mnt/tank/docs}
+          - {name: media, path: /mnt/tank/media}
+      block:
+        # Lets services bind 10.2.0.10 at boot before DHCP has assigned it
+        - name: services | Allow binding addresses that are not up yet
+          ansible.builtin.copy:
+            dest: /etc/sysctl.d/60-nonlocal-bind.conf
+            content: |
+              net.ipv4.ip_nonlocal_bind = 1
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Apply sysctl
+
+        - name: services | Config directories
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+          loop:
+            - /etc/nfs.conf.d
+            - /etc/nftables.d
+            - /etc/systemd/system/cockpit.socket.d
+
+        - name: services | Publish Docker ports on VLAN20 only
+          ansible.builtin.copy:
+            dest: /etc/docker/daemon.json
+            content: "{{ {'ip': vlan20_ip} | to_nice_json }}\n"
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart docker
+
+        - name: services | NFS exports
+          ansible.builtin.template:
+            src: templates/exports.j2
+            dest: /etc/exports.d/home-ops.exports
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Reload NFS exports
+
+        - name: services | Remove Cockpit NFS exports
+          ansible.builtin.file:
+            path: /etc/exports.d/cockpit-file-sharing.exports
+            state: absent
+          notify: Reload NFS exports
+
+        - name: services | NFSv4 only
+          ansible.builtin.copy:
+            dest: /etc/nfs.conf.d/home-ops.conf
+            content: |
+              [nfsd]
+              vers3=n
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart NFS server
+
+        - name: services | Mask NFSv3 helpers
+          ansible.builtin.systemd_service:
+            name: "{{ item }}"
+            masked: true
+            state: stopped
+          loop:
+            - rpcbind.socket
+            - rpcbind.service
+            - rpc-statd.service
+
+        - name: services | Samba config
+          ansible.builtin.template:
+            src: templates/smb.conf.j2
+            dest: /etc/samba/smb.conf
+            owner: root
+            group: root
+            mode: "0644"
+            validate: testparm -s %s
+          notify: Restart Samba
+
+        - name: services | Drop Cockpit registry shares
+          ansible.builtin.command: net conf drop
+          register: smb_registry
+          changed_when: smb_registry.rc == 0
+          failed_when: false
+
+        - name: services | Cockpit listens on VLAN20
+          ansible.builtin.copy:
+            dest: /etc/systemd/system/cockpit.socket.d/listen.conf
+            content: |
+              [Socket]
+              ListenStream=
+              ListenStream={{ vlan20_ip }}:9090
+              FreeBind=yes
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart cockpit
+
+        # upsmon on lviv talks to localhost; hass and nut_exporter use 10.2.0.10
+        - name: services | NUT listens on loopback and VLAN20
+          ansible.builtin.copy:
+            dest: /etc/nut/upsd.conf
+            content: |
+              LISTEN 127.0.0.1 3493
+              LISTEN {{ vlan20_ip }} 3493
+            owner: root
+            group: nut
+            mode: "0640"
+          notify: Restart NUT
+
+        - name: services | VLAN1 firewall rules
+          ansible.builtin.template:
+            src: templates/vlan1-firewall.nft.j2
+            dest: /etc/nftables.d/vlan1-firewall.nft
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart VLAN1 firewall
+
+        # Not nftables.service: its ExecStop flushes the whole ruleset, Docker's included
+        - name: services | VLAN1 firewall unit
+          ansible.builtin.copy:
+            dest: /etc/systemd/system/vlan1-firewall.service
+            content: |
+              [Unit]
+              Description=nftables input filter for the VLAN1 interface
+              Wants=network-pre.target
+              Before=network-pre.target
+
+              [Service]
+              Type=oneshot
+              RemainAfterExit=yes
+              ExecStart=/usr/sbin/nft -f /etc/nftables.d/vlan1-firewall.nft
+              ExecStop=/usr/sbin/nft delete table inet vlan1_firewall
+
+              [Install]
+              WantedBy=multi-user.target
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart VLAN1 firewall
+
+        - name: services | Enable VLAN1 firewall
+          ansible.builtin.systemd_service:
+            name: vlan1-firewall.service
+            enabled: true
+            daemon_reload: true
+
     - name: Read secrets from 1Password
       ansible.builtin.shell: "op read 'op://{{ item.key }}' < /dev/null"
       delegate_to: localhost
@@ -201,3 +377,47 @@
           retries: 30
           delay: 10
           when: not ansible_check_mode
+
+  handlers:
+    - name: Apply sysctl
+      ansible.builtin.command: sysctl -p /etc/sysctl.d/60-nonlocal-bind.conf
+      changed_when: true
+
+    - name: Restart docker
+      ansible.builtin.systemd_service:
+        name: docker.service
+        state: restarted
+
+    - name: Reload NFS exports
+      ansible.builtin.command: exportfs -ra
+      changed_when: true
+
+    - name: Restart NFS server
+      ansible.builtin.systemd_service:
+        name: nfs-server.service
+        state: restarted
+
+    - name: Restart Samba
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        state: restarted
+      loop:
+        - smbd.service
+        - nmbd.service
+
+    - name: Restart cockpit
+      ansible.builtin.systemd_service:
+        name: cockpit.socket
+        state: restarted
+        daemon_reload: true
+
+    - name: Restart NUT
+      ansible.builtin.systemd_service:
+        name: nut-server.service
+        state: restarted
+
+    - name: Restart VLAN1 firewall
+      ansible.builtin.systemd_service:
+        name: vlan1-firewall.service
+        state: restarted
+        daemon_reload: true

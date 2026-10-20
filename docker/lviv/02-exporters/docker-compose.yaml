@@ -7,7 +7,7 @@ services:
       - --path.procfs=/host/proc
       - --path.sysfs=/host/sys
       - --path.udev.data=/host/root/run/udev/data
-      - --web.listen-address=0.0.0.0:9100
+      - --web.listen-address=10.2.0.10:9100
       - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
     container_name: node-exporter
     image: quay.io/prometheus/node-exporter:v1.12.1
@@ -20,7 +20,13 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
     healthcheck:
-      test: [CMD, wget, --no-verbose, --tries=1, --spider, 'http://localhost:9100/metrics']
+      test:
+        - CMD
+        - wget
+        - --no-verbose
+        - --tries=1
+        - --spider
+        - 'http://10.2.0.10:9100/metrics'
       start_period: 15s
       interval: 30s
       timeout: 5s
@@ -35,7 +41,13 @@ services:
     restart: unless-stopped
     user: root
     healthcheck:
-      test: [CMD, wget, --no-verbose, --tries=1, --spider, 'http://localhost:9633/metrics']
+      test:
+        - CMD
+        - wget
+        - --no-verbose
+        - --tries=1
+        - --spider
+        - 'http://localhost:9633/metrics'
       start_period: 15s
       interval: 30s
       timeout: 5s

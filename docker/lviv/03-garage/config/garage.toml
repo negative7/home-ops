@@ -4,12 +4,12 @@ db_engine = "lmdb"
 
 replication_factor = 1
 
-rpc_bind_addr = "[::]:9001"
+rpc_bind_addr = "10.2.0.10:9001"
 
 [s3_api]
 s3_region = "us-east-1"
-api_bind_addr = "[::]:9000"
+api_bind_addr = "10.2.0.10:9000"
 
 [admin]
-api_bind_addr = "[::]:9002"
+api_bind_addr = "10.2.0.10:9002"
 metrics_require_token = true

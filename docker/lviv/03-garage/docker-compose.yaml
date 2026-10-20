@@ -31,11 +31,13 @@ services:
     restart: unless-stopped
     logging:
       driver: json-file
-    network_mode: host
+    # Bridge networking so Docker publishes it on VLAN20 only (daemon.json "ip")
+    ports:
+      - 3909:3909
     environment:
       - PORT=3909
-      - API_BASE_URL=http://localhost:9002
-      - S3_ENDPOINT_URL=http://localhost:9000
+      - API_BASE_URL=http://10.2.0.10:9002
+      - S3_ENDPOINT_URL=http://10.2.0.10:9000
       - S3_REGION=us-east-1
       - API_ADMIN_KEY=${GARAGE_ADMIN_TOKEN}
     volumes:
