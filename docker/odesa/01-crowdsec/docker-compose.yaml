@@ -4,7 +4,8 @@ name: crowdsec
 
 services:
   crowdsec:
-    image: ghcr.io/crowdsecurity/crowdsec:v1.8.1@sha256:0f2523fa61ef507f15d953045cface490cc880670c62f2755ced17524107f71a
+    # -debian variant ships journalctl, which the journald acquisition shells out to
+    image: ghcr.io/crowdsecurity/crowdsec:v1.8.1-debian@sha256:ab1bdb61a072154d478ad6c625b8e62c7f79a727b2740209d2128dd51d69d58d
     container_name: crowdsec
     restart: unless-stopped
     environment:
@@ -14,11 +15,14 @@ services:
     volumes:
       - /var/log:/var/log:ro
       - /run/systemd/journal:/run/systemd/journal:ro
+      # journalctl only opens /var/log/journal/<machine-id> for the local machine-id
+      - /etc/machine-id:/etc/machine-id:ro
       - crowdsec-db:/var/lib/crowdsec/data
       - crowdsec-config:/etc/crowdsec
       - ./scenarios:/etc/crowdsec/scenarios/custom:ro
       - ./whitelists:/etc/crowdsec/parsers/s02-enrich/custom:ro
-      - ./acquis.d:/etc/crowdsec/acquis.d/custom:ro
+      # crowdsec does not recurse into subdirectories of acquis.d
+      - ./acquis.d:/etc/crowdsec/acquis.d:ro
       - ./config/config.yaml.local:/etc/crowdsec/config.yaml.local:ro
     ports:
       - "127.0.0.1:8088:8080"
