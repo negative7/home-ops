@@ -54,7 +54,7 @@ machine:
         rsize=1048576
         wsize=1048576
   install:
-    image: factory.talos.dev/metal-installer/93c74e897f4963c075e4c2dc1544617e06729ad41bed425a672302e1b00c69b0:v1.14.4
+    image: factory.talos.dev/metal-installer/c0986b75e6403ad8ca29191038bc6628931d35cbb24eb0e4220dfdf6c141f5ad:v1.14.4
   kernel:
     modules:
       - name: dm_thin_pool # miroir lvmthin backend
@@ -67,6 +67,10 @@ machine:
     defaultRuntimeSeccompProfileEnabled: true
     disableManifestsDirectory: true
     extraConfig:
+      crashLoopBackOff:
+        maxContainerRestartPeriod: 60s
+      imageMaximumGCAge: 168h
+      maxParallelImagePulls: 3
       maxPods: 150
       serializeImagePulls: false
       shutdownGracePeriod: 120s # mandatory for miroir/DRBD to release cleanly on reboot
@@ -159,23 +163,6 @@ cluster:
   proxy:
     disabled: true
     image: registry.k8s.io/kube-proxy:v1.37.1
-  scheduler:
-    extraArgs:
-      bind-address: 0.0.0.0
-    image: registry.k8s.io/kube-scheduler:v1.37.1
-    config:
-      apiVersion: kubescheduler.config.k8s.io/v1
-      kind: KubeSchedulerConfiguration
-      profiles:
-        - schedulerName: default-scheduler
-          pluginConfig:
-            - name: PodTopologySpread
-              args:
-                defaultingType: List
-                defaultConstraints:
-                  - maxSkew: 1
-                    topologyKey: kubernetes.io/hostname
-                    whenUnsatisfiable: ScheduleAnyway
   secretboxEncryptionSecret: op://home-cluster/home-ops/CLUSTER_SECRETBOXENCRYPTIONSECRET
   serviceAccount:
     key: op://home-cluster/home-ops/CLUSTER_SERVICEACCOUNT_KEY
@@ -209,6 +196,57 @@ apiVersion: v1alpha1
 kind: KmsgLogConfig
 name: victoria-logs
 url: tcp://127.0.0.1:13333/
+{% if ENV.IS_CONTROLPLANE %}
+---
+apiVersion: v1alpha1
+kind: KubeAuthenticationConfig
+configuration:
+  anonymous:
+    conditions:
+      - path: /livez
+      - path: /readyz
+      - path: /healthz
+    enabled: true
+  jwt: []
+---
+apiVersion: v1alpha1
+kind: KubeSchedulerConfig
+config:
+  profiles:
+    - schedulerName: default-scheduler
+      plugins:
+        score:
+          disabled:
+            - name: ImageLocality
+      pluginConfig:
+        - name: PodTopologySpread
+          args:
+            defaultingType: List
+            defaultConstraints:
+              - maxSkew: 1
+                topologyKey: kubernetes.io/hostname
+                whenUnsatisfiable: ScheduleAnyway
+extraArgs:
+  bind-address: 0.0.0.0
+image: registry.k8s.io/kube-scheduler:v1.37.1
+{% endif %}
+---
+apiVersion: v1alpha1
+kind: FilesystemTrimConfig
+interval: 168h0m0s
+---
+apiVersion: v1alpha1
+kind: FilesystemScrubConfig
+interval: 168h0m0s
+---
+apiVersion: v1alpha1
+kind: EtcFileConfig
+name: nfs.conf
+mode: 0o644
+contents: |
+  [nfsrahead]
+  nfs4=16384
+  default=128
 ---
 apiVersion: v1alpha1
 kind: WatchdogTimerConfig
