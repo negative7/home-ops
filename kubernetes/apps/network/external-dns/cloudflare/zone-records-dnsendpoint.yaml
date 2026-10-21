@@ -22,7 +22,7 @@ spec:
     - dnsName: _dmarc.negative7.com
       recordType: TXT
       targets:
-        - v=DMARC1; p=quarantine; rua=mailto:admin@negative7.com
+        - v=DMARC1; p=reject; rua=mailto:admin@negative7.com
       providerSpecific:
         - &unproxied
           name: external-dns.alpha.kubernetes.io/cloudflare-proxied
