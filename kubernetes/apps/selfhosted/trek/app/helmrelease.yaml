@@ -23,7 +23,7 @@ spec:
             image:
               # renovate: datasource=docker depName=mauriceboe/trek
               repository: mauriceboe/trek
-              tag: 4.3.3@sha256:1ef1ccf41af8ae409e0435518facb5789b6adc99681ef26d1869508355455749
+              tag: 4.3.4@sha256:6b7c8f275cc0ff3ca44979084bf078f553c96a0564493a132c1631ffaf6c3e77
             env:
               ALLOWED_ORIGINS: https://travel.negative7.com
               APP_URL: https://travel.negative7.com
