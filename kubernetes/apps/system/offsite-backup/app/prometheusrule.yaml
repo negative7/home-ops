@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: offsite-backup-rules
+spec:
+  groups:
+    - name: offsite-backup.rules
+      rules:
+        - alert: OffsiteBackupStale
+          expr: |-
+            time() - kube_cronjob_status_last_successful_time{namespace="system", cronjob="offsite-backup"} > 129600
+          for: 1h
+          annotations:
+            summary: >-
+              The B2 offsite backup has not succeeded in over 36 hours
+          labels:
+            severity: warning
