@@ -103,7 +103,7 @@ services:
 
   qui:
     container_name: qui
-    image: ghcr.io/autobrr/qui:v1.32.0
+    image: ghcr.io/autobrr/qui:v1.33.1
     user: "2000:2000"
     restart: unless-stopped
     logging:
