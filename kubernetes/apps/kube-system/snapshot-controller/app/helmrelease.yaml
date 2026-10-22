@@ -9,17 +9,13 @@ spec:
   chartRef:
     kind: OCIRepository
     name: snapshot-controller
+  # The chart ships upstream CRDs in crds/; CreateReplace keeps them upgraded
   install:
     crds: CreateReplace
   upgrade:
     crds: CreateReplace
-  dependsOn:
-    - name: cert-manager
-      namespace: cert-manager
   values:
-    # Keep the CRDs (and every VolumeSnapshot) when this release stops owning them
-    keepCRDs: true
-    controller:
-      replicaCount: 1
+    replicaCount: 1
+    monitoring:
       serviceMonitor:
-        create: true
+        enabled: true
