@@ -11,6 +11,9 @@ spec:
   interval: 30m
   values:
     fullnameOverride: victoria-logs
+    global:
+      image:
+        registry: quay.io
     server:
       persistentVolume:
         enabled: true
@@ -19,7 +22,8 @@ spec:
       retentionPeriod: 14d
       route:
         enabled: true
-        hostnames: [victoria-logs.negative7.com]
+        hostnames:
+          - victoria-logs.negative7.com
         parentRefs:
           - name: envoy-internal
             namespace: network

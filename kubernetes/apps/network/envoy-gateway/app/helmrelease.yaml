@@ -10,6 +10,8 @@ spec:
     name: envoy-gateway
   interval: 30m
   values:
+    global:
+      imageRegistry: mirror.gcr.io
     config:
       envoyGateway:
         extensionApis:
