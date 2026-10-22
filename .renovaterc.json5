@@ -38,5 +38,19 @@
       matchPackageNames: ["code.forgejo.org/forgejo/forgejo"],
       allowedVersions: "!/^v?17\\.0\\.0$/",
     },
+    {
+      description: "Pin container image digests (not chart OCIRepositories)",
+      matchDatasources: ["docker"],
+      matchManagers: ["helm-values", "kubernetes", "docker-compose"],
+      pinDigests: true,
+    },
+    {
+      description: "Batch digest pins into a single PR",
+      matchUpdateTypes: ["pinDigest"],
+      groupName: "container digests",
+      group: {
+        commitMessageTopic: "{{{groupName}}}",
+      },
+    },
   ],
 }
