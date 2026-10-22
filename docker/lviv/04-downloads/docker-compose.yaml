@@ -5,7 +5,7 @@ services:
   sabnzbd:
     container_name: sabnzbd
     hostname: sabnzbd.internal
-    image: ghcr.io/home-operations/sabnzbd:5.1.3
+    image: ghcr.io/home-operations/sabnzbd:5.1.3@sha256:c89b0322721c3eba47221e5f916505e7e742684651f73c5215717340b6b5402f
     user: "2000:2000"
     restart: unless-stopped
     logging:
@@ -33,7 +33,7 @@ services:
   gluetun:
     container_name: gluetun
     hostname: gluetun.internal
-    image: qmcgaw/gluetun:v3.41.3
+    image: qmcgaw/gluetun:v3.41.3@sha256:fa19cc76b2af13d57a8d3dc3066f2ada061b1c761b8aecf989b3877c0486e027
     restart: unless-stopped
     logging:
       driver: json-file
@@ -75,7 +75,7 @@ services:
 
   qbittorrent:
     container_name: qbittorrent
-    image: ghcr.io/home-operations/qbittorrent:5.3.0
+    image: ghcr.io/home-operations/qbittorrent:5.3.0@sha256:faa37907a4242c6c3c5fdd3f7ea95e0c2308534406f4d606ba64d816e764d39f
     user: "2000:2000"
     restart: unless-stopped
     logging:
@@ -103,7 +103,7 @@ services:
 
   qui:
     container_name: qui
-    image: ghcr.io/autobrr/qui:v1.33.1
+    image: ghcr.io/autobrr/qui:v1.33.1@sha256:c83ce0370ab372c931ccb3f0ddd0eb1bc850026ce9eafc13ce94443f6f2a2cd3
     user: "2000:2000"
     restart: unless-stopped
     logging:
@@ -123,7 +123,7 @@ services:
   autobrr:
     container_name: autobrr
     hostname: autobrr.internal
-    image: ghcr.io/autobrr/autobrr:v1.89.0
+    image: ghcr.io/autobrr/autobrr:v1.89.0@sha256:60efc357e1852f1cd337b8c26d65c5299feadbb4f364c89299b1eede5d159ce4
     user: "2000:2000"
     restart: unless-stopped
     logging:
