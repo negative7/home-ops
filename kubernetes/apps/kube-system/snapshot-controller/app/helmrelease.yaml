@@ -17,6 +17,8 @@ spec:
     - name: cert-manager
       namespace: cert-manager
   values:
+    # Keep the CRDs (and every VolumeSnapshot) when this release stops owning them
+    keepCRDs: true
     controller:
       replicaCount: 1
       serviceMonitor:
