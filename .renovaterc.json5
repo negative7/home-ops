@@ -45,6 +45,17 @@
       pinDigests: true,
     },
     {
+      // The forgejo chart appends "-rootless" unless the tag *ends* with it, so a
+      // tag@digest becomes "…@sha256:…-rootless" (InvalidImageName, outage 2026-10-22).
+      // Talos/Kubernetes component images stay on plain tags, matching onedr0p and bjw-s.
+      description: "Never pin digests where the consumer builds the image ref itself",
+      matchFileNames: [
+        "kubernetes/apps/dev/forgejo/app/**",
+        "kubernetes/talos/**",
+      ],
+      pinDigests: false,
+    },
+    {
       description: "Batch digest pins into a single PR",
       matchUpdateTypes: ["pinDigest"],
       groupName: "container digests",
