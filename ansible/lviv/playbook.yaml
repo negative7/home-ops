@@ -105,11 +105,6 @@
             fsid: 86a3b8c1-486d-4dba-9c87-a1c1496707ea
             clients: 10.2.0.0/24
             options: rw,sync,no_subtree_check
-          # Removed after the kopiur → Garage migration (Phase 8)
-          - path: /mnt/tank/kopia
-            fsid: cbbc97c9-3dcf-44ce-92eb-d9f9aea2bffe
-            clients: 10.2.0.0/24
-            options: rw,sync,no_subtree_check,all_squash,anonuid=2000,anongid=2000
           - path: /mnt/tank/backups/adguard
             fsid: f11a6dff-f103-4386-8de0-2673ea390f12
             clients: 10.0.5.3
