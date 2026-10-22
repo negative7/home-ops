@@ -15,6 +15,51 @@
       ignoreTests: false,
     },
     {
+      // Same tag, new digest (rebuild) or first-time pin: the version doesn't change.
+      // Floating tags are excluded because a new digest there means new code.
+      description: "Auto-merge digest pins and rebuilds of versioned tags",
+      matchDatasources: ["docker"],
+      matchUpdateTypes: ["pinDigest", "digest"],
+      matchCurrentValue: "!/^(main|master|latest|release|rolling|edge|nightly)$/",
+      automerge: true,
+      automergeType: "pr",
+      ignoreTests: false,
+    },
+    {
+      // Patch releases of apps and charts, after a 3-day soak so regressions surface upstream first.
+      // Core infrastructure is excluded and always gets a manual review.
+      description: "Auto-merge patch updates outside core infrastructure",
+      matchDatasources: ["docker"],
+      matchUpdateTypes: ["patch"],
+      matchPackageNames: [
+        "*",
+        "!/forgejo/",
+        "!/cilium/",
+        "!/coredns/",
+        "!/cloudnative-pg/",
+        "!/postgres/",
+        "!/kanidm/",
+        "!/miroir/",
+        "!/kopi/",
+        "!/flux/",
+        "!/siderolabs/",
+        "!/kube-apiserver|kube-controller-manager|kube-scheduler|kubelet/",
+        "!/envoy/",
+        "!/spegel/",
+        "!/multus/",
+        "!/cert-manager|trust-manager/",
+        "!/external-secrets/",
+        "!/1password/",
+        "!/tuppr/",
+      ],
+      minimumReleaseAge: "3 days",
+      // Some registries return no release timestamp; don't hold those updates forever
+      minimumReleaseAgeBehaviour: "timestamp-optional",
+      automerge: true,
+      automergeType: "pr",
+      ignoreTests: false,
+    },
+    {
       description: "Auto-merge high-cadence OCI packages weekly",
       matchDatasources: ["docker"],
       matchUpdateTypes: ["minor", "patch"],
@@ -26,6 +71,14 @@
       automergeType: "pr",
       ignoreTests: false,
       schedule: ["before 6am on Monday"],
+    },
+    {
+      description: "Auto-merge dev tooling (mise) minor and patch updates",
+      matchManagers: ["mise"],
+      matchUpdateTypes: ["minor", "patch"],
+      automerge: true,
+      automergeType: "pr",
+      ignoreTests: false,
     },
     {
       description: "Auto-merge Grafana dashboards",
