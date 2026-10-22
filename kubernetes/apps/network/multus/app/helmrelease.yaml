@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -10,15 +10,8 @@ spec:
     name: multus
   interval: 30m
   values:
-    multus:
-      image:
-        repository: ghcr.io/k8snetworkplumbingwg/multus-cni
-        tag: v4.3.1@sha256:9dc8ca645a78552ed4151cf67c2998d18f260f172cc541580d8acce2ee3495c2
-      resources:
-        requests:
-          cpu: 10m
-        limits:
-          memory: 32Mi
-    cni:
-      netPath: /etc/cni/net.d
-      binPath: /opt/cni/bin
+    resources:
+      requests:
+        cpu: 10m
+      limits:
+        memory: 32Mi
