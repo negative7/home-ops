@@ -279,7 +279,7 @@ configuration:
     enabled: true
   jwt: []
 ---
-# key2 + identity matches what .cluster.secretboxEncryptionSecret rendered, so existing secrets stay readable
+# key3 replaced the leaked key2 on 2026-10-21; identity stays as a read fallback
 apiVersion: v1alpha1
 kind: KubeEtcdEncryptionConfig
 config:
@@ -287,8 +287,8 @@ config:
     - providers:
         - secretbox:
             keys:
-              - name: key2
-                secret: op://home-cluster/home-ops/CLUSTER_SECRETBOXENCRYPTIONSECRET
+              - name: key3
+                secret: op://home-cluster/home-ops/CLUSTER_SECRETBOX_KEY3
         - identity: {}
       resources:
         - secrets
