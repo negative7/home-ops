@@ -18,8 +18,9 @@ spec:
             resets(node_boot_time_seconds[15m]) > 0
           labels:
             severity: warning
-        # Textfile metric from odesa's 04-exporters (Debian /run/reboot-required). Unattended-upgrades
-        # installs ~06:00 and reboots at 03:00, so only alert when that nightly reboot was missed.
+        # Textfile metric from odesa's 04-exporters and lviv's reboot-required-metric timer (Debian
+        # /run/reboot-required). Unattended-upgrades installs ~06:00 and reboots at 03:00 (odesa) /
+        # 05:00 (lviv), so only alert when that nightly reboot was missed.
         - alert: NodeRebootRequired
           annotations:
             summary: Node {{$labels.instance}} has installed updates that need a reboot.

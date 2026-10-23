@@ -396,6 +396,107 @@
             state: started
             daemon_reload: true
 
+    # Debian + Debian-Security origins only (the stock 50unattended-upgrades): Docker, zfs-dkms
+    # (backports) and the other third-party repos stay manual. Reboots after kopiur's 03:00
+    # full maintenance; NFS/Garage clients in the cluster just stall for the few minutes it takes
+    - name: unattended-upgrades
+      tags:
+        - unattended-upgrades
+      vars:
+        auto_reboot_time: "05:00"
+        textfile_dir: /var/lib/node-exporter/textfile
+      block:
+        - name: unattended-upgrades | Install
+          ansible.builtin.apt:
+            name: unattended-upgrades
+            state: present
+            update_cache: true
+            cache_valid_time: 3600
+
+        - name: unattended-upgrades | Enable periodic security upgrades
+          ansible.builtin.copy:
+            dest: /etc/apt/apt.conf.d/20auto-upgrades
+            content: |
+              APT::Periodic::Update-Package-Lists "1";
+              APT::Periodic::Unattended-Upgrade "1";
+            owner: root
+            group: root
+            mode: "0644"
+
+        - name: unattended-upgrades | Enable timers
+          ansible.builtin.systemd_service:
+            name: "{{ item }}"
+            enabled: true
+            state: started
+          loop:
+            - apt-daily.timer
+            - apt-daily-upgrade.timer
+
+        # NodeRebootRequired only fires if this didn't happen (see kube-prometheus-stack prometheusrules)
+        - name: unattended-upgrades | Reboot automatically when required
+          ansible.builtin.copy:
+            dest: /etc/apt/apt.conf.d/52unattended-upgrades-reboot
+            content: |
+              Unattended-Upgrade::Automatic-Reboot "true";
+              Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+              Unattended-Upgrade::Automatic-Reboot-Time "{{ auto_reboot_time }}";
+            owner: root
+            group: root
+            mode: "0644"
+
+        # node_reboot_required for node-exporter's textfile collector (dir is created by the zfs block)
+        - name: unattended-upgrades | Reboot-required metric script
+          ansible.builtin.copy:
+            dest: /usr/local/bin/reboot-required-metric
+            content: |
+              #!/bin/sh
+              # Managed by ansible. unattended-upgrades drops /run/reboot-required when an update needs a reboot
+              set -eu
+              out={{ textfile_dir }}/reboot.prom
+              if [ -f /run/reboot-required ]; then v=1; else v=0; fi
+              printf '# HELP node_reboot_required 1 if the host has pending updates that need a reboot.\n# TYPE node_reboot_required gauge\nnode_reboot_required %s\n' "$v" > "$out.tmp"
+              mv "$out.tmp" "$out"
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: unattended-upgrades | Reboot-required metric units
+          ansible.builtin.copy:
+            dest: "/etc/systemd/system/{{ item.name }}"
+            content: "{{ item.content }}"
+            owner: root
+            group: root
+            mode: "0644"
+          loop:
+            - name: reboot-required-metric.service
+              content: |
+                [Unit]
+                Description=Write the reboot-required metric for node-exporter
+
+                [Service]
+                Type=oneshot
+                ExecStart=/usr/local/bin/reboot-required-metric
+            - name: reboot-required-metric.timer
+              content: |
+                [Unit]
+                Description=Write the reboot-required metric every 5 minutes
+
+                [Timer]
+                OnBootSec=1min
+                OnUnitActiveSec=5min
+
+                [Install]
+                WantedBy=timers.target
+          loop_control:
+            label: "{{ item.name }}"
+
+        - name: unattended-upgrades | Enable reboot-required metric timer
+          ansible.builtin.systemd_service:
+            name: reboot-required-metric.timer
+            enabled: true
+            state: started
+            daemon_reload: true
+
     - name: Read secrets from 1Password
       ansible.builtin.shell: "op read 'op://{{ item.key }}' < /dev/null"
       delegate_to: localhost
