@@ -113,7 +113,6 @@
           - {name: data, path: /mnt/tank/data}
           - {name: backups, path: /mnt/tank/backups}
           - {name: docs, path: /mnt/tank/docs}
-          - {name: media, path: /mnt/tank/media}
       block:
         # Lets services bind 10.2.0.10 at boot before DHCP has assigned it
         - name: services | Allow binding addresses that are not up yet
