@@ -28,7 +28,6 @@ spec:
   postBuild:
     substitute:
       APP: immich
-      APP_NAMESPACE: selfhosted
       SUBDOMAIN: photos
       DATABASE_EXTENSIONS: |
         [
@@ -39,7 +38,7 @@ spec:
         ]
       OIDC_DISPLAY_NAME: "Immich"
       OIDC_CALLBACK: /auth/login
-      OIDC_EXTRA_CALLBACKS: "[\"app.immich:///oauth-callback\", \"https://immich.negative7.com/user-settings\"]"
+      OIDC_STRICT_REDIRECT: "false"
       OIDC_LEGACY_CRYPTO: "true"
   prune: true
   sourceRef:

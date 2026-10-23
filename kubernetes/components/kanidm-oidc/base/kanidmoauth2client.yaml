@@ -1,0 +1,28 @@
+---
+# Adopts an existing Kanidm client of the same name; the operator writes the
+# `${APP}-kanidm-oauth2-credentials` secret (CLIENT_ID/CLIENT_SECRET + aliases)
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmOAuth2Client
+metadata:
+  name: ${APP}
+spec:
+  kanidmRef:
+    name: kanidm
+    namespace: security
+  displayname: ${OIDC_DISPLAY_NAME:=${APP}}
+  origin: https://${SUBDOMAIN:=${APP}}.negative7.com${OIDC_ORIGIN:=/}
+  redirectUrl: ${OIDC_REDIRECT_URLS:=["https://${SUBDOMAIN:=${APP}}.negative7.com${OIDC_CALLBACK:=/oauth2/callback}"]}
+  scopeMap:
+    - group: ${OIDC_GROUP:=apps}
+      scopes: ${OIDC_SCOPES:=["openid", "profile", "email", "groups"]}
+  strictRedirectUrl: ${OIDC_STRICT_REDIRECT:=true}
+  preferShortUsername: ${OIDC_SHORT_USERNAME:=false}
+  allowInsecureClientDisablePkce: ${OIDC_DISABLE_PKCE:=false}
+  jwtLegacyCryptoEnable: ${OIDC_LEGACY_CRYPTO:=false}
+  secretKeyAliases:
+    clientId:
+      - ${OIDC_CLIENT_ID_KEY:=client-id}
+    clientSecret:
+      - ${OIDC_CLIENT_SECRET_KEY:=client-secret}
+  image:
+    url: ${OIDC_IMAGE_URL:=https://cdn.jsdelivr.net/gh/selfhst/icons/svg/${APP}.svg}

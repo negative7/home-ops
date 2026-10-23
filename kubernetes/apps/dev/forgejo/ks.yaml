@@ -27,7 +27,6 @@ spec:
   postBuild:
     substitute:
       APP: forgejo
-      APP_NAMESPACE: dev
       KOPIUR_MOVER_UID: "1000"
       KOPIUR_MOVER_GID: "1000"
       KOPIUR_CAPACITY: 10Gi
@@ -37,7 +36,6 @@ spec:
       SUBDOMAIN: git
       OIDC_CLIENT_ID_KEY: key
       OIDC_CLIENT_SECRET_KEY: secret
-      OIDC_SCOPES: '["openid", "profile", "email", "groups"]'
   prune: true
   sourceRef:
     kind: GitRepository

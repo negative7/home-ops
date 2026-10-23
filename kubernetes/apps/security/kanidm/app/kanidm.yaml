@@ -1,0 +1,60 @@
+---
+apiVersion: kaniop.rs/v1beta1
+kind: Kanidm
+metadata:
+  name: kanidm
+spec:
+  domain: idm.negative7.com
+  origin: https://idm.negative7.com
+  image: docker.io/kanidm/server:1.11.2@sha256:e45f00bd354c1fc1c06a4be484b4e87b094c431e78280f1d19e911815e63efb5
+  logLevel: info
+  env:
+    - name: TZ
+      value: America/New_York
+  oauth2ClientNamespaceSelector: {}
+  replicaGroups:
+    - name: default
+      replicas: 1
+      primaryNode: true
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          memory: 512Mi
+  # PVC is also managed by the kopiur backup component (KOPIUR_CLAIM in ks.yaml)
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+        storageClassName: miroir-replicated
+  tlsSecretName: idm-negative7-com-tls
+  securityContext:
+    fsGroup: 2000
+    fsGroupChangePolicy: OnRootMismatch
+    runAsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 2000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: kanidm
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+  gateway:
+    parentRefs:
+      - name: envoy-external
+        namespace: network
+    hostnames:
+      - idm.negative7.com
+    backendTlsPolicy:
+      validation:
+        hostname: idm.negative7.com
+        wellKnownCaCertificates: System
