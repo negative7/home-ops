@@ -25,6 +25,8 @@ spec:
       news_feed_enabled: 'false'
     plugins:
       plugin_admin_enabled: 'false'
+      # Auto-updating bundled plugins deletes them from the read-only root FS, leaving them unregistered
+      preinstall_auto_update: 'false'
     security:
       angular_support_enabled: 'true'
     server:
