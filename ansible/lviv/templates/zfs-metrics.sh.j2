@@ -1,0 +1,45 @@
+#!/bin/sh
+# Managed by ansible. Writes ZFS pool capacity and sanoid snapshot metrics for node-exporter's
+# textfile collector; node-exporter has no zpool size or snapshot metrics of its own
+set -eu
+
+out={{ zfs_textfile_dir }}/zfs.prom
+tmp="$out.tmp"
+
+{
+  zpool list -Hp -o name,size,alloc,frag | awk -F '\t' '
+    { size[$1] = $2; alloc[$1] = $3; frag[$1] = ($4 == "-" ? "NaN" : $4 / 100) }
+    END {
+      print "# HELP zfs_pool_size_bytes Total pool size."
+      print "# TYPE zfs_pool_size_bytes gauge"
+      for (p in size) printf "zfs_pool_size_bytes{pool=\"%s\"} %s\n", p, size[p]
+      print "# HELP zfs_pool_allocated_bytes Space allocated in the pool."
+      print "# TYPE zfs_pool_allocated_bytes gauge"
+      for (p in alloc) printf "zfs_pool_allocated_bytes{pool=\"%s\"} %s\n", p, alloc[p]
+      print "# HELP zfs_pool_fragmentation_ratio Free-space fragmentation of the pool."
+      print "# TYPE zfs_pool_fragmentation_ratio gauge"
+      for (p in frag) printf "zfs_pool_fragmentation_ratio{pool=\"%s\"} %s\n", p, frag[p]
+    }'
+
+  # Only sanoid's autosnap_* count, so manual snapshots don't mask a stalled timer
+  zfs list -Hp -t snapshot -o name,creation | awk -F '\t' '
+    $1 ~ /@autosnap_/ { split($1, s, "@"); if ($2 > newest[s[1]]) newest[s[1]] = $2 }
+    END {
+      print "# HELP zfs_dataset_newest_snapshot_timestamp_seconds Creation time of the newest sanoid snapshot."
+      print "# TYPE zfs_dataset_newest_snapshot_timestamp_seconds gauge"
+      for (d in newest) printf "zfs_dataset_newest_snapshot_timestamp_seconds{dataset=\"%s\"} %s\n", d, newest[d]
+    }'
+
+  zfs list -Hp -t filesystem -o name,usedbysnapshots | awk -F '\t' '
+    BEGIN {
+      print "# HELP zfs_dataset_used_by_snapshots_bytes Space held only by snapshots."
+      print "# TYPE zfs_dataset_used_by_snapshots_bytes gauge"
+    }
+    { printf "zfs_dataset_used_by_snapshots_bytes{dataset=\"%s\"} %s\n", $1, $2 }'
+
+  echo "# HELP zfs_metrics_timestamp_seconds When this file was last written."
+  echo "# TYPE zfs_metrics_timestamp_seconds gauge"
+  echo "zfs_metrics_timestamp_seconds $(date +%s)"
+} > "$tmp"
+
+mv "$tmp" "$out"

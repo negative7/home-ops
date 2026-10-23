@@ -270,6 +270,7 @@
       tags:
         - zfs
       vars:
+        zfs_textfile_dir: /var/lib/node-exporter/textfile
         zfs_datasets:
           - name: tank
             properties: {dnodesize: auto}
@@ -340,6 +341,60 @@
             name: sanoid.timer
             enabled: true
             state: started
+
+        # node-exporter (docker/lviv/02-exporters) reads this through its /host/root bind mount
+        - name: zfs | Textfile collector directory
+          ansible.builtin.file:
+            path: "{{ zfs_textfile_dir }}"
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: zfs | Metrics script
+          ansible.builtin.template:
+            src: templates/zfs-metrics.sh.j2
+            dest: /usr/local/bin/zfs-metrics
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: zfs | Metrics units
+          ansible.builtin.copy:
+            dest: "/etc/systemd/system/{{ item.name }}"
+            content: "{{ item.content }}"
+            owner: root
+            group: root
+            mode: "0644"
+          loop:
+            - name: zfs-metrics.service
+              content: |
+                [Unit]
+                Description=Write ZFS pool and snapshot metrics for node-exporter
+
+                [Service]
+                Type=oneshot
+                ExecStart=/usr/local/bin/zfs-metrics
+            - name: zfs-metrics.timer
+              content: |
+                [Unit]
+                Description=Write ZFS pool and snapshot metrics every 5 minutes
+
+                [Timer]
+                OnBootSec=1min
+                OnUnitActiveSec=5min
+
+                [Install]
+                WantedBy=timers.target
+          loop_control:
+            label: "{{ item.name }}"
+
+        - name: zfs | Enable metrics timer
+          ansible.builtin.systemd_service:
+            name: zfs-metrics.timer
+            enabled: true
+            state: started
+            daemon_reload: true
 
     - name: Read secrets from 1Password
       ansible.builtin.shell: "op read 'op://{{ item.key }}' < /dev/null"
