@@ -8,4 +8,5 @@ components:
   - ../../components/kopiur/secret
 resources:
   - ./namespace.yaml
+  - ./kaniop/ks.yaml
   - ./kanidm/ks.yaml

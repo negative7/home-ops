@@ -16,10 +16,8 @@ spec:
   postBuild:
     substitute:
       APP: trek
-      APP_NAMESPACE: selfhosted
       ANUBIS_TARGET: http://trek.selfhosted.svc.cluster.local:3000
       OIDC_CALLBACK: /api/auth/oidc/callback
-      OIDC_SCOPES: '["openid", "profile", "email", "groups"]'
       SUBDOMAIN: travel
   prune: true
   sourceRef:

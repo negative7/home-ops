@@ -14,6 +14,6 @@ spec:
       issuer: "https://idm.negative7.com/oauth2/openid/${APP}"
     clientID: *app
     clientSecret:
-      name: "kanidm-${APP}-oidc"
+      name: "${APP}-kanidm-oauth2-credentials"
     redirectURL: "https://${SUBDOMAIN:=${APP}}.negative7.com/oauth2/callback"
     logoutPath: "/logout"

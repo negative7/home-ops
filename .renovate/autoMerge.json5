@@ -38,7 +38,7 @@
         "!/coredns/",
         "!/cloudnative-pg/",
         "!/postgres/",
-        "!/kanidm/",
+        "!/kanidm|kaniop/",
         "!/miroir/",
         "!/kopi/",
         "!/flux/",
