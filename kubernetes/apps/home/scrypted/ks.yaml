@@ -29,5 +29,5 @@ spec:
   postBuild:
     substitute:
       APP: *appname
-      KOPIUR_CAPACITY: 5Gi
+      KOPIUR_CAPACITY: 20Gi
       KOPIUR_STORAGECLASS: miroir-replicated
