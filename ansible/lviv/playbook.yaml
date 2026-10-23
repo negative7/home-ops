@@ -101,6 +101,10 @@
             fsid: aa97f48c-9715-4e14-9a52-0517f1ed5438
             clients: 10.2.0.0/24
             options: rw,sync,no_subtree_check
+          - path: /mnt/tank/data/immich
+            fsid: 7c5941bd-898b-4626-9e5d-14202926a1a8
+            clients: 10.2.0.0/24
+            options: rw,sync,no_subtree_check
           - path: /mnt/tank/backups/plex
             fsid: 86a3b8c1-486d-4dba-9c87-a1c1496707ea
             clients: 10.2.0.0/24
