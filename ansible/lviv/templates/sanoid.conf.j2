@@ -1,0 +1,64 @@
+# Managed by ansible. The most specific section wins; nothing is recursive except Garage,
+# whose meta and data must be snapshotted atomically (zfs snapshot -r)
+[tank/data/immich]
+  use_template = critical
+  hourly = 24
+  monthly = 12
+
+[tank/apps]
+  use_template = critical
+
+[tank/apps/garage]
+  use_template = backup_target
+  recursive = zfs
+
+[tank/backups]
+  use_template = backup_target
+  daily = 14
+  monthly = 3
+
+[tank/alex]
+  use_template = archive
+
+[tank/home]
+  use_template = user
+
+[tank/data]
+  use_template = light
+
+#### templates
+[template_critical]
+  hourly = 36
+  daily = 30
+  monthly = 6
+  autosnap = yes
+  autoprune = yes
+
+[template_archive]
+  hourly = 0
+  daily = 30
+  monthly = 12
+  autosnap = yes
+  autoprune = yes
+
+[template_backup_target]
+  hourly = 0
+  daily = 7
+  weekly = 4
+  monthly = 0
+  autosnap = yes
+  autoprune = yes
+
+[template_user]
+  hourly = 24
+  daily = 14
+  monthly = 3
+  autosnap = yes
+  autoprune = yes
+
+[template_light]
+  hourly = 0
+  daily = 7
+  monthly = 0
+  autosnap = yes
+  autoprune = yes
