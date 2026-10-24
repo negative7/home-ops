@@ -1,0 +1,12 @@
+# Managed by ansible
+[Unit]
+Description=AdGuard Home Backup
+RequiresMountsFor={{ adguard_backup_dir }}
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/adguard-backup.sh
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths={{ adguard_backup_dir }} /tmp
+SyslogIdentifier=adguard-backup

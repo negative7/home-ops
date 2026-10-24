@@ -40,8 +40,22 @@
       - 1.1.1.1
     container_binds: []
     adguard_service: AdGuardHome.service
+    # Installed in the container when missing
+    container_packages:
+      - openssh-server
+      - nfs-common
+
+    # Daily tarball of /opt/AdGuardHome to lviv over NFS (export is in the lviv playbook)
+    adguard_backup_nfs: 10.2.0.10:/mnt/tank/backups/adguard
+    adguard_backup_dir: /mnt/tank/backups/adguard
+    adguard_backup_retention_days: 7
+    adguard_backup_schedule: "*-*-* 02:30:00"
 
   handlers:
+    - name: Reload container systemd
+      ansible.builtin.command: "systemctl --machine={{ container_name }} daemon-reload"
+      changed_when: true
+
     - name: Restart container networkd
       ansible.builtin.command: "systemctl --machine={{ container_name }} restart systemd-networkd.service"
       changed_when: true
@@ -176,18 +190,17 @@
           delay: 5
           until: container_state is not failed
 
-        - name: container | Check for sshd
-          ansible.builtin.stat:
-            path: "{{ container_rootfs }}/usr/sbin/sshd"
-          register: container_sshd
-
-        - name: container | Install openssh-server
+        - name: container | Install packages
           ansible.builtin.command: >-
             systemd-run --machine={{ container_name }} --wait --pipe --quiet
             --setenv=DEBIAN_FRONTEND=noninteractive
-            /bin/sh -c 'apt-get update -qq && apt-get install -y openssh-server'
-          when: not container_sshd.stat.exists
-          changed_when: true
+            /bin/sh -c 'missing="";
+            for p in {{ container_packages | join(" ") }}; do
+            dpkg-query -W -f="\${Status}" "$p" 2>/dev/null | grep -q "ok installed" || missing="$missing $p"; done;
+            [ -z "$missing" ] && exit 0;
+            echo "installing:$missing" && apt-get update -qq && apt-get install -y $missing'
+          register: container_install
+          changed_when: "'installing:' in container_install.stdout"
 
         - name: container | Create /root/.ssh
           ansible.builtin.file:
@@ -226,12 +239,48 @@
             mode: "0644"
           notify: Restart container sshd
 
+        - name: container | Backup NFS mount
+          ansible.builtin.lineinfile:
+            path: "{{ container_rootfs }}/etc/fstab"
+            regexp: "^\\S+\\s+{{ adguard_backup_dir }}\\s"
+            line: "{{ adguard_backup_nfs }}  {{ adguard_backup_dir }}  nfs4  defaults,vers=4.2,_netdev,nofail,x-systemd.automount  0 0"
+          notify: Reload container systemd
+
+        - name: container | Backup script
+          ansible.builtin.template:
+            src: templates/adguard-backup.sh.j2
+            dest: "{{ container_rootfs }}/usr/local/sbin/adguard-backup.sh"
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: container | Backup units
+          ansible.builtin.template:
+            src: "templates/{{ item }}.j2"
+            dest: "{{ container_rootfs }}/etc/systemd/system/{{ item }}"
+            owner: root
+            group: root
+            mode: "0644"
+          loop:
+            - adguard-backup.service
+            - adguard-backup.timer
+          notify: Reload container systemd
+
+        - name: container | Flush handlers before enabling
+          ansible.builtin.meta: flush_handlers
+
+        # Starts the automount generated from fstab
+        - name: container | Mount remote filesystems
+          ansible.builtin.command: "systemctl --machine={{ container_name }} start remote-fs.target"
+          changed_when: false
+
         - name: container | Enable services
           ansible.builtin.command: "systemctl --machine={{ container_name }} enable --now {{ item }}"
           loop:
             - systemd-networkd.service
             - ssh.service
             - "{{ adguard_service }}"
+            - adguard-backup.timer
           register: container_enable
           changed_when: container_enable.stderr is search('Created symlink')
 

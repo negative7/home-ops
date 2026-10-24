@@ -1,0 +1,32 @@
+#!/bin/bash
+# Managed by ansible
+# Runs inside the container: tars /opt/AdGuardHome to the NFS share and prunes old archives
+set -euo pipefail
+
+AGH_SOURCE="/opt/AdGuardHome"
+NFS_MOUNT="{{ adguard_backup_dir }}"
+RETENTION_DAYS={{ adguard_backup_retention_days }}
+
+log() { echo "$*"; }
+die() { log "ERROR: $*"; exit 1; }
+
+log "Starting AdGuard Home backup"
+[[ -d "$AGH_SOURCE" ]] || die "Source directory $AGH_SOURCE not found"
+mountpoint -q "$NFS_MOUNT" || die "NFS share is not mounted at $NFS_MOUNT"
+
+BACKUP_TAR="$NFS_MOUNT/adguard_$(date '+%Y%m%d_%H%M%S').tar.gz"
+log "Destination: $BACKUP_TAR"
+
+# tar exits 1 when a file changed while it was read, which AdGuard's querylog.json always does;
+# the archive is still complete, so only fail on worse errors
+rc=0
+tar --warning=no-file-changed -czf "$BACKUP_TAR" \
+  -C "$(dirname "$AGH_SOURCE")" "$(basename "$AGH_SOURCE")" || rc=$?
+[[ $rc -le 1 ]] || die "tar failed with exit code $rc"
+log "Archive created (size: $(du -sh "$BACKUP_TAR" | cut -f1))"
+
+ln -sfn "$BACKUP_TAR" "$NFS_MOUNT/latest"
+
+PRUNED=$(find "$NFS_MOUNT" -maxdepth 1 -name "adguard_*.tar.gz" \
+  -mtime +"$RETENTION_DAYS" -print -delete | wc -l)
+log "Pruned $PRUNED backup(s) older than $RETENTION_DAYS days"
