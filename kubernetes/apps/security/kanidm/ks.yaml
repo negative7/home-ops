@@ -23,6 +23,8 @@ spec:
       failed: status.conditions.exists(c, c.type == 'Available' && c.status == 'False')
       current: status.conditions.exists(c, c.type == 'Available' && c.status == 'True')
   interval: 1h
+  # The Available health check fails while Kanidm starts; retry instead of waiting the full interval
+  retryInterval: 2m
   path: "./kubernetes/apps/security/kanidm/app"
   postBuild:
     substitute:
