@@ -50,8 +50,8 @@ spec:
               HOME: /tmp
               RCLONE_CONFIG: /tmp/rclone.conf
               RCLONE_FAST_LIST: "true"
-              RCLONE_TRANSFERS: "8"
-              RCLONE_CHECKERS: "16"
+              RCLONE_TRANSFERS: "32"
+              RCLONE_CHECKERS: "48"
               RCLONE_STATS: 5m
               RCLONE_STATS_LOG_LEVEL: NOTICE
               RCLONE_STATS_ONE_LINE: "true"
