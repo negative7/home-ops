@@ -127,8 +127,11 @@ if [[ "$DRY_RUN" == "true" ]]; then
 fi
 api="$FORGEJO_API_URL/repos/$FORGEJO_REPOSITORY/issues"
 auth=(-H "Authorization: token $FORGEJO_TOKEN" -H "Content-Type: application/json")
+# Only edit our own comment (a comment left by another account can't be edited); empty = any author
+me="$(curl -fsS "${auth[@]}" "$FORGEJO_API_URL/user" 2>/dev/null | "$JQ" -r '.login // empty' || true)"
 existing="$(curl -fsS "${auth[@]}" "$api/$PR_NUMBER/comments?limit=50" |
-  "$JQ" -r --arg m "$MARKER" '[.[] | select(.body | startswith($m))] | first | .id // empty')"
+  "$JQ" -r --arg m "$MARKER" --arg me "$me" \
+    '[.[] | select((.body | startswith($m)) and ($me == "" or .user.login == $me))] | first | .id // empty')"
 payload="$("$JQ" -n --arg b "$comment" '{body: $b}')"
 if [[ -n "$existing" ]]; then
   curl -fsS -X PATCH "${auth[@]}" -d "$payload" "$api/comments/$existing" >/dev/null
