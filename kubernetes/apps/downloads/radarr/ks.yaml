@@ -21,7 +21,10 @@ spec:
       namespace: miroir-system
     - name: kopiur
       namespace: system
+    - name: kanidm
+      namespace: security
   components:
+    - ../../../../components/kanidm-oidc/envoy
     - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
   postBuild:
@@ -29,3 +32,4 @@ spec:
       APP: *appname
       KOPIUR_CAPACITY: 2Gi
       KOPIUR_STORAGECLASS: miroir-replicated
+      OIDC_DISPLAY_NAME: Radarr
