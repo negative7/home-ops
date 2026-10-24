@@ -8,6 +8,7 @@ on:
       - main
     paths:
       - kubernetes/**
+      - docker/**
       - .forgejo/scripts/image-scan.sh
       - .forgejo/workflows/image-scan.yaml
 
@@ -50,6 +51,7 @@ jobs:
         shell: bash
         env:
           BASE_REF: ${{ forgejo.base_ref }}
+          BASE_SHA: ${{ forgejo.event.pull_request.base.sha }}
           FORGEJO_API_URL: ${{ forgejo.api_url }}
           FORGEJO_REPOSITORY: ${{ forgejo.repository }}
           # post as negative7-bot (same account as konflate); falls back to the job token

@@ -7,6 +7,9 @@ set -euo pipefail
 : "${FORGEJO_API_URL:?}" "${FORGEJO_REPOSITORY:?}" "${FORGEJO_TOKEN:?}" "${PR_NUMBER:?}"
 DRY_RUN="${DRY_RUN:-false}" # true = print the comment, don't post it
 BASE_REF="${BASE_REF:-main}"
+# The PR's base commit from the event. Renovate can merge a PR before this job fetches, and then
+# origin/main already contains HEAD and the diff comes out empty
+BASE_SHA="${BASE_SHA:-origin/${BASE_REF}}"
 GATE="${GATE:-false}" # true = fail the check when a PR introduces a fixable CRITICAL
 MAX_IMAGES="${MAX_IMAGES:-25}"
 MARKER="<!-- image-scan -->"
@@ -19,14 +22,28 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 # Diff against the merge-base so a branch that is behind main doesn't report main's newer images as removed
-base="$(git merge-base "origin/${BASE_REF}" HEAD)"
-"$FLATE" diff images -p ./kubernetes/flux/cluster --base "$base" -o json >"$WORK/new.json"
-"$FLATE" diff images -p ./kubernetes/flux/cluster --base "$base" --include-removed -o json >"$WORK/all.json"
+base="$(git merge-base "$BASE_SHA" HEAD)"
+"$FLATE" diff images -p ./kubernetes/flux/cluster --base "$base" -o json >"$WORK/flate-new.json"
+"$FLATE" diff images -p ./kubernetes/flux/cluster --base "$base" --include-removed -o json >"$WORK/flate-all.json"
+
+# Compose stacks under docker/ (lviv, odesa) aren't rendered by flate; read their image: lines from git
+compose_images() {
+  git ls-tree -r --name-only "$1" -- docker | grep -E '(^|/)docker-compose[^/]*\.ya?ml$' |
+    while read -r f; do git show "$1:$f"; done |
+    sed -nE "s/^[[:space:]]*image:[[:space:]]*[\"']?([^\"'[:space:]#]+).*/\1/p" | sort -u || true
+}
+compose_images "$base" >"$WORK/compose-base.txt"
+compose_images HEAD >"$WORK/compose-head.txt"
+comm -13 "$WORK/compose-base.txt" "$WORK/compose-head.txt" | "$JQ" -R . | "$JQ" -s . >"$WORK/compose-added.json"
+comm -23 "$WORK/compose-base.txt" "$WORK/compose-head.txt" | "$JQ" -R . | "$JQ" -s . >"$WORK/compose-removed.json"
+
+"$JQ" -s '.[0] + .[1] | unique' "$WORK/flate-new.json" "$WORK/compose-added.json" >"$WORK/new.json"
+"$JQ" -s '.[0] + .[1] + .[2] | unique' "$WORK/flate-all.json" "$WORK/compose-added.json" "$WORK/compose-removed.json" >"$WORK/all.json"
 
 # repository without tag/digest (keeps registry ports like host:5000)
 REPO='sub("@.*$"; "") | if (split("/") | last | contains(":")) then sub(":[^:/]*$"; "") else . end'
-# repo:tag without digest, for display
-SHORT='sub("@.*$"; "")'
+# repo:tag without digest for display; digest-only images keep a short digest
+SHORT='if (sub("@.*$"; "") | split("/") | last | contains(":")) then sub("@.*$"; "") else sub("(?<d>@sha256:[0-9a-f]{12}).*$"; "\(.d)") end'
 
 "$JQ" -c --slurpfile all "$WORK/all.json" '
   . as $new | ($all[0] - $new) as $old
