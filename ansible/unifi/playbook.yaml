@@ -5,40 +5,11 @@
 # Firmware updates wipe /usr, /var and possibly /root but keep /data, so this playbook keeps
 # everything it needs under /data and is safe to rerun after an update to get DNS back:
 #   just ansible unifi
-# If the update also reset root's SSH keys, use the root password from 1Password (needs sshpass):
-#   just ansible unifi -e unifi_password_auth=true
-#
-- name: Read UniFi credentials
-  hosts: localhost
-  connection: local
-  gather_facts: false
-  vars:
-    unifi_password_auth: false
-  tasks:
-    - name: Read root password from 1Password
-      when: unifi_password_auth | bool
-      block:
-        - name: Check sshpass is installed
-          ansible.builtin.command: sshpass -V
-          changed_when: false
-
-        - name: Read root password
-          ansible.builtin.command: "op read 'op://home-cluster/unifi/password'"
-          changed_when: false
-          no_log: true
-          register: unifi_password_raw
-
-        - name: Set password fact
-          ansible.builtin.set_fact:
-            unifi_root_password: "{{ unifi_password_raw.stdout }}"
-          no_log: true
-
 - name: Bootstrap UniFi gateway
   hosts: all
   gather_facts: false
   vars:
     ansible_user: root
-    ansible_password: "{{ hostvars['localhost'].unifi_root_password | default('') }}"
     ansible_python_interpreter: auto_silent
 
     ssh_authorized_keys:

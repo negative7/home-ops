@@ -32,7 +32,7 @@ odesa *args: _op
     just log info "Running playbook" "host" "odesa" "address" "{{ odesa_host }}"
     ansible-playbook -i "{{ odesa_host }}," "{{ ansible_dir }}/odesa/playbook.yaml" "$@"
 
-[doc('Run the UniFi gateway playbook (-e unifi_password_auth=true when SSH keys were reset)')]
+[doc('Run the UniFi gateway playbook')]
 [script]
 unifi *args:
     just log info "Running playbook" "host" "unifi" "address" "{{ unifi_host }}"
