@@ -35,6 +35,11 @@ odesa *args: _op
 [doc('Run the UniFi gateway playbook')]
 [script]
 unifi *args:
+    # Firmware updates can reset root's authorized_keys; ssh-copy-id prompts for the root password
+    if ! ssh -o BatchMode=yes -o ConnectTimeout=5 "root@{{ unifi_host }}" true 2>/dev/null; then
+        just log warn "SSH key auth failed, copying key" "host" "unifi" "address" "{{ unifi_host }}"
+        ssh-copy-id -i ~/.ssh/id_ed25519.pub "root@{{ unifi_host }}"
+    fi
     just log info "Running playbook" "host" "unifi" "address" "{{ unifi_host }}"
     ansible-playbook -i "{{ unifi_host }}," "{{ ansible_dir }}/unifi/playbook.yaml" "$@"
 
