@@ -1,0 +1,31 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app crowdsec-bouncer
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: crowdsec-bouncer
+  interval: 1h
+  values:
+    fullnameOverride: *app
+    image:
+      tag: v0.8.2@sha256:444dcf855e3e4aac290084733ecca127e55abb966938be919e0aa7caf209e5e6
+    podAnnotations:
+      secret.reloader.stakater.com/reload: crowdsec-secret
+    config:
+      # Pod CIDR: envoy-external appends the real client IP (from PROXY v2) to X-Forwarded-For
+      trustedProxies:
+        - 10.244.0.0/16
+      bouncer:
+        lapiURL: http://crowdsec-service:8080
+        metrics: true
+        apiKeySecretRef:
+          name: crowdsec-secret
+          key: BOUNCER_KEY_envoy
+      prometheus:
+        enabled: true
+        serviceMonitor:
+          enabled: true
