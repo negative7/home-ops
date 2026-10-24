@@ -1,5 +1,8 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  // Renovate merges on a later run once checks are green. Forgejo's "merge when checks succeed"
+  // merged right away because main has no required checks, before the image scan had run
+  platformAutomerge: false,
   packageRules: [
     {
       description: "Auto-merge trusted OCI digests",
