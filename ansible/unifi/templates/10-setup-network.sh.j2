@@ -1,0 +1,76 @@
+#!/bin/bash
+# Managed by ansible
+# Based on unifi-common-addons nspawn-container/scripts/10-setup-network.sh, made idempotent so
+# ansible can rerun it. Creates br{{ container_vlan }}.mac so the host can reach the container's macvlan
+# address, and makes dnsmasq listen on it
+set -uo pipefail
+
+VLAN="{{ container_vlan }}"
+IPV4_IP="{{ container_ipv4 }}"
+IPV4_GW="{{ container_ipv4_gw }}"
+IPV6_IP="{{ container_ipv6 }}"
+IPV6_GW="{{ container_ipv6_gw }}"
+# Interfaces whose DNS (TCP/UDP 53) is DNATed to the container, e.g. "br0 br20"
+FORCED_INTFC="{{ container_forced_dns_interfaces | join(' ') }}"
+
+BR="br${VLAN}"
+MAC="${BR}.mac"
+
+ip link set "$BR" promisc on
+
+if ! ip link show "$MAC" >/dev/null 2>&1; then
+  ip link add "$MAC" link "$BR" type macvlan mode bridge
+  echo "changed: created $MAC"
+fi
+if ! ip -4 addr show dev "$MAC" | grep -qw "inet ${IPV4_GW}"; then
+  ip addr add "$IPV4_GW" dev "$MAC" noprefixroute
+  echo "changed: added $IPV4_GW to $MAC"
+fi
+if [ -n "$IPV6_GW" ] && ! ip -6 addr show dev "$MAC" | grep -qw "inet6 ${IPV6_GW}"; then
+  ip -6 addr add "$IPV6_GW" dev "$MAC" noprefixroute
+  echo "changed: added $IPV6_GW to $MAC"
+fi
+ip link set "$MAC" promisc on
+ip link set "$MAC" up
+
+ip route replace "${IPV4_IP}/32" dev "$MAC"
+if [ -n "$IPV6_IP" ]; then
+  ip -6 route replace "${IPV6_IP}/128" dev "$MAC"
+fi
+
+# dnsmasq reads extra config from /run/dnsmasq.dhcp.conf.d (Network > 9.3.29); restart it only
+# when the snippet changes, UniFi respawns it
+if [ -d /run/dnsmasq.dhcp.conf.d ]; then
+  conf=/run/dnsmasq.dhcp.conf.d/macvlan.conf
+  pidfile=/run/dnsmasq-main.pid
+else
+  conf=/run/dnsmasq.conf.d/custom.conf
+  pidfile=/run/dnsmasq.pid
+fi
+if ! grep -qxF "interface=${MAC}" "$conf" 2>/dev/null; then
+  echo "interface=${MAC}" >>"$conf"
+  kill -9 "$(cat "$pidfile")"
+  echo "changed: dnsmasq now listens on $MAC"
+fi
+
+for intfc in ${FORCED_INTFC}; do
+  [ -d "/sys/class/net/${intfc}" ] || continue
+  for proto in udp tcp; do
+    for target in log dnat; do
+      if [ "$target" = log ]; then
+        jump="-j LOG --log-prefix [DNAT-${intfc}-${proto}]"
+      else
+        jump="-j DNAT --to ${IPV4_IP}"
+      fi
+      rule="PREROUTING -i ${intfc} -p ${proto} ! -s ${IPV4_IP} ! -d ${IPV4_IP} --dport 53 ${jump}"
+      # shellcheck disable=SC2086
+      iptables -t nat -C ${rule} 2>/dev/null || { iptables -t nat -A ${rule} && echo "changed: iptables ${rule}"; }
+      if [ -n "$IPV6_IP" ]; then
+        [ "$target" = dnat ] && jump="-j DNAT --to ${IPV6_IP}"
+        rule="PREROUTING -i ${intfc} -p ${proto} ! -s ${IPV6_IP} ! -d ${IPV6_IP} --dport 53 ${jump}"
+        # shellcheck disable=SC2086
+        ip6tables -t nat -C ${rule} 2>/dev/null || { ip6tables -t nat -A ${rule} && echo "changed: ip6tables ${rule}"; }
+      fi
+    done
+  done
+done

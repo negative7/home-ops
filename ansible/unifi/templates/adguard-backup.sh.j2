@@ -1,0 +1,29 @@
+#!/bin/bash
+# Managed by ansible
+# Runs inside the container: tars AdGuard Home's config to the NFS share and prunes old archives.
+# The playbook restores AdGuardHome.yaml from "latest" when it is missing
+set -euo pipefail
+
+AGH_DIR="{{ adguard_dir }}"
+NFS_MOUNT="{{ adguard_backup_dir }}"
+RETENTION_DAYS={{ adguard_backup_retention_days }}
+
+log() { echo "$*"; }
+die() { log "ERROR: $*"; exit 1; }
+
+log "Starting AdGuard Home backup"
+[[ -f "$AGH_DIR/AdGuardHome.yaml" ]] || die "$AGH_DIR/AdGuardHome.yaml not found"
+mountpoint -q "$NFS_MOUNT" || die "NFS share is not mounted at $NFS_MOUNT"
+
+BACKUP_TAR="$NFS_MOUNT/adguard_$(date '+%Y%m%d_%H%M%S').tar.gz"
+log "Destination: $BACKUP_TAR"
+
+# Keep the AdGuardHome/ prefix so restores work from older full-directory archives too
+tar -czf "$BACKUP_TAR" -C "$(dirname "$AGH_DIR")" "$(basename "$AGH_DIR")/AdGuardHome.yaml"
+log "Archive created (size: $(du -sh "$BACKUP_TAR" | cut -f1))"
+
+ln -sfn "$BACKUP_TAR" "$NFS_MOUNT/latest"
+
+PRUNED=$(find "$NFS_MOUNT" -maxdepth 1 -name "adguard_*.tar.gz" \
+  -mtime +"$RETENTION_DAYS" -print -delete | wc -l)
+log "Pruned $PRUNED backup(s) older than $RETENTION_DAYS days"

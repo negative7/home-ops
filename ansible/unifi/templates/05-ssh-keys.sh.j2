@@ -1,0 +1,16 @@
+#!/bin/bash
+# Managed by ansible
+# Firmware updates can reset /root/.ssh; re-add the keys kept on /data (never removes other keys)
+set -euo pipefail
+
+install -d -m 0700 /root/.ssh
+touch /root/.ssh/authorized_keys
+chmod 0600 /root/.ssh/authorized_keys
+
+while IFS= read -r key; do
+  [ -n "$key" ] || continue
+  if ! grep -qxF "$key" /root/.ssh/authorized_keys; then
+    echo "$key" >>/root/.ssh/authorized_keys
+    echo "changed: added ${key##* } to /root/.ssh/authorized_keys"
+  fi
+done <{{ unifi_ssh_keys_file }}

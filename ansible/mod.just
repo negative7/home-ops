@@ -9,6 +9,7 @@ ansible_dir := justfile_dir() + '/ansible'
 # Hosts are reached by IP: odesa only over WireGuard, lviv on VLAN20 (survives its network cutover)
 lviv_host := '10.2.0.10'
 odesa_host := '10.99.0.1'
+unifi_host := '10.0.1.1'
 
 [private]
 [script]
@@ -31,7 +32,18 @@ odesa *args: _op
     just log info "Running playbook" "host" "odesa" "address" "{{ odesa_host }}"
     ansible-playbook -i "{{ odesa_host }}," "{{ ansible_dir }}/odesa/playbook.yaml" "$@"
 
-# Both playbooks read secrets with `op read`
+[doc('Run the UniFi gateway playbook')]
+[script]
+unifi *args:
+    # Firmware updates can reset root's authorized_keys; ssh-copy-id prompts for the root password
+    if ! ssh -o BatchMode=yes -o ConnectTimeout=5 "root@{{ unifi_host }}" true 2>/dev/null; then
+        just log warn "SSH key auth failed, copying key" "host" "unifi" "address" "{{ unifi_host }}"
+        ssh-copy-id -i ~/.ssh/id_ed25519.pub "root@{{ unifi_host }}"
+    fi
+    just log info "Running playbook" "host" "unifi" "address" "{{ unifi_host }}"
+    ansible-playbook -i "{{ unifi_host }}," "{{ ansible_dir }}/unifi/playbook.yaml" "$@"
+
+# The lviv and odesa playbooks read secrets with `op read`
 [private]
 [script]
 _op:

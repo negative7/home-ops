@@ -1,0 +1,344 @@
+---
+# UniFi gateway (UniFi OS 4.x+) with unifi-common (udm-boot) and an nspawn container running
+# AdGuard Home, per https://github.com/unifi-utilities/unifi-common-addons/tree/main/nspawn-container
+#
+# Firmware updates wipe /usr, /var and possibly /root but keep /data, so this playbook keeps
+# everything it needs under /data and is safe to rerun after an update to get DNS back:
+#   just ansible unifi
+- name: Bootstrap UniFi gateway
+  hosts: all
+  gather_facts: false
+  vars:
+    ansible_user: root
+    ansible_python_interpreter: auto_silent
+
+    ssh_authorized_keys:
+      - "{{ lookup('ansible.builtin.file', '~/.ssh/id_ed25519.pub') }}"
+    unifi_ssh_keys_file: /data/custom/ssh/authorized_keys
+
+    unifi_on_boot_dir: /data/on_boot.d
+    unifi_dpkg_cache: /data/custom/dpkg
+    unifi_container_packages:
+      - systemd-container
+      - libnss-mymachines
+      - debootstrap
+      - arch-test
+
+    container_name: debian-adguard
+    container_rootfs: "/data/custom/machines/{{ container_name }}"
+    container_nspawn_src: "/data/custom/nspawn/{{ container_name }}.nspawn"
+    # Container network: macvlan on brVLAN; the gateway side brVLAN.mac gets container_ipv4_gw
+    container_vlan: 5
+    container_ipv4: 10.0.5.3
+    container_ipv4_gw: 10.0.5.1/24
+    # Leave both empty to disable IPv6
+    container_ipv6: ""
+    container_ipv6_gw: ""
+    container_forced_dns_interfaces:
+      - br5
+    container_nameservers:
+      - 1.1.1.1
+    container_binds: []
+    adguard_service: AdGuardHome.service
+    adguard_dir: /opt/AdGuardHome
+    # Only used for a fresh install; AdGuard Home updates itself afterwards
+    adguard_download_url: https://static.adtidy.org/adguardhome/release/AdGuardHome_linux_arm64.tar.gz
+    # Installed in the container when missing
+    container_packages:
+      - openssh-server
+      - nfs-common
+
+    # Daily tarball of AdGuard's config to lviv over NFS (export is in the lviv playbook). Query log,
+    # stats and filters are left out; AdGuard rebuilds them
+    adguard_backup_nfs: 10.2.0.10:/mnt/tank/backups/adguard
+    adguard_backup_dir: /mnt/tank/backups/adguard
+    adguard_backup_retention_days: 7
+    adguard_backup_schedule: "*-*-* 02:30:00"
+
+  handlers:
+    - name: Reload container systemd
+      ansible.builtin.command: "systemctl --machine={{ container_name }} daemon-reload"
+      changed_when: true
+
+    - name: Restart container networkd
+      ansible.builtin.command: "systemctl --machine={{ container_name }} restart systemd-networkd.service"
+      changed_when: true
+
+    - name: Restart container sshd
+      ansible.builtin.command: "systemctl --machine={{ container_name }} restart ssh.service"
+      changed_when: true
+
+  tasks:
+    - name: Check host connectivity
+      ansible.builtin.ping:
+
+    - name: Check container rootfs exists
+      ansible.builtin.stat:
+        path: "{{ container_rootfs }}/etc/os-release"
+      register: container_rootfs_stat
+
+    - name: Fail without a container rootfs
+      ansible.builtin.fail:
+        msg: >-
+          {{ container_rootfs }} is missing. /data survives firmware updates, so either container_name
+          is wrong or the rootfs is gone (recreate it with debootstrap and restore AdGuard's config).
+      when: not container_rootfs_stat.stat.exists
+
+    # unifi-common's udm-boot runs every executable in /data/on_boot.d at boot. Vendored, so it can
+    # be reinstalled without DNS
+    - name: udm-boot
+      block:
+        - name: udm-boot | Install service
+          ansible.builtin.copy:
+            src: files/udm-boot.service
+            dest: /etc/systemd/system/udm-boot.service
+            owner: root
+            group: root
+            mode: "0644"
+
+        - name: udm-boot | Enable service
+          ansible.builtin.systemd_service:
+            name: udm-boot.service
+            enabled: true
+            daemon_reload: true
+
+    - name: Create /data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      loop:
+        - "{{ unifi_on_boot_dir }}"
+        - "{{ unifi_dpkg_cache }}"
+        - "{{ unifi_ssh_keys_file | dirname }}"
+        - "{{ container_nspawn_src | dirname }}"
+
+    - name: Install SSH keys for on_boot.d
+      ansible.builtin.copy:
+        dest: "{{ unifi_ssh_keys_file }}"
+        content: "{{ ssh_authorized_keys | join('\n') }}\n"
+        owner: root
+        group: root
+        mode: "0600"
+
+    # 0-setup-system.sh copies it to /etc/systemd/nspawn and restarts the container if it changed
+    - name: Install container nspawn config
+      ansible.builtin.template:
+        src: templates/container.nspawn.j2
+        dest: "{{ container_nspawn_src }}"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Install on_boot.d scripts
+      ansible.builtin.template:
+        src: "templates/{{ item }}.j2"
+        dest: "{{ unifi_on_boot_dir }}/{{ item }}"
+        owner: root
+        group: root
+        mode: "0755"
+      loop:
+        - 0-setup-system.sh
+        - 05-ssh-keys.sh
+        - 10-setup-network.sh
+
+    # Same code path as a boot; the scripts are idempotent and print "changed:" when they act
+    - name: Run on_boot.d scripts
+      ansible.builtin.command: "{{ unifi_on_boot_dir }}/{{ item }}"
+      loop:
+        - 0-setup-system.sh
+        - 05-ssh-keys.sh
+        - 10-setup-network.sh
+      register: on_boot_run
+      changed_when: "'changed:' in on_boot_run.stdout"
+
+    # The rootfs lives on /data, so these normally survive updates; written from the host so they
+    # work while the container has no network
+    - name: container
+      block:
+        - name: container | Network config
+          ansible.builtin.template:
+            src: templates/mv-br.network.j2
+            dest: "{{ container_rootfs }}/etc/systemd/network/mv-br{{ container_vlan }}.network"
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart container networkd
+
+        - name: container | resolv.conf
+          ansible.builtin.copy:
+            dest: "{{ container_rootfs }}/etc/resolv.conf"
+            content: |
+              # Managed by ansible
+              {% for ns in container_nameservers %}
+              nameserver {{ ns }}
+              {% endfor %}
+            owner: root
+            group: root
+            mode: "0644"
+            # Replace a dangling symlink to a resolver the container doesn't run
+            follow: false
+
+        - name: container | Flush handlers
+          ansible.builtin.meta: flush_handlers
+
+        - name: container | Wait for boot
+          ansible.builtin.command: "systemctl --machine={{ container_name }} is-system-running --wait"
+          register: container_state
+          changed_when: false
+          # degraded still means it booted; a failed unrelated unit shouldn't block DNS
+          failed_when: container_state.stdout not in ['running', 'degraded']
+          retries: 12
+          delay: 5
+          until: container_state is not failed
+
+        - name: container | Install packages
+          ansible.builtin.command: >-
+            systemd-run --machine={{ container_name }} --wait --pipe --quiet
+            --setenv=DEBIAN_FRONTEND=noninteractive
+            /bin/sh -c 'missing="";
+            for p in {{ container_packages | join(" ") }}; do
+            dpkg-query -W -f="\${Status}" "$p" 2>/dev/null | grep -q "ok installed" || missing="$missing $p"; done;
+            [ -z "$missing" ] && exit 0;
+            echo "installing:$missing" && apt-get update -qq && apt-get install -y $missing'
+          register: container_install
+          changed_when: "'installing:' in container_install.stdout"
+
+        - name: container | Create /root/.ssh
+          ansible.builtin.file:
+            path: "{{ container_rootfs }}/root/.ssh"
+            state: directory
+            owner: root
+            group: root
+            mode: "0700"
+
+        - name: container | SSH keys
+          ansible.builtin.copy:
+            dest: "{{ container_rootfs }}/root/.ssh/authorized_keys"
+            content: "{{ ssh_authorized_keys | join('\n') }}\n"
+            owner: root
+            group: root
+            mode: "0600"
+
+        - name: container | Create sshd_config.d
+          ansible.builtin.file:
+            path: "{{ container_rootfs }}/etc/ssh/sshd_config.d"
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: container | Key-only sshd
+          ansible.builtin.copy:
+            dest: "{{ container_rootfs }}/etc/ssh/sshd_config.d/10-ansible.conf"
+            content: |
+              # Managed by ansible
+              PermitRootLogin prohibit-password
+              PasswordAuthentication no
+              KbdInteractiveAuthentication no
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart container sshd
+
+        - name: container | Backup NFS mount
+          ansible.builtin.lineinfile:
+            path: "{{ container_rootfs }}/etc/fstab"
+            regexp: "^\\S+\\s+{{ adguard_backup_dir }}\\s"
+            line: "{{ adguard_backup_nfs }}  {{ adguard_backup_dir }}  nfs4  defaults,vers=4.2,_netdev,nofail,x-systemd.automount  0 0"
+          notify: Reload container systemd
+
+        - name: container | Backup script
+          ansible.builtin.template:
+            src: templates/adguard-backup.sh.j2
+            dest: "{{ container_rootfs }}/usr/local/sbin/adguard-backup.sh"
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: container | Backup units
+          ansible.builtin.template:
+            src: "templates/{{ item }}.j2"
+            dest: "{{ container_rootfs }}/etc/systemd/system/{{ item }}"
+            owner: root
+            group: root
+            mode: "0644"
+          loop:
+            - adguard-backup.service
+            - adguard-backup.timer
+          notify: Reload container systemd
+
+        - name: container | Flush handlers before enabling
+          ansible.builtin.meta: flush_handlers
+
+        # Starts the automount generated from fstab
+        - name: container | Mount remote filesystems
+          ansible.builtin.command: "systemctl --machine={{ container_name }} start remote-fs.target"
+          changed_when: false
+
+        - name: container | Check for AdGuard Home
+          ansible.builtin.stat:
+            path: "{{ container_rootfs }}{{ adguard_dir }}/AdGuardHome"
+          register: adguard_bin
+
+        - name: container | Install AdGuard Home
+          ansible.builtin.command: >-
+            systemd-run --machine={{ container_name }} --wait --pipe --quiet
+            /bin/sh -c 'curl -fsSL {{ adguard_download_url }} | tar -xz -C {{ adguard_dir | dirname }}'
+          when: not adguard_bin.stat.exists
+          changed_when: true
+
+        # Only written when missing; the one on the gateway came from `AdGuardHome -s install`
+        - name: container | AdGuard Home unit
+          ansible.builtin.template:
+            src: templates/AdGuardHome.service.j2
+            dest: "{{ container_rootfs }}/etc/systemd/system/{{ adguard_service }}"
+            owner: root
+            group: root
+            mode: "0644"
+            force: false
+          notify: Reload container systemd
+
+        - name: container | Check for AdGuard Home config
+          ansible.builtin.stat:
+            path: "{{ container_rootfs }}{{ adguard_dir }}/AdGuardHome.yaml"
+          register: adguard_config
+
+        # Exit 3 means there is no backup yet; AdGuard then starts its setup wizard on :3000
+        - name: container | Restore AdGuard Home config from latest backup
+          ansible.builtin.command: >-
+            systemd-run --machine={{ container_name }} --wait --pipe --quiet
+            /bin/sh -c 'test -e {{ adguard_backup_dir }}/latest || exit 3;
+            tar -xzf {{ adguard_backup_dir }}/latest -C {{ adguard_dir | dirname }}
+            {{ adguard_dir | basename }}/AdGuardHome.yaml &&
+            systemctl try-restart {{ adguard_service }}'
+          when: not adguard_config.stat.exists
+          register: adguard_restore
+          changed_when: adguard_restore.rc == 0
+          failed_when: adguard_restore.rc not in [0, 3]
+
+        - name: container | Warn about missing backup
+          ansible.builtin.debug:
+            msg: "No backup in {{ adguard_backup_dir }}; finish AdGuard Home setup at http://{{ container_ipv4 }}:3000"
+          when: adguard_restore.rc | default(0) == 3
+
+        - name: container | Flush handlers before starting AdGuard Home
+          ansible.builtin.meta: flush_handlers
+
+        - name: container | Enable services
+          ansible.builtin.command: "systemctl --machine={{ container_name }} enable --now {{ item }}"
+          loop:
+            - systemd-networkd.service
+            - ssh.service
+            - "{{ adguard_service }}"
+            - adguard-backup.timer
+          register: container_enable
+          changed_when: container_enable.stderr is search('Created symlink')
+
+    - name: Wait for AdGuard Home DNS
+      ansible.builtin.wait_for:
+        host: "{{ container_ipv4 }}"
+        port: 53
+        timeout: 60

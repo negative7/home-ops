@@ -1,0 +1,12 @@
+# Managed by ansible
+[Unit]
+Description=Daily AdGuard Home Backup Timer
+
+[Timer]
+OnCalendar={{ adguard_backup_schedule }}
+# Catch up on a run missed while the container was down
+Persistent=true
+RandomizedDelaySec=5min
+
+[Install]
+WantedBy=timers.target

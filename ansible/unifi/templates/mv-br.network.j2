@@ -1,0 +1,11 @@
+[Match]
+Name=mv-br{{ container_vlan }}
+
+[Network]
+IPForward=yes
+Address={{ container_ipv4 }}/{{ container_ipv4_gw.split('/')[1] }}
+Gateway={{ container_ipv4_gw.split('/')[0] }}
+{% if container_ipv6 %}
+Address={{ container_ipv6 }}/{{ container_ipv6_gw.split('/')[1] }}
+Gateway={{ container_ipv6_gw.split('/')[0] }}
+{% endif %}
