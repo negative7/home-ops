@@ -1,9 +1,10 @@
 #!/bin/bash
 # Managed by ansible
-# Runs inside the container: tars /opt/AdGuardHome to the NFS share and prunes old archives
+# Runs inside the container: tars AdGuard Home's config to the NFS share and prunes old archives.
+# The playbook restores AdGuardHome.yaml from "latest" when it is missing
 set -euo pipefail
 
-AGH_SOURCE="/opt/AdGuardHome"
+AGH_DIR="{{ adguard_dir }}"
 NFS_MOUNT="{{ adguard_backup_dir }}"
 RETENTION_DAYS={{ adguard_backup_retention_days }}
 
@@ -11,18 +12,14 @@ log() { echo "$*"; }
 die() { log "ERROR: $*"; exit 1; }
 
 log "Starting AdGuard Home backup"
-[[ -d "$AGH_SOURCE" ]] || die "Source directory $AGH_SOURCE not found"
+[[ -f "$AGH_DIR/AdGuardHome.yaml" ]] || die "$AGH_DIR/AdGuardHome.yaml not found"
 mountpoint -q "$NFS_MOUNT" || die "NFS share is not mounted at $NFS_MOUNT"
 
 BACKUP_TAR="$NFS_MOUNT/adguard_$(date '+%Y%m%d_%H%M%S').tar.gz"
 log "Destination: $BACKUP_TAR"
 
-# tar exits 1 when a file changed while it was read, which AdGuard's querylog.json always does;
-# the archive is still complete, so only fail on worse errors
-rc=0
-tar --warning=no-file-changed -czf "$BACKUP_TAR" \
-  -C "$(dirname "$AGH_SOURCE")" "$(basename "$AGH_SOURCE")" || rc=$?
-[[ $rc -le 1 ]] || die "tar failed with exit code $rc"
+# Keep the AdGuardHome/ prefix so restores work from older full-directory archives too
+tar -czf "$BACKUP_TAR" -C "$(dirname "$AGH_DIR")" "$(basename "$AGH_DIR")/AdGuardHome.yaml"
 log "Archive created (size: $(du -sh "$BACKUP_TAR" | cut -f1))"
 
 ln -sfn "$BACKUP_TAR" "$NFS_MOUNT/latest"

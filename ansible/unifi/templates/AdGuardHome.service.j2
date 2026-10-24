@@ -1,0 +1,17 @@
+# Managed by ansible
+[Unit]
+Description=AdGuard Home: Network-level blocker
+ConditionFileIsExecutable={{ adguard_dir }}/AdGuardHome
+After=network-online.target
+
+[Service]
+StartLimitInterval=5
+StartLimitBurst=10
+ExecStart={{ adguard_dir }}/AdGuardHome -s run
+WorkingDirectory={{ adguard_dir }}
+Restart=always
+RestartSec=10
+EnvironmentFile=-/etc/sysconfig/AdGuardHome
+
+[Install]
+WantedBy=multi-user.target

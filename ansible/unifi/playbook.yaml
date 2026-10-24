@@ -40,12 +40,16 @@
       - 1.1.1.1
     container_binds: []
     adguard_service: AdGuardHome.service
+    adguard_dir: /opt/AdGuardHome
+    # Only used for a fresh install; AdGuard Home updates itself afterwards
+    adguard_download_url: https://static.adtidy.org/adguardhome/release/AdGuardHome_linux_arm64.tar.gz
     # Installed in the container when missing
     container_packages:
       - openssh-server
       - nfs-common
 
-    # Daily tarball of /opt/AdGuardHome to lviv over NFS (export is in the lviv playbook)
+    # Daily tarball of AdGuard's config to lviv over NFS (export is in the lviv playbook). Query log,
+    # stats and filters are left out; AdGuard rebuilds them
     adguard_backup_nfs: 10.2.0.10:/mnt/tank/backups/adguard
     adguard_backup_dir: /mnt/tank/backups/adguard
     adguard_backup_retention_days: 7
@@ -273,6 +277,55 @@
         - name: container | Mount remote filesystems
           ansible.builtin.command: "systemctl --machine={{ container_name }} start remote-fs.target"
           changed_when: false
+
+        - name: container | Check for AdGuard Home
+          ansible.builtin.stat:
+            path: "{{ container_rootfs }}{{ adguard_dir }}/AdGuardHome"
+          register: adguard_bin
+
+        - name: container | Install AdGuard Home
+          ansible.builtin.command: >-
+            systemd-run --machine={{ container_name }} --wait --pipe --quiet
+            /bin/sh -c 'curl -fsSL {{ adguard_download_url }} | tar -xz -C {{ adguard_dir | dirname }}'
+          when: not adguard_bin.stat.exists
+          changed_when: true
+
+        # Only written when missing; the one on the gateway came from `AdGuardHome -s install`
+        - name: container | AdGuard Home unit
+          ansible.builtin.template:
+            src: templates/AdGuardHome.service.j2
+            dest: "{{ container_rootfs }}/etc/systemd/system/{{ adguard_service }}"
+            owner: root
+            group: root
+            mode: "0644"
+            force: false
+          notify: Reload container systemd
+
+        - name: container | Check for AdGuard Home config
+          ansible.builtin.stat:
+            path: "{{ container_rootfs }}{{ adguard_dir }}/AdGuardHome.yaml"
+          register: adguard_config
+
+        # Exit 3 means there is no backup yet; AdGuard then starts its setup wizard on :3000
+        - name: container | Restore AdGuard Home config from latest backup
+          ansible.builtin.command: >-
+            systemd-run --machine={{ container_name }} --wait --pipe --quiet
+            /bin/sh -c 'test -e {{ adguard_backup_dir }}/latest || exit 3;
+            tar -xzf {{ adguard_backup_dir }}/latest -C {{ adguard_dir | dirname }}
+            {{ adguard_dir | basename }}/AdGuardHome.yaml &&
+            systemctl try-restart {{ adguard_service }}'
+          when: not adguard_config.stat.exists
+          register: adguard_restore
+          changed_when: adguard_restore.rc == 0
+          failed_when: adguard_restore.rc not in [0, 3]
+
+        - name: container | Warn about missing backup
+          ansible.builtin.debug:
+            msg: "No backup in {{ adguard_backup_dir }}; finish AdGuard Home setup at http://{{ container_ipv4 }}:3000"
+          when: adguard_restore.rc | default(0) == 3
+
+        - name: container | Flush handlers before starting AdGuard Home
+          ansible.builtin.meta: flush_handlers
 
         - name: container | Enable services
           ansible.builtin.command: "systemctl --machine={{ container_name }} enable --now {{ item }}"
