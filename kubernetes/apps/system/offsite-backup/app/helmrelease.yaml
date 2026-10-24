@@ -1,0 +1,79 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: offsite-backup
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: offsite-backup
+  interval: 30m
+  values:
+    controllers:
+      offsite-backup:
+        type: cronjob
+        cronjob:
+          # after kopiur full maintenance (03:00 + up to 1h jitter)
+          schedule: "30 5 * * *"
+          timeZone: America/New_York
+          backoffLimit: 0
+          concurrencyPolicy: Forbid
+          failedJobsHistory: 1
+          successfulJobsHistory: 1
+          ttlSecondsAfterFinished: 86400
+        pod:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+        containers:
+          app:
+            image:
+              # ghcr.io/rclone/rclone stopped at 1.73.x
+              repository: docker.io/rclone/rclone
+              tag: 1.75.2@sha256:2687085f718d3c628f7fdfb77c52a1d344332aed543110bb88088f2c70d43eb5
+            command:
+              - "/bin/sh"
+              - "-c"
+            args:
+              - |
+                rc=0
+                # Kopia already encrypts the repo; kept plain so Kopia can connect to B2 directly in a disaster
+                rclone sync garage:kopiur "b2:${B2_BUCKET}/kopiur" || rc=1
+                rclone sync garage:cnpg-backups b2crypt:cnpg-backups || rc=1
+                rclone sync garage:sergiy-pc b2crypt:sergiy-pc || rc=1
+                exit $rc
+            env:
+              TZ: America/New_York
+              HOME: /tmp
+              RCLONE_CONFIG: /tmp/rclone.conf
+              RCLONE_FAST_LIST: "true"
+              RCLONE_TRANSFERS: "8"
+              RCLONE_CHECKERS: "16"
+              RCLONE_STATS: 5m
+              RCLONE_STATS_LOG_LEVEL: NOTICE
+              RCLONE_STATS_ONE_LINE: "true"
+            envFrom:
+              - secretRef:
+                  name: offsite-backup-secret
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                memory: 1Gi
+    persistence:
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          offsite-backup:
+            app:
+              - path: /tmp
+                subPath: tmp
