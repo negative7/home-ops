@@ -194,17 +194,24 @@
           delay: 5
           until: container_state is not failed
 
+        # Checked from the host: systemd-run expands $ in its arguments, so no shell variables there.
+        # Multi-arch library packages are named pkg:arch.list; only list plain ones here
+        - name: container | Check installed packages
+          ansible.builtin.stat:
+            path: "{{ container_rootfs }}/var/lib/dpkg/info/{{ item }}.list"
+          loop: "{{ container_packages }}"
+          register: container_package_lists
+
         - name: container | Install packages
           ansible.builtin.command: >-
             systemd-run --machine={{ container_name }} --wait --pipe --quiet
             --setenv=DEBIAN_FRONTEND=noninteractive
-            /bin/sh -c 'missing="";
-            for p in {{ container_packages | join(" ") }}; do
-            dpkg-query -W -f="\${Status}" "$p" 2>/dev/null | grep -q "ok installed" || missing="$missing $p"; done;
-            [ -z "$missing" ] && exit 0;
-            echo "installing:$missing" && apt-get update -qq && apt-get install -y $missing'
-          register: container_install
-          changed_when: "'installing:' in container_install.stdout"
+            /bin/sh -c 'apt-get update -qq && apt-get install -y {{ container_missing_packages | join(" ") }}'
+          vars:
+            container_missing_packages: >-
+              {{ container_package_lists.results | rejectattr('stat.exists') | map(attribute='item') | list }}
+          when: container_missing_packages | length > 0
+          changed_when: true
 
         - name: container | Create /root/.ssh
           ansible.builtin.file:
