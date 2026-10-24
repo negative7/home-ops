@@ -47,11 +47,6 @@
 
     unifi_on_boot_dir: /data/on_boot.d
     unifi_dpkg_cache: /data/custom/dpkg
-    # Leftovers from the podman/CNI era (UniFi OS < 3); 05 failed every boot and broke udm-boot
-    unifi_on_boot_obsolete:
-      - 05-install-cni-plugins.sh
-      - 06-cni-bridge.sh
-      - 42-watch-for-changes.sh
     unifi_container_packages:
       - systemd-container
       - libnss-mymachines
@@ -147,12 +142,6 @@
         owner: root
         group: root
         mode: "0644"
-
-    - name: Remove obsolete on_boot.d scripts
-      ansible.builtin.file:
-        path: "{{ unifi_on_boot_dir }}/{{ item }}"
-        state: absent
-      loop: "{{ unifi_on_boot_obsolete }}"
 
     - name: Install on_boot.d scripts
       ansible.builtin.template:
