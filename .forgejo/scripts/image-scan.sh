@@ -40,7 +40,9 @@ count="$("$JQ" length "$WORK/pairs.json")"
 scan() {
   local img="$1" out="$WORK/scan.json" attempt
   for attempt in 1 2; do
-    if "$TRIVY" image --quiet --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed \
+    # The runner sets GITHUB_TOKEN to the Forgejo job token; trivy would send it to ghcr.io
+    # (DENIED) instead of pulling anonymously, so drop it for these public image pulls
+    if env -u GITHUB_TOKEN -u GH_TOKEN "$TRIVY" image --quiet --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed \
       --format json --output "$out" "$img" >&2; then
       break
     fi
