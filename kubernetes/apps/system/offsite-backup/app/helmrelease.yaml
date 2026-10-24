@@ -43,6 +43,7 @@ spec:
                 rclone sync garage:kopiur "b2:${B2_BUCKET}/kopiur" || rc=1
                 rclone sync garage:cnpg-backups b2crypt:cnpg-backups || rc=1
                 rclone sync garage:sergiy-pc b2crypt:sergiy-pc || rc=1
+                rclone sync garage:kanidm b2crypt:kanidm || rc=1
                 exit $rc
             env:
               TZ: America/New_York
