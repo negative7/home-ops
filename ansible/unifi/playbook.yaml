@@ -8,7 +8,6 @@
 # If the update also reset root's SSH keys, use the root password from 1Password (needs sshpass):
 #   just ansible unifi -e unifi_password_auth=true
 #
-# TODO: values below are upstream defaults and still have to be checked against the gateway
 - name: Read UniFi credentials
   hosts: localhost
   connection: local
@@ -48,13 +47,18 @@
 
     unifi_on_boot_dir: /data/on_boot.d
     unifi_dpkg_cache: /data/custom/dpkg
+    # Leftovers from the podman/CNI era (UniFi OS < 3); 05 failed every boot and broke udm-boot
+    unifi_on_boot_obsolete:
+      - 05-install-cni-plugins.sh
+      - 06-cni-bridge.sh
+      - 42-watch-for-changes.sh
     unifi_container_packages:
       - systemd-container
       - libnss-mymachines
       - debootstrap
       - arch-test
 
-    container_name: debian-custom
+    container_name: debian-adguard
     container_rootfs: "/data/custom/machines/{{ container_name }}"
     container_nspawn_src: "/data/custom/nspawn/{{ container_name }}.nspawn"
     # Container network: macvlan on brVLAN; the gateway side brVLAN.mac gets container_ipv4_gw
@@ -64,18 +68,14 @@
     # Leave both empty to disable IPv6
     container_ipv6: ""
     container_ipv6_gw: ""
-    container_forced_dns_interfaces: []
+    container_forced_dns_interfaces:
+      - br5
     container_nameservers:
       - 1.1.1.1
     container_binds: []
     adguard_service: AdGuardHome.service
 
   handlers:
-    - name: Restart container
-      ansible.builtin.systemd_service:
-        name: "systemd-nspawn@{{ container_name }}.service"
-        state: restarted
-
     - name: Restart container networkd
       ansible.builtin.command: "systemctl --machine={{ container_name }} restart systemd-networkd.service"
       changed_when: true
@@ -139,6 +139,7 @@
         group: root
         mode: "0600"
 
+    # 0-setup-system.sh copies it to /etc/systemd/nspawn and restarts the container if it changed
     - name: Install container nspawn config
       ansible.builtin.template:
         src: templates/container.nspawn.j2
@@ -146,7 +147,12 @@
         owner: root
         group: root
         mode: "0644"
-      notify: Restart container
+
+    - name: Remove obsolete on_boot.d scripts
+      ansible.builtin.file:
+        path: "{{ unifi_on_boot_dir }}/{{ item }}"
+        state: absent
+      loop: "{{ unifi_on_boot_obsolete }}"
 
     - name: Install on_boot.d scripts
       ansible.builtin.template:
@@ -187,7 +193,7 @@
           ansible.builtin.copy:
             dest: "{{ container_rootfs }}/etc/resolv.conf"
             content: |
-              # {{ ansible_managed }}
+              # Managed by ansible
               {% for ns in container_nameservers %}
               nameserver {{ ns }}
               {% endfor %}
@@ -196,35 +202,6 @@
             mode: "0644"
             # Replace a dangling symlink to a resolver the container doesn't run
             follow: false
-
-        - name: container | Create /root/.ssh
-          ansible.builtin.file:
-            path: "{{ container_rootfs }}/root/.ssh"
-            state: directory
-            owner: root
-            group: root
-            mode: "0700"
-
-        - name: container | SSH keys
-          ansible.builtin.copy:
-            dest: "{{ container_rootfs }}/root/.ssh/authorized_keys"
-            content: "{{ ssh_authorized_keys | join('\n') }}\n"
-            owner: root
-            group: root
-            mode: "0600"
-
-        - name: container | Key-only sshd
-          ansible.builtin.copy:
-            dest: "{{ container_rootfs }}/etc/ssh/sshd_config.d/10-ansible.conf"
-            content: |
-              # {{ ansible_managed }}
-              PermitRootLogin prohibit-password
-              PasswordAuthentication no
-              KbdInteractiveAuthentication no
-            owner: root
-            group: root
-            mode: "0644"
-          notify: Restart container sshd
 
         - name: container | Flush handlers
           ansible.builtin.meta: flush_handlers
@@ -251,6 +228,43 @@
             /bin/sh -c 'apt-get update -qq && apt-get install -y openssh-server'
           when: not container_sshd.stat.exists
           changed_when: true
+
+        - name: container | Create /root/.ssh
+          ansible.builtin.file:
+            path: "{{ container_rootfs }}/root/.ssh"
+            state: directory
+            owner: root
+            group: root
+            mode: "0700"
+
+        - name: container | SSH keys
+          ansible.builtin.copy:
+            dest: "{{ container_rootfs }}/root/.ssh/authorized_keys"
+            content: "{{ ssh_authorized_keys | join('\n') }}\n"
+            owner: root
+            group: root
+            mode: "0600"
+
+        - name: container | Create sshd_config.d
+          ansible.builtin.file:
+            path: "{{ container_rootfs }}/etc/ssh/sshd_config.d"
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: container | Key-only sshd
+          ansible.builtin.copy:
+            dest: "{{ container_rootfs }}/etc/ssh/sshd_config.d/10-ansible.conf"
+            content: |
+              # Managed by ansible
+              PermitRootLogin prohibit-password
+              PasswordAuthentication no
+              KbdInteractiveAuthentication no
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart container sshd
 
         - name: container | Enable services
           ansible.builtin.command: "systemctl --machine={{ container_name }} enable --now {{ item }}"

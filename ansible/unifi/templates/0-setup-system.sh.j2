@@ -1,5 +1,5 @@
 #!/bin/bash
-# {{ ansible_managed }}
+# Managed by ansible
 # Based on unifi-common-addons nspawn-container/scripts/0-setup-system.sh. Firmware updates wipe
 # /usr and /var (systemd-container, /var/lib/machines) but keep /data. Differences from upstream:
 # online install is tried with a timeout and falls back to the cached .debs (upstream's set -e
@@ -45,8 +45,10 @@ if $online; then
 fi
 
 mkdir -p /etc/systemd/nspawn /var/lib/machines
+nspawn_changed=false
 if ! cmp -s "$NSPAWN_SRC" "/etc/systemd/nspawn/$MACHINE.nspawn"; then
   cp "$NSPAWN_SRC" "/etc/systemd/nspawn/$MACHINE.nspawn"
+  nspawn_changed=true
   echo "changed: restored /etc/systemd/nspawn/$MACHINE.nspawn"
 fi
 
@@ -63,4 +65,7 @@ fi
 if ! systemctl is-active --quiet "systemd-nspawn@$MACHINE.service"; then
   machinectl start "$MACHINE"
   echo "changed: started $MACHINE"
+elif $nspawn_changed; then
+  systemctl restart "systemd-nspawn@$MACHINE.service"
+  echo "changed: restarted $MACHINE for the new nspawn config"
 fi
