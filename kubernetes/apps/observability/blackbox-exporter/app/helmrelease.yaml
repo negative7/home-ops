@@ -49,7 +49,8 @@ spec:
       rules:
         - alert: BlackboxProbeFailed
           # a body-regex failure is a finding (e.g. UniFiUpdateAvailable), not an unreachable host
-          expr: probe_success == 0 unless on (instance, job) probe_failed_due_to_regex == 1
+          # last_over_time bridges the 5m lookback for slow probes (unifi-update runs every 15m)
+          expr: last_over_time(probe_success[20m]) == 0 unless on (instance, job) last_over_time(probe_failed_due_to_regex[20m]) == 1
           for: 15m
           labels:
             severity: critical
@@ -57,7 +58,7 @@ spec:
             summary: |-
               The host {{ $labels.target }} is currently unreachable
         - alert: UniFiUpdateAvailable
-          expr: probe_failed_due_to_regex{job="unifi-update"} == 1
+          expr: last_over_time(probe_failed_due_to_regex{job="unifi-update"}[20m]) == 1
           for: 1h
           labels:
             severity: warning
