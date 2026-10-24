@@ -34,18 +34,16 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # Informational for now: a download, scan or API error must not fail the check and block
+      # Renovate automerge. Remove continue-on-error from both steps when enabling GATE.
+      # The action only saves its cache when it runs the install itself, so install here
+      # (GitHub downloads are ~350 kB/s per connection from home).
       - name: Setup mise
+        continue-on-error: true
         uses: https://github.com/jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde # v5.2.1
         with:
           cache: true
-          install: false
-
-      # Informational for now: a download, scan or API error must not fail the check and block
-      # Renovate automerge. Remove continue-on-error from both steps when enabling GATE.
-      - name: Install tools
-        continue-on-error: true
-        shell: bash
-        run: mise install github:home-operations/flate aqua:aquasecurity/trivy aqua:jqlang/jq
+          install_args: github:home-operations/flate aqua:aquasecurity/trivy aqua:jqlang/jq
 
       - name: Scan changed images
         continue-on-error: true
