@@ -63,3 +63,20 @@ spec:
     staticConfig:
       static:
         - https://odesa-gatus.negative7.com
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: unifi-update
+spec:
+  # Unauthenticated /api/system reports deviceState=updateAvailable for pending UniFi OS/app updates
+  jobName: unifi-update
+  interval: 15m
+  module: unifi_update
+  prober:
+    url: blackbox-exporter.observability.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - https://unifi.negative7.com/api/system
