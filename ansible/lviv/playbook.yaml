@@ -138,7 +138,6 @@
           loop:
             - /etc/nfs.conf.d
             - /etc/nftables.d
-            - /etc/systemd/system/cockpit.socket.d
 
         - name: services | Publish Docker ports on VLAN20 only
           ansible.builtin.copy:
@@ -156,12 +155,6 @@
             owner: root
             group: root
             mode: "0644"
-          notify: Reload NFS exports
-
-        - name: services | Remove Cockpit NFS exports
-          ansible.builtin.file:
-            path: /etc/exports.d/cockpit-file-sharing.exports
-            state: absent
           notify: Reload NFS exports
 
         - name: services | NFSv4 only
@@ -194,25 +187,6 @@
             mode: "0644"
             validate: testparm -s %s
           notify: Restart Samba
-
-        - name: services | Drop Cockpit registry shares
-          ansible.builtin.command: net conf drop
-          register: smb_registry
-          changed_when: smb_registry.rc == 0
-          failed_when: false
-
-        - name: services | Cockpit listens on VLAN20
-          ansible.builtin.copy:
-            dest: /etc/systemd/system/cockpit.socket.d/listen.conf
-            content: |
-              [Socket]
-              ListenStream=
-              ListenStream={{ vlan20_ip }}:9090
-              FreeBind=yes
-            owner: root
-            group: root
-            mode: "0644"
-          notify: Restart cockpit
 
         # upsmon on lviv talks to localhost; hass and nut_exporter use 10.2.0.10
         - name: services | NUT listens on loopback and VLAN20
@@ -634,12 +608,6 @@
       loop:
         - smbd.service
         - nmbd.service
-
-    - name: Restart cockpit
-      ansible.builtin.systemd_service:
-        name: cockpit.socket
-        state: restarted
-        daemon_reload: true
 
     - name: Restart NUT
       ansible.builtin.systemd_service:
