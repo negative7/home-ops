@@ -9,6 +9,7 @@ ansible_dir := justfile_dir() + '/ansible'
 # Hosts are reached by IP: odesa only over WireGuard, lviv on VLAN20 (survives its network cutover)
 lviv_host := '10.2.0.10'
 odesa_host := '10.99.0.1'
+unifi_host := '10.0.1.1'
 
 [private]
 [script]
@@ -31,7 +32,13 @@ odesa *args: _op
     just log info "Running playbook" "host" "odesa" "address" "{{ odesa_host }}"
     ansible-playbook -i "{{ odesa_host }}," "{{ ansible_dir }}/odesa/playbook.yaml" "$@"
 
-# Both playbooks read secrets with `op read`
+[doc('Run the UniFi gateway playbook (-e unifi_password_auth=true when SSH keys were reset)')]
+[script]
+unifi *args:
+    just log info "Running playbook" "host" "unifi" "address" "{{ unifi_host }}"
+    ansible-playbook -i "{{ unifi_host }}," "{{ ansible_dir }}/unifi/playbook.yaml" "$@"
+
+# The lviv and odesa playbooks read secrets with `op read`
 [private]
 [script]
 _op:

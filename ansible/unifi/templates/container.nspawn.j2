@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+[Exec]
+Boot=on
+ResolvConf=off
+
+[Network]
+MACVLAN=br{{ container_vlan }}
+{% if container_binds | length > 0 %}
+
+[Files]
+{% for bind in container_binds %}
+{{ bind }}
+{% endfor %}
+{% endif %}

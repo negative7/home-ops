@@ -1,0 +1,66 @@
+#!/bin/bash
+# {{ ansible_managed }}
+# Based on unifi-common-addons nspawn-container/scripts/0-setup-system.sh. Firmware updates wipe
+# /usr and /var (systemd-container, /var/lib/machines) but keep /data. Differences from upstream:
+# online install is tried with a timeout and falls back to the cached .debs (upstream's set -e
+# aborted on a failed apt-get update, before reaching the offline path), and the cache is only
+# replaced after a complete download (upstream deleted it first)
+set -uo pipefail
+
+DPKG_CACHE="{{ unifi_dpkg_cache }}"
+PACKAGES="{{ unifi_container_packages | join(' ') }}"
+MACHINE="{{ container_name }}"
+ROOTFS="{{ container_rootfs }}"
+NSPAWN_SRC="{{ container_nspawn_src }}"
+
+installed() {
+  dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -q 'install ok installed'
+}
+
+online=false
+if timeout 60 apt-get update -qq; then
+  online=true
+fi
+
+if ! installed systemd-container; then
+  echo "changed: installing systemd-container"
+  # shellcheck disable=SC2086
+  if ! { $online && timeout 300 apt-get install -y $PACKAGES; }; then
+    echo "online install failed, installing cached packages from $DPKG_CACHE"
+    dpkg -i "$DPKG_CACHE"/*.deb || { echo "offline install failed" >&2; exit 1; }
+  fi
+fi
+
+if $online; then
+  tmp="$(mktemp -d)"
+  # shellcheck disable=SC2086
+  if (cd "$tmp" && timeout 300 apt-get download $PACKAGES); then
+    mkdir -p "$DPKG_CACHE"
+    rm -f "$DPKG_CACHE"/*.deb
+    mv "$tmp"/*.deb "$DPKG_CACHE"/
+  else
+    echo "package download failed, keeping existing cache in $DPKG_CACHE"
+  fi
+  rm -rf "$tmp"
+fi
+
+mkdir -p /etc/systemd/nspawn /var/lib/machines
+if ! cmp -s "$NSPAWN_SRC" "/etc/systemd/nspawn/$MACHINE.nspawn"; then
+  cp "$NSPAWN_SRC" "/etc/systemd/nspawn/$MACHINE.nspawn"
+  echo "changed: restored /etc/systemd/nspawn/$MACHINE.nspawn"
+fi
+
+if [ ! -e "/var/lib/machines/$MACHINE" ]; then
+  ln -s "$ROOTFS" "/var/lib/machines/$MACHINE"
+  echo "changed: linked $ROOTFS into /var/lib/machines"
+fi
+
+if ! systemctl is-enabled --quiet "systemd-nspawn@$MACHINE.service"; then
+  machinectl enable "$MACHINE"
+  echo "changed: enabled $MACHINE"
+fi
+
+if ! systemctl is-active --quiet "systemd-nspawn@$MACHINE.service"; then
+  machinectl start "$MACHINE"
+  echo "changed: started $MACHINE"
+fi
