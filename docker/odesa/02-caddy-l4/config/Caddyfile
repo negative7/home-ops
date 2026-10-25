@@ -68,7 +68,16 @@
 }
 
 odesa-doco-cd.negative7.com {
-	reverse_proxy doco-cd:8880
+	# Only the push webhook and the health check; the /v1/api/* management API stays private
+	@public {
+		path /v1/webhook /v1/webhook/* /v1/health
+	}
+	handle @public {
+		reverse_proxy doco-cd:8880
+	}
+	handle {
+		respond 404
+	}
 }
 
 odesa-gatus.negative7.com {
