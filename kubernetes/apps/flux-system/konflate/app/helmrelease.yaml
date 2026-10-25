@@ -21,9 +21,6 @@ spec:
       existingSecret: konflate-secret
     httpRoute:
       enabled: true
-      annotations:
-        gatus.home-operations.com/endpoint: |-
-          conditions: ["[STATUS] == 200"]
       parentRefs:
         - name: envoy-internal
           namespace: network
