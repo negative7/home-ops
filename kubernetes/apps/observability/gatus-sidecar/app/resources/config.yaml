@@ -26,6 +26,16 @@ endpoints:
     conditions:
       - "[CONNECTED] == true"
 
+  - name: odesa | ping
+    group: vps
+    url: icmp://135.148.43.50
+    interval: 1m
+    ui:
+      hide-url: true
+      hide-hostname: true
+    conditions:
+      - "[CONNECTED] == true"
+
 metrics: true
 
 storage:
