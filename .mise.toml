@@ -9,12 +9,12 @@ TALOSCONFIG = '{{config_root}}/talosconfig'
 pipx.uvx = true
 
 [tools]
-"aqua:astral-sh/uv" = "0.13.1"
+"aqua:astral-sh/uv" = "0.13.5"
 "aqua:google/yamlfmt" = "0.21.0"
 "npm:markdownlint-cli2" = "0.23.3"
 "pipx:ansible" = "14.5.0"
 "pipx:ansible-core" = "2.21.5"
-"pipx:b2" = "5.0.1"
+"pipx:b2" = "5.0.2"
 "pipx:yamllint" = "1.38.0"
 
 
@@ -37,7 +37,7 @@ lefthook = "2.2.2"
 node = "26.12.1"
 oxfmt = "0.74.0"
 shellcheck = "0.11.0"
-go = "1.27.2"
+go = "1.27.3"
 "go:code.gitea.io/tea" = "1.3.3"
 
 [hooks]
