@@ -25,7 +25,7 @@ spec:
         gatus.home-operations.com/endpoint: |-
           conditions: ["[STATUS] == 200"]
       parentRefs:
-        - name: envoy-external
+        - name: envoy-internal
           namespace: network
       hostnames:
         - "konflate.negative7.com"
