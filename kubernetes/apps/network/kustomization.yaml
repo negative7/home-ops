@@ -14,4 +14,3 @@ resources:
   - ./external-dns/ks.yaml
   - ./external-services/ks.yaml
   - ./multus/ks.yaml
-  - ./tailscale-ssh/ks.yaml
