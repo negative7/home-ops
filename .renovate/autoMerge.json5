@@ -5,19 +5,6 @@
   platformAutomerge: false,
   packageRules: [
     {
-      description: "Auto-merge trusted OCI digests",
-      matchDatasources: ["docker"],
-      matchUpdateTypes: ["digest"],
-      matchPackagePrefixes: [
-        "ghcr.io/home-operations",
-        "ghcr.io/bjw-s",
-        "ghcr.io/bjw-s-labs",
-      ],
-      automerge: true,
-      automergeType: "pr",
-      ignoreTests: false,
-    },
-    {
       // Same tag, new digest (rebuild) or first-time pin: the version doesn't change.
       // Floating tags are excluded because a new digest there means new code.
       description: "Auto-merge digest pins and rebuilds of versioned tags",
@@ -26,7 +13,14 @@
       matchCurrentValue: "!/^(main|master|latest|release|rolling|edge|nightly)$/",
       automerge: true,
       automergeType: "pr",
-      ignoreTests: false,
+    },
+    {
+      // A new digest behind an existing tag is a re-push; give a bad or compromised one a day to be pulled
+      description: "Soak digest rebuilds for a day",
+      matchDatasources: ["docker"],
+      matchUpdateTypes: ["digest"],
+      minimumReleaseAge: "1 day",
+      minimumReleaseAgeBehaviour: "timestamp-optional",
     },
     {
       // Patch releases of apps and charts, after a 3-day soak so regressions surface upstream first.
@@ -34,8 +28,8 @@
       description: "Auto-merge patch updates outside core infrastructure",
       matchDatasources: ["docker"],
       matchUpdateTypes: ["patch"],
+      // Negation-only list: matches every package except these
       matchPackageNames: [
-        "*",
         "!/forgejo/",
         "!/cilium/",
         "!/coredns/",
@@ -60,7 +54,6 @@
       minimumReleaseAgeBehaviour: "timestamp-optional",
       automerge: true,
       automergeType: "pr",
-      ignoreTests: false,
     },
     {
       description: "Auto-merge high-cadence OCI packages weekly",
@@ -72,16 +65,15 @@
       ],
       automerge: true,
       automergeType: "pr",
-      ignoreTests: false,
       schedule: ["before 6am on Monday"],
     },
     {
-      description: "Auto-merge dev tooling (mise) minor and patch updates",
+      // Dev and CI tooling, any update type including 0.x minors and majors; a bad bump is a one-line revert
+      description: "Auto-merge all dev tooling (mise) updates",
       matchManagers: ["mise"],
-      matchUpdateTypes: ["minor", "patch"],
+      matchUpdateTypes: ["major", "minor", "patch"],
       automerge: true,
       automergeType: "pr",
-      ignoreTests: false,
     },
     {
       description: "Auto-merge Grafana dashboards",
