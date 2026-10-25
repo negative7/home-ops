@@ -10,7 +10,6 @@
     "local>negative7/home-ops//.renovate/grafanaDashboards.json5",
     "local>negative7/home-ops//.renovate/groups.json5",
     "local>negative7/home-ops//.renovate/labels.json5",
-    "local>negative7/home-ops//.renovate/semanticCommits.json5",
     ":semanticCommits",
     ":timezone(America/New_York)",
   ],
