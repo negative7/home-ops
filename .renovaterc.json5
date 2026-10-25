@@ -10,31 +10,15 @@
     "local>negative7/home-ops//.renovate/grafanaDashboards.json5",
     "local>negative7/home-ops//.renovate/groups.json5",
     "local>negative7/home-ops//.renovate/labels.json5",
-    ":semanticCommits",
+    "local>negative7/home-ops//.renovate/apps/cloudnative-pg.json5",
     ":timezone(America/New_York)",
   ],
   // Forgejo/Gitea bug: commits/{ref}/statuses 404s when the ref contains a
   // URL-encoded slash, which breaks resolveBranchStatus for the default
   // "renovate/" prefix. See https://github.com/go-gitea/gitea/issues/36253
   branchPrefix: "renovate-",
-  commitBodyTable: true,
   // Main moves often; rebasing every behind-main automerge PR keeps pushing its merge to a later run
   rebaseWhen: "conflicted",
-  // Forgejo has no vulnerability alerts of its own; OSV lets CVE fixes bypass schedules and soak
-  osvVulnerabilityAlerts: true,
-  suppressNotifications: [
-    "prEditedNotification",
-    "prIgnoreNotification",
-  ],
-  flux: {
-    managerFilePatterns: ["/^kubernetes/.+\\.yaml(?:\\.j2)?$/"],
-  },
-  "helm-values": {
-    managerFilePatterns: ["/^kubernetes/.+\\.yaml(?:\\.j2)?$/"],
-  },
-  kubernetes: {
-    managerFilePatterns: ["/^kubernetes/.+\\.yaml(?:\\.j2)?$/"],
-  },
   packageRules: [
     {
       description: "Pin container image digests (not chart OCIRepositories)",
