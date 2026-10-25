@@ -68,18 +68,10 @@
       schedule: ["before 6am on Monday"],
     },
     {
-      description: "Auto-merge dev tooling (mise) patch updates",
+      // Dev and CI tooling, any update type including 0.x minors and majors; a bad bump is a one-line revert
+      description: "Auto-merge all dev tooling (mise) updates",
       matchManagers: ["mise"],
-      matchUpdateTypes: ["patch"],
-      automerge: true,
-      automergeType: "pr",
-    },
-    {
-      // zer0ver: a 0.x minor can break, so those wait for review
-      description: "Auto-merge dev tooling (mise) minor updates from 1.0 on",
-      matchManagers: ["mise"],
-      matchUpdateTypes: ["minor"],
-      matchCurrentVersion: "!/^v?0\\./",
+      matchUpdateTypes: ["major", "minor", "patch"],
       automerge: true,
       automergeType: "pr",
     },
