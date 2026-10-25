@@ -1,8 +1,8 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   // Scopes and the major "!" prefix come from the home-operations default preset. These keep this
-  // repo's style on top: feat/fix by update type for every manager (upstream makes mise, github-release
-  // and renovate-config updates chore), a bare depName topic and spaced version brackets
+  // repo's style on top: feat/fix by update type, chore for digests and tooling, a bare depName topic
+  // and spaced version brackets
   packageRules: [
     {
       matchUpdateTypes: ["major", "minor"],
@@ -18,9 +18,18 @@
     },
     {
       matchUpdateTypes: ["digest"],
-      semanticCommitType: "fix",
+      semanticCommitType: "chore",
       commitMessageTopic: "{{depName}}",
       commitMessageExtra: "( {{currentDigestShort}} ➔ {{newDigestShort}} )",
+    },
+    {
+      // Tooling and release-asset bumps are maintenance, whatever the update type
+      matchManagers: ["mise", "renovate-config"],
+      semanticCommitType: "chore",
+    },
+    {
+      matchDatasources: ["github-releases"],
+      semanticCommitType: "chore",
     },
     {
       // Comes after the type rules above so workflow updates stay ci(github-action)
