@@ -1,0 +1,36 @@
+---
+# Dragonfly operator v1.7+ no longer creates this policy itself, and the metrics policy alone
+# isolates the pod: clients in the app namespace need 6379, the operator and replicas need the admin port
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ${APP}-dragonfly-access
+spec:
+  podSelector:
+    matchLabels:
+      app: ${APP}-dragonfly
+      app.kubernetes.io/name: dragonfly
+      app.kubernetes.io/part-of: dragonfly
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 6379
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: database
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: dragonfly-operator
+        - podSelector:
+            matchLabels:
+              app: ${APP}-dragonfly
+              app.kubernetes.io/name: dragonfly
+              app.kubernetes.io/part-of: dragonfly
+      ports:
+        - protocol: TCP
+          port: 9999
