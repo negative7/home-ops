@@ -8,3 +8,4 @@ resources:
   - ./kanidm.yaml
   - ./groups.yaml
   - ./pushsecret.yaml
+  - ./ciliumnetworkpolicy.yaml
