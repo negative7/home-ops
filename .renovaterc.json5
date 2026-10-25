@@ -18,6 +18,8 @@
   // "renovate/" prefix. See https://github.com/go-gitea/gitea/issues/36253
   branchPrefix: "renovate-",
   commitBodyTable: true,
+  // Main moves often; rebasing every behind-main automerge PR keeps pushing its merge to a later run
+  rebaseWhen: "conflicted",
   // Forgejo has no vulnerability alerts of its own; OSV lets CVE fixes bypass schedules and soak
   osvVulnerabilityAlerts: true,
   suppressNotifications: [
