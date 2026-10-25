@@ -1,8 +1,5 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  // Renovate merges on a later run once checks are green. Forgejo's "merge when checks succeed"
-  // merged right away because main has no required checks, before the image scan had run
-  platformAutomerge: false,
   packageRules: [
     {
       // Same tag, new digest (rebuild) or first-time pin: the version doesn't change.
@@ -59,9 +56,20 @@
       description: "Auto-merge high-cadence OCI packages weekly",
       matchDatasources: ["docker"],
       matchUpdateTypes: ["minor", "patch"],
+      matchPackageNames: ["/kube-prometheus-stack/"],
+      automerge: true,
+      automergeType: "pr",
+      schedule: ["before 6am on Monday"],
+    },
+    {
+      description: "Auto-merge high-cadence packages weekly",
+      matchDatasources: ["docker"],
+      matchUpdateTypes: ["digest", "minor", "patch"],
       matchPackageNames: [
         "ghcr.io/renovatebot/renovate",
-        "/kube-prometheus-stack/",
+        "ghcr.io/cloudnative-pg/postgresql",
+        "ghcr.io/emberstack/helm-charts/reflector",
+        "ghcr.io/mogenius/helm-charts/renovate-operator",
       ],
       automerge: true,
       automergeType: "pr",
