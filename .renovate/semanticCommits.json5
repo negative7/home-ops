@@ -1,47 +1,31 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "packageRules": [
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  // Scopes and the major "!" prefix come from the home-operations default preset. These keep this
+  // repo's style on top: feat/fix by update type for every manager (upstream makes mise, github-release
+  // and renovate-config updates chore), a bare depName topic and spaced version brackets
+  packageRules: [
     {
-      "matchUpdateTypes": ["major"],
-      "semanticCommitType": "feat",
-      "commitMessageTopic": "{{depName}}",
-      "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}})!:",
-      "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
-      "commitMessageSuffix": ""
+      matchUpdateTypes: ["major", "minor"],
+      semanticCommitType: "feat",
+      commitMessageTopic: "{{depName}}",
+      commitMessageExtra: "( {{currentVersion}} ➔ {{newVersion}} )",
     },
     {
-      "matchUpdateTypes": ["minor"],
-      "semanticCommitType": "feat",
-      "commitMessageTopic": "{{depName}}",
-      "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
-      "commitMessageSuffix": ""
+      matchUpdateTypes: ["patch"],
+      semanticCommitType: "fix",
+      commitMessageTopic: "{{depName}}",
+      commitMessageExtra: "( {{currentVersion}} ➔ {{newVersion}} )",
     },
     {
-      "matchUpdateTypes": ["patch"],
-      "semanticCommitType": "fix",
-      "commitMessageTopic": "{{depName}}",
-      "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
-      "commitMessageSuffix": ""
+      matchUpdateTypes: ["digest"],
+      semanticCommitType: "fix",
+      commitMessageTopic: "{{depName}}",
+      commitMessageExtra: "( {{currentDigestShort}} ➔ {{newDigestShort}} )",
     },
     {
-      "matchUpdateTypes": ["digest"],
-      "semanticCommitType": "fix",
-      "commitMessageTopic": "{{depName}}",
-      "commitMessageExtra": "( {{currentDigestShort}} ➔ {{newDigestShort}} )",
-      "commitMessageSuffix": ""
+      // Comes after the type rules above so workflow updates stay ci(github-action)
+      matchManagers: ["github-actions"],
+      semanticCommitType: "ci",
     },
-    {
-      "matchDatasources": ["docker"],
-      "semanticCommitScope": "container"
-    },
-    {
-      "matchDatasources": ["helm"],
-      "semanticCommitScope": "helm"
-    },
-    {
-      "matchManagers": ["github-actions"],
-      "semanticCommitType": "ci",
-      "semanticCommitScope": "github-action"
-    }
-  ]
+  ],
 }

@@ -3,6 +3,7 @@
   extends: [
     "github>home-operations/renovate-presets#10.0.1",
     "github>home-operations/renovate-presets//apps/cnpg.json5#10.0.1",
+    "github>home-operations/renovate-presets//apps/grafanaDashboards.json5#10.0.1",
     "github>home-operations/renovate-presets//apps/talosFactory.json5#10.0.1",
     "local>negative7/home-ops//.renovate/autoMerge.json5",
     "local>negative7/home-ops//.renovate/customManagers.json5",
@@ -18,6 +19,8 @@
   // "renovate/" prefix. See https://github.com/go-gitea/gitea/issues/36253
   branchPrefix: "renovate-",
   commitBodyTable: true,
+  // Forgejo has no vulnerability alerts of its own; OSV lets CVE fixes bypass schedules and soak
+  osvVulnerabilityAlerts: true,
   suppressNotifications: [
     "prEditedNotification",
     "prIgnoreNotification",
@@ -32,12 +35,6 @@
     managerFilePatterns: ["/^kubernetes/.+\\.yaml(?:\\.j2)?$/"],
   },
   packageRules: [
-    {
-      // Upstream advises against 17.0.0 (push/merge breakage); drop once 17.0.1+ ships
-      description: "Hold Forgejo 17.0.0",
-      matchPackageNames: ["code.forgejo.org/forgejo/forgejo"],
-      allowedVersions: "!/^v?17\\.0\\.0$/",
-    },
     {
       description: "Pin container image digests (not chart OCIRepositories)",
       matchDatasources: ["docker"],

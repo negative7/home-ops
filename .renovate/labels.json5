@@ -14,7 +14,7 @@
       addLabels: ["type/patch"],
     },
     {
-      matchUpdateTypes: ["digest"],
+      matchUpdateTypes: ["digest", "pinDigest"],
       addLabels: ["type/digest"],
     },
   ],
