@@ -66,6 +66,11 @@ spec:
                   - ALL
     service:
       app:
+        annotations:
+          com.dashbrr.service.type: bazarr
+          com.dashbrr.service.name: Bazarr
+          com.dashbrr.service.url: http://bazarr.downloads.svc.cluster.local:6767
+          com.dashbrr.service.apikey: "$${DASHBRR_BAZARR_API_KEY}"
         ports:
           http:
             port: *port

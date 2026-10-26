@@ -117,6 +117,10 @@ spec:
       app:
         type: LoadBalancer
         annotations:
+          com.dashbrr.service.type: jellyfin
+          com.dashbrr.service.name: Jellyfin
+          com.dashbrr.service.url: http://jellyfin.media.svc.cluster.local:8096
+          com.dashbrr.service.apikey: "$${DASHBRR_JELLYFIN_API_KEY}"
           lbipam.cilium.io/ips: 10.2.1.108
         externalTrafficPolicy: Local
         ports:

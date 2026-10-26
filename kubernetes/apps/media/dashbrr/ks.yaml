@@ -1,0 +1,37 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: dashbrr
+spec:
+  components:
+    - ../../../../components/kanidm-oidc
+    - ../../../../components/kopiur/backup
+  dependsOn:
+    - name: onepassword-connect
+      namespace: external-secrets
+    - name: miroir
+      namespace: miroir-system
+    - name: kopiur
+      namespace: system
+    - name: kanidm
+      namespace: security
+  interval: 1h
+  path: ./kubernetes/apps/media/dashbrr/app
+  postBuild:
+    substitute:
+      APP: dashbrr
+      KOPIUR_CAPACITY: 1Gi
+      # Dashbrr v0.7.0 sends no PKCE challenge and requests no groups scope
+      OIDC_CALLBACK: /api/auth/oidc/callback
+      OIDC_DISABLE_PKCE: "true"
+      OIDC_DISPLAY_NAME: Dashbrr
+      OIDC_GROUP: admins
+      OIDC_SCOPES: "[\"openid\", \"profile\", \"email\"]"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: media

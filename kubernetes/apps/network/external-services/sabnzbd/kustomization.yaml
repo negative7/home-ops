@@ -5,3 +5,4 @@ kind: Kustomization
 resources:
   - ./backend.yaml
   - ./httproute.yaml
+  - ./service.yaml
