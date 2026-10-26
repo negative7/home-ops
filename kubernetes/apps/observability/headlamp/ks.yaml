@@ -5,8 +5,18 @@ kind: Kustomization
 metadata:
   name: headlamp
 spec:
+  components:
+    - ../../../../components/kanidm-oidc/envoy
+  dependsOn:
+    - name: kanidm
+      namespace: security
   interval: 1h
   path: ./kubernetes/apps/observability/headlamp/app
+  postBuild:
+    substitute:
+      APP: headlamp
+      OIDC_DISPLAY_NAME: Headlamp
+      OIDC_GROUP: admins
   prune: true
   sourceRef:
     kind: GitRepository
