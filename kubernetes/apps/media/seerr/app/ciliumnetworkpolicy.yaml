@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: seerr
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: seerr
+  egress:
+    - # Sonarr / Radarr (egress label internet denies the rest of the cluster)
+      toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: downloads
+            app.kubernetes.io/name: sonarr
+      toPorts:
+        - ports:
+            - protocol: TCP
+              port: "8989"
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: downloads
+            app.kubernetes.io/name: radarr
+      toPorts:
+        - ports:
+            - protocol: TCP
+              port: "7878"
