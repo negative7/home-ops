@@ -39,11 +39,25 @@ spec:
             args:
               - |
                 rc=0
+                count() { rclone size --json "$1" | sed -n 's/.*"count":\([0-9]*\).*/\1/p'; }
+                # Skip a bucket whose source holds under half the objects already in B2, so a wiped
+                # Garage fails the job instead of hiding the off-site copy (Kopia maintenance alone
+                # hides up to ~35% of kopiur a night)
+                guarded_sync() {
+                  src=$(count "$1"); dst=$(count "$2")
+                  if [ -z "$src" ] || [ -z "$dst" ]; then
+                    echo "ERROR: could not count objects in $1 or $2"; return 1
+                  fi
+                  if [ $((src * 2)) -lt "$dst" ]; then
+                    echo "ERROR: $1 has $src objects but $2 has $dst, refusing to sync"; return 1
+                  fi
+                  rclone sync "$1" "$2"
+                }
                 # Kopia already encrypts the repo; kept plain so Kopia can connect to B2 directly in a disaster
-                rclone sync garage:kopiur "b2:${B2_BUCKET}/kopiur" || rc=1
-                rclone sync garage:cnpg-backups b2crypt:cnpg-backups || rc=1
-                rclone sync garage:sergiy-pc b2crypt:sergiy-pc || rc=1
-                rclone sync garage:kanidm b2crypt:kanidm || rc=1
+                guarded_sync garage:kopiur "b2:${B2_BUCKET}/kopiur" || rc=1
+                guarded_sync garage:cnpg-backups b2crypt:cnpg-backups || rc=1
+                guarded_sync garage:sergiy-pc b2crypt:sergiy-pc || rc=1
+                guarded_sync garage:kanidm b2crypt:kanidm || rc=1
                 exit $rc
             env:
               TZ: America/New_York
