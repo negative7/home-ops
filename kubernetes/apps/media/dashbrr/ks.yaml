@@ -28,6 +28,7 @@ spec:
       OIDC_DISABLE_PKCE: "true"
       OIDC_DISPLAY_NAME: Dashbrr
       OIDC_GROUP: admins
+      OIDC_IMAGE_URL: https://cdn.jsdelivr.net/gh/autobrr/dashbrr@v0.7.0/web/public/logo.svg
       OIDC_SCOPES: "[\"openid\", \"profile\", \"email\"]"
   prune: true
   sourceRef:
