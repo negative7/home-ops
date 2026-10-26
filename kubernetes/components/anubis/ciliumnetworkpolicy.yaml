@@ -1,0 +1,15 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: ${APP}-anubis
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: ${APP}-anubis
+  egress:
+    - # The protected app (egress label block-all denies everything else)
+      toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: ${APP}

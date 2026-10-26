@@ -11,6 +11,8 @@ spec:
   interval: 1h
   values:
     replicaCount: 1
+    podLabels:
+      egress.policy.home.arpa/block-all: "true"
     config:
       kubernetes: true
       trustedProxies:
