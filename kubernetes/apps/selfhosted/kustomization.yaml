@@ -16,4 +16,3 @@ resources:
   - ./namespace.yaml
   - ./outline/ks.yaml
   - ./spoolman/ks.yaml
-  - ./trek/ks.yaml
