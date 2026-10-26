@@ -250,6 +250,9 @@
             properties: {dnodesize: auto}
           - name: tank/apps
             properties: {compression: zstd}
+          # Cap so a runaway backup job can't fill the pool (includes the sanoid snapshots)
+          - name: tank/apps/garage
+            properties: {quota: 500G}
           - name: tank/apps/garage/meta
             properties: {recordsize: 16K}
           # Garage blocks are already zstd-compressed
