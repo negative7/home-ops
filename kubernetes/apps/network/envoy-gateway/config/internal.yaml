@@ -35,9 +35,13 @@ spec:
         certificateRefs:
           - kind: Secret
             name: negative7-com-tls
+    # Forgejo only
     - name: ssh
       protocol: TCP
       port: 22
       allowedRoutes:
         namespaces:
-          from: All
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: dev

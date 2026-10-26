@@ -1,0 +1,40 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.envoyproxy.io/httproutefilter_v1alpha1.json
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: HTTPRouteFilter
+metadata:
+  name: misdirected
+spec:
+  directResponse:
+    statusCode: 421
+    contentType: text/plain
+    body:
+      type: Inline
+      inline: Misdirected Request
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/httproute_v1.json
+# No hostnames, so this only matches a Host/SNI that no other route claims
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: misdirected
+  annotations:
+    external-dns.kubernetes.io/controller: none
+spec:
+  parentRefs:
+    - name: envoy-internal
+      namespace: network
+      sectionName: https
+    - name: envoy-external
+      namespace: network
+      sectionName: https
+    - name: envoy-external
+      namespace: network
+      sectionName: https-proxy
+  rules:
+    - filters:
+        - type: ExtensionRef
+          extensionRef:
+            group: gateway.envoyproxy.io
+            kind: HTTPRouteFilter
+            name: misdirected
