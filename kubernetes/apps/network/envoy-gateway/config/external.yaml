@@ -22,7 +22,12 @@ spec:
       port: 80
       allowedRoutes:
         namespaces:
-          from: Same
+          # Only the https-redirect route: an app route in network without a
+          # sectionName would otherwise also be served over plain HTTP
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: https-redirect
     - name: https
       protocol: HTTPS
       port: 443
@@ -39,7 +44,12 @@ spec:
       port: 8080
       allowedRoutes:
         namespaces:
-          from: Same
+          # Only the https-redirect route: an app route in network without a
+          # sectionName would otherwise also be served over plain HTTP
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: https-redirect
     - name: https-proxy
       protocol: HTTPS
       port: 8443

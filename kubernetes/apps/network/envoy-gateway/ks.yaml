@@ -36,3 +36,22 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: network
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: envoy-gateway-redirect
+spec:
+  dependsOn:
+    - name: envoy-gateway-config
+      namespace: network
+  interval: 1h
+  # No targetNamespace: the redirect route lives in its own https-redirect namespace,
+  # the only one the gateways' plain-HTTP listeners accept routes from
+  path: "./kubernetes/apps/network/envoy-gateway/redirect"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
