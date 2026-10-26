@@ -27,7 +27,7 @@ spec:
       value: "true"
     - name: AWS_REGION
       value: us-east-1
-  image: ghcr.io/renovatebot/renovate:44.181.11@sha256:050ecf98a30c64b5dd4c51343218d52dcb6cce6875cc47cb5a754f7adee65af7
+  image: ghcr.io/renovatebot/renovate:44.181.12@sha256:5164b93fea95e0e80c4ef059cd748002a920922463ad8cc752f350f0ad41a583
   parallelism: 5
   provider:
     name: forgejo
