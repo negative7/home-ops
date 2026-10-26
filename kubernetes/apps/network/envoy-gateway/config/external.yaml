@@ -143,6 +143,12 @@ spec:
               protocol: TCP
             - port: "8443"
               protocol: TCP
+    # xDS replies from the controller: Cilium 1.20 drops them as new ingress when the
+    # controller is on the same node (Service VIP, DSR), so the pod never gets config
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: gateway-helm
+            control-plane: envoy-gateway
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.envoyproxy.io/envoyextensionpolicy_v1alpha1.json
 apiVersion: gateway.envoyproxy.io/v1alpha1
