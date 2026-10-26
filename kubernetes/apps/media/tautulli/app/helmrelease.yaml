@@ -23,6 +23,9 @@ spec:
               TZ: America/New_York
               TAUTULLI_HTTP_BASE_URL: https://tautulli.negative7.com
               TAUTULLI_HTTP_PORT: &port 80
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
             probes:
               liveness:
                 enabled: true

@@ -157,6 +157,14 @@ spec:
                   icon: jellyfin.png
                   href: https://jellystat.negative7.com
                   description: Jellyfin Statistics
+              - Tautulli:
+                  icon: tautulli.png
+                  href: https://tautulli.negative7.com
+                  description: Plex Statistics
+                  widget:
+                    type: tautulli
+                    url: http://tautulli.media.svc.cluster.local
+                    key: '{{ "{{" }}HOMEPAGE_VAR_TAUTULLI_KEY{{ "}}" }}'
 
             - Downloads:
               - Sonarr:
