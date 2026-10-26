@@ -96,10 +96,6 @@ spec:
   http2:
     onInvalidMessage: TerminateStream
   http3: {}
-  # TODO: drop once odesa caddy-l4 is on the :8080/:8443 proxy listeners; until then
-  # any LAN client can still send a PROXY header to :80/:443
-  proxyProtocol:
-    optional: true
   targetSelectors:
     - group: gateway.networking.k8s.io
       kind: Gateway
