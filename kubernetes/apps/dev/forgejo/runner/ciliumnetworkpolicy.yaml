@@ -51,6 +51,11 @@ spec:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
             gateway.networking.k8s.io/gateway-name: envoy-external
+    - # Forgejo (git.negative7.com) is routed through envoy-internal
+      toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
     - # Internet egress
       toCIDRSet:
         - cidrGroupRef: internet
