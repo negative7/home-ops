@@ -1,0 +1,17 @@
+---
+# Carries the Dashbrr discovery annotations for the lviv container (no postBuild here, so no $$ escaping)
+apiVersion: v1
+kind: Service
+metadata:
+  name: autobrr
+  annotations:
+    com.dashbrr.service.type: autobrr
+    com.dashbrr.service.name: Autobrr
+    com.dashbrr.service.url: http://lviv.homelab.internal:7474
+    com.dashbrr.service.apikey: "${DASHBRR_AUTOBRR_API_KEY}"
+spec:
+  type: ExternalName
+  externalName: lviv.homelab.internal
+  ports:
+    - name: http
+      port: 7474

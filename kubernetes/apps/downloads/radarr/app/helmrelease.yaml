@@ -79,6 +79,11 @@ spec:
 
     service:
       app:
+        annotations:
+          com.dashbrr.service.type: radarr
+          com.dashbrr.service.name: Radarr
+          com.dashbrr.service.url: http://radarr.downloads.svc.cluster.local:7878
+          com.dashbrr.service.apikey: "$${DASHBRR_RADARR_API_KEY}"
         controller: radarr
         ports:
           http:

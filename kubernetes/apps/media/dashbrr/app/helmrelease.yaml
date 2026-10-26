@@ -1,0 +1,150 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dashbrr
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: dashbrr
+  interval: 30m
+  dependsOn:
+    - name: miroir
+      namespace: miroir-system
+  values:
+    controllers:
+      dashbrr:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        strategy: Recreate
+        serviceAccount:
+          identifier: dashbrr
+
+        pod:
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            runAsNonRoot: true
+            fsGroup: 2000
+            fsGroupChangePolicy: "OnRootMismatch"
+            seccompProfile:
+              type: RuntimeDefault
+
+        initContainers:
+          # Imports every Service annotated com.dashbrr.service.type (all namespaces) and
+          # resolves their DASHBRR_*_API_KEY placeholders from this env. Services already
+          # in the DB (matched by URL) are skipped, so a rotated key needs the card re-added
+          discover:
+            image: &image
+              repository: ghcr.io/autobrr/dashbrr
+              tag: v0.7.0@sha256:0a14f0b614e840e0157290d70abd753ea124a7af28769e79f11acbfc5db01cf0
+            args:
+              - "config"
+              - "discover"
+              - "--k8s"
+              - "--yes"
+            env: &env
+              TZ: America/New_York
+              DASHBRR__DB_TYPE: sqlite
+              DASHBRR__DB_PATH: /config/dashbrr.db
+            envFrom:
+              - secretRef:
+                  name: dashbrr-secret
+              - secretRef:
+                  name: dashbrr-extra-secret
+                  optional: true
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 256Mi
+            securityContext: &securityContext
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+
+        containers:
+          app:
+            image: *image
+            env:
+              <<: *env
+              DASHBRR__LISTEN_ADDR: 0.0.0.0:8080
+              DASHBRR__LOG_LEVEL: info
+              DASHBRR__OIDC_ISSUER: https://idm.negative7.com/oauth2/openid/dashbrr
+              DASHBRR__OIDC_CLIENT_ID: dashbrr
+              DASHBRR__OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: dashbrr-kanidm-oauth2-credentials
+                    key: CLIENT_SECRET
+              DASHBRR__OIDC_REDIRECT_URL: https://dashbrr.negative7.com/api/auth/oidc/callback
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 8080
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 256Mi
+            securityContext: *securityContext
+
+    serviceAccount:
+      dashbrr: {}
+
+    rbac:
+      roles:
+        dashbrr:
+          type: ClusterRole
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - "services"
+              verbs:
+                - "get"
+                - "list"
+                - "watch"
+      bindings:
+        dashbrr:
+          type: ClusterRoleBinding
+          roleRef:
+            identifier: dashbrr
+          subjects:
+            - identifier: dashbrr
+
+    service:
+      app:
+        controller: dashbrr
+        ports:
+          http:
+            port: 8080
+
+    route:
+      app:
+        hostnames:
+          - dashbrr.negative7.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+
+    persistence:
+      config:
+        existingClaim: dashbrr
+        globalMounts:
+          - path: /config
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp

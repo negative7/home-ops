@@ -79,6 +79,11 @@ spec:
 
     service:
       app:
+        annotations:
+          com.dashbrr.service.type: sonarr
+          com.dashbrr.service.name: Sonarr
+          com.dashbrr.service.url: http://sonarr.downloads.svc.cluster.local:8989
+          com.dashbrr.service.apikey: "$${DASHBRR_SONARR_API_KEY}"
         controller: sonarr
         ports:
           http:

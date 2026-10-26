@@ -8,6 +8,7 @@ components:
   - ../../components/kopiur/secret
 resources:
   - ./namespace.yaml
+  - ./dashbrr/ks.yaml
   - ./jellyfin/ks.yaml
   - ./jellyplex-watched/ks.yaml
   - ./jellystat/ks.yaml

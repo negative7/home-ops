@@ -76,6 +76,11 @@ spec:
 
     service:
       app:
+        annotations:
+          com.dashbrr.service.type: prowlarr
+          com.dashbrr.service.name: Prowlarr
+          com.dashbrr.service.url: http://prowlarr.downloads.svc.cluster.local:9696
+          com.dashbrr.service.apikey: "$${DASHBRR_PROWLARR_API_KEY}"
         controller: prowlarr
         ports:
           http:

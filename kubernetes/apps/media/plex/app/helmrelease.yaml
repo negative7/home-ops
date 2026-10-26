@@ -78,6 +78,10 @@ spec:
         controller: plex
         type: LoadBalancer
         annotations:
+          com.dashbrr.service.type: plex
+          com.dashbrr.service.name: Plex
+          com.dashbrr.service.url: http://plex.media.svc.cluster.local:32400
+          com.dashbrr.service.apikey: "$${DASHBRR_PLEX_API_KEY}"
           io.cilium/lb-ipam-ips: 10.2.1.105
         ports:
           http:
