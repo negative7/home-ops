@@ -25,5 +25,5 @@ volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: true
 parameters:
   csi.storage.k8s.io/fstype: ext4
-  miroir.home-operations.com/replicas: "2"
+  miroir.home-operations.com/replicas: "3"
   miroir.home-operations.com/quorum: last-man-standing
