@@ -22,7 +22,7 @@ spec:
   postBuild:
     substitute:
       APP: dashbrr
-      KOPIUR_CAPACITY: 1Gi
+      KOPIUR_CAPACITY: 2Gi
       # Dashbrr v0.7.0 sends no PKCE challenge and requests no groups scope
       OIDC_CALLBACK: /api/auth/oidc/callback
       OIDC_DISABLE_PKCE: "true"
