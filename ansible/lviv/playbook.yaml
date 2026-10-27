@@ -258,6 +258,9 @@
           # Garage blocks are already zstd-compressed
           - name: tank/apps/garage/data
             properties: {recordsize: 1M, compression: lz4}
+          # Zot registry cache (docker/lviv/05-zot): layers are already compressed; not snapshotted
+          - name: tank/apps/zot
+            properties: {quota: 200G, recordsize: 1M, compression: lz4}
           - name: tank/backups
             properties: {sync: standard, recordsize: 1M}
           - name: tank/data/immich
