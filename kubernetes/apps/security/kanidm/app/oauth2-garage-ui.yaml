@@ -1,0 +1,49 @@
+---
+# garage-ui runs on lviv (docker/lviv/03-garage), so its credentials go to 1Password for doco-cd
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmOAuth2Client
+metadata:
+  name: garage-ui
+spec:
+  kanidmRef:
+    name: kanidm
+  displayname: Garage UI
+  origin: https://garage.negative7.com/
+  redirectUrl:
+    - https://garage.negative7.com/auth/oidc/callback
+  scopeMap:
+    - group: admins
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+  strictRedirectUrl: true
+  preferShortUsername: true
+  allowInsecureClientDisablePkce: true
+  image:
+    url: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/garage.svg
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/external-secrets.io/pushsecret_v1alpha1.json
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  name: garage-ui-kanidm-oauth2-credentials
+spec:
+  secretStoreRefs:
+    - name: onepassword-connect
+      kind: ClusterSecretStore
+  selector:
+    secret:
+      name: garage-ui-kanidm-oauth2-credentials
+  data:
+    - match:
+        secretKey: CLIENT_ID
+        remoteRef:
+          remoteKey: garage_ui
+          property: oidc_client_id
+    - match:
+        secretKey: CLIENT_SECRET
+        remoteRef:
+          remoteKey: garage_ui
+          property: oidc_client_secret
