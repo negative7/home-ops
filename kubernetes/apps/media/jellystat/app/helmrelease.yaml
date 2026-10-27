@@ -28,6 +28,9 @@ spec:
               tag: 1.1.12@sha256:e61c759ec706da378bc8374e797da1dfd298ab30f804cefd82d192c301a888c7
             env:
               TZ: America/New_York
+              # TLS to postgres-rw, verified against the cluster CA (trust-manager root-ca)
+              NODE_EXTRA_CA_CERTS: /etc/ssl/root-ca/ca.crt
+              POSTGRES_SSL_ENABLED: "true"
               POSTGRES_PORT: "5432"
               POSTGRES_USER:
                 valueFrom:
@@ -94,6 +97,12 @@ spec:
                 drop:
                   - ALL
     persistence:
+      root-ca:
+        type: secret
+        name: root-ca
+        globalMounts:
+          - path: /etc/ssl/root-ca
+            readOnly: true
       backup-data:
         type: emptyDir
         globalMounts:
