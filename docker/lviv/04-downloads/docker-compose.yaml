@@ -90,12 +90,18 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/tank/apps/qbittorrent:/config
       - /mnt/tank/data/torrents:/data/torrents:rw
+    # Fails when gluetun's control server is unreachable, i.e. this container is stuck in the
+    # netns of a gluetun that was restarted alone (doco-cd then restarts it into the current one).
+    # Also re-applies the forwarded port when gluetun's up command ran while qBittorrent was down
     healthcheck:
       test:
-        - CMD
-        - curl
-        - -f
-        - "http://localhost:8080/api/v2/app/version"
+        - CMD-SHELL
+        - >-
+          curl -fsS -o /dev/null http://localhost:8080/api/v2/app/version &&
+          p=$$(curl -fsS http://127.0.0.1:8000/v1/portforward | jq -r .port) &&
+          if [ "$$p" -gt 0 ] && [ "$$(curl -fsS http://localhost:8080/api/v2/app/preferences | jq -r '"\(.listen_port) \(.current_network_interface)"')" != "$$p tun0" ]; then
+          curl -fsS -o /dev/null --data "json={\"listen_port\":$$p,\"current_network_interface\":\"tun0\",\"random_port\":false,\"upnp\":false}" http://localhost:8080/api/v2/app/setPreferences;
+          fi
       start_period: 30s
       interval: 30s
       timeout: 5s
@@ -119,6 +125,15 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/tank/apps/qui:/config
+    # Fails when stuck in the netns of a gluetun that was restarted alone (see qbittorrent)
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl -fsS -o /dev/null http://localhost:7476/health && curl -fsS -o /dev/null http://127.0.0.1:8000/v1/portforward
+      start_period: 30s
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   autobrr:
     container_name: autobrr
