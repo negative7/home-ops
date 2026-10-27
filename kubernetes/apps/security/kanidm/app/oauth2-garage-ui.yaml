@@ -21,6 +21,8 @@ spec:
   strictRedirectUrl: true
   preferShortUsername: true
   allowInsecureClientDisablePkce: true
+  image:
+    url: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/garage.svg
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/external-secrets.io/pushsecret_v1alpha1.json
 apiVersion: external-secrets.io/v1alpha1

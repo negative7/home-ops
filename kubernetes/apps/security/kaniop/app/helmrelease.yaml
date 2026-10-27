@@ -20,6 +20,10 @@ spec:
               - op: add
                 path: /spec/template/metadata/labels/egress.policy.home.arpa~1kube-api
                 value: "true"
+              # KanidmOAuth2Client spec.image: the operator fetches client icons
+              - op: add
+                path: /spec/template/metadata/labels/egress.policy.home.arpa~1internet
+                value: "true"
   values:
     metrics:
       enabled: true

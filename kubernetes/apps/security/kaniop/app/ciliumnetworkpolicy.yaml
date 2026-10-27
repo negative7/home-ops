@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
-# Operator only: egress label kube-api limits it to the API server, DNS and kanidm.
+# Operator only: egress labels kube-api + internet (client icon fetches) plus DNS and kanidm.
 # Backup jobs (data-mover) are separate pods and aren't selected.
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
