@@ -50,7 +50,8 @@ spec:
       # Password over TLS for clients that can't present a client cert; must precede the cert rule
       - hostssl all jellystat all scram-sha-256
       - hostssl all all all cert clientcert=verify-full map=pooler-map
-      - host all all all scram-sha-256
+      # Ahead of CNPG's appended `host all all all scram-sha-256`: no plaintext network logins
+      - hostnossl all all all reject
     pg_ident:
       - pooler-map pooler-rw all
     shared_preload_libraries:
