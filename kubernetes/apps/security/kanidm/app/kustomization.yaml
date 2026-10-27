@@ -7,5 +7,6 @@ resources:
   - ./certificate.yaml
   - ./kanidm.yaml
   - ./groups.yaml
+  - ./oauth2-garage-ui.yaml
   - ./pushsecret.yaml
   - ./ciliumnetworkpolicy.yaml
