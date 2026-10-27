@@ -1,0 +1,33 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kguardian
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kguardian
+  interval: 30m
+  values:
+    broker:
+      # Without it any pod can read every recorded flow and forge rows
+      auth:
+        enabled: true
+        existingSecret: kguardian-broker-auth
+      resources:
+        limits:
+          memory: 2Gi
+    # Flow history is rebuilt by observation, so the bundled DB stays off the shared CNPG cluster and unbacked
+    database:
+      persistence:
+        storageClassName: miroir-local
+        size: 10Gi
+      resources:
+        limits:
+          memory: 1Gi
+    frontend:
+      allowedHosts:
+        - kguardian.negative7.com
+    telemetry:
+      enabled: false
