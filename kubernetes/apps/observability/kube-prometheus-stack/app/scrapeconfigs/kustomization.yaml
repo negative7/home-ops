@@ -10,4 +10,3 @@ resources:
   - ./nut-exporter.yaml
   - ./odesa.yaml
   - ./smartctl-exporter.yaml
-  - ./zot.yaml

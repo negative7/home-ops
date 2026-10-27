@@ -47,7 +47,6 @@ spec:
       static:
         - kyiv.homelab.internal:8006
         - lviv.homelab.internal:9000
-        - lviv.homelab.internal:5000
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
 apiVersion: monitoring.coreos.com/v1

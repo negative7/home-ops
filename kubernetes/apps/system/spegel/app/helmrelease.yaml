@@ -22,6 +22,5 @@ spec:
         matchLabels:
           dashboards: grafana
     spegel:
-      appendMirrors: true
       containerdRegistryConfigPath: /etc/cri/conf.d/hosts
       containerdSock: /run/containerd/containerd.sock
