@@ -1,5 +1,8 @@
 ---
 working_dir: ./docker/odesa
+# Webhooks fire for every branch push; only deploy main
+reference: refs/heads/main
+webhook_filter: ^refs/heads/main$
 auto_discovery:
   enabled: true
   depth: 1
