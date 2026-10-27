@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cilium-rules
+spec:
+  groups:
+    - name: cilium.rules
+      rules:
+        # A caller missing from a CNP or an egress label shows up here instead of as a silent breakage
+        - alert: CiliumPolicyDenied
+          expr: |-
+            sum by (source_namespace, source_workload, destination_namespace, destination_workload) (
+              increase(hubble_drop_total{reason=~"POLICY_DENIED|POLICY_DENY"}[30m])
+            ) > 0
+          for: 15m
+          annotations:
+            summary: >-
+              Cilium is dropping {{ $labels.source_namespace }}/{{ $labels.source_workload }} →
+              {{ $labels.destination_namespace }}/{{ $labels.destination_workload }}
+            description: |
+              Policy-denied drops in the last 30m. Check with
+              `hubble observe --verdict DROPPED --from-namespace {{ $labels.source_namespace }}`.
+          labels:
+            severity: warning
