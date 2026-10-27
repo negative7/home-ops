@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+# Operator only: egress label kube-api limits it to the API server, DNS and kanidm.
+# Backup jobs (data-mover) are separate pods and aren't selected.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kaniop
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: kaniop
+      app.kubernetes.io/component: operator
+  ingress:
+    # Kubelet probes
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: observability
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # Same-node Service VIP replies count as new ingress on Cilium 1.20
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: kanidm
+            kanidm.kaniop.rs/cluster: kanidm
+    - fromEntities:
+        - kube-apiserver
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: kanidm
+            kanidm.kaniop.rs/cluster: kanidm
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP

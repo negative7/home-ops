@@ -9,6 +9,17 @@ spec:
     kind: OCIRepository
     name: kaniop
   interval: 30m
+  # The chart has no pod labels value
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: kaniop
+            patch: |
+              - op: add
+                path: /spec/template/metadata/labels/egress.policy.home.arpa~1kube-api
+                value: "true"
   values:
     metrics:
       enabled: true
