@@ -206,6 +206,42 @@ content: |
   [plugins."io.containerd.cri.v1.runtime"]
     device_ownership_from_security_context = true
 ---
+# Zot pull-through cache on lviv (docker/lviv/05-zot); containerd falls back to upstream when it is down
+apiVersion: v1alpha1
+kind: RegistryMirrorConfig
+name: docker.io
+endpoints:
+  - url: http://lviv.homelab.internal:5000/v2/docker-hub/
+    overridePath: true
+---
+apiVersion: v1alpha1
+kind: RegistryMirrorConfig
+name: ghcr.io
+endpoints:
+  - url: http://lviv.homelab.internal:5000/v2/ghcr/
+    overridePath: true
+---
+apiVersion: v1alpha1
+kind: RegistryMirrorConfig
+name: quay.io
+endpoints:
+  - url: http://lviv.homelab.internal:5000/v2/quay/
+    overridePath: true
+---
+apiVersion: v1alpha1
+kind: RegistryMirrorConfig
+name: registry.k8s.io
+endpoints:
+  - url: http://lviv.homelab.internal:5000/v2/k8s/
+    overridePath: true
+---
+apiVersion: v1alpha1
+kind: RegistryMirrorConfig
+name: mirror.gcr.io
+endpoints:
+  - url: http://lviv.homelab.internal:5000/v2/gcr/
+    overridePath: true
+---
 apiVersion: v1alpha1
 kind: KubeNodeConfig
 nodeIP:

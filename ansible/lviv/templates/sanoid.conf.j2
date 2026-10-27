@@ -1,5 +1,6 @@
 # Managed by ansible. The most specific section wins; nothing is recursive except Garage,
 # whose meta and data must be snapshotted atomically (zfs snapshot -r)
+# tank/apps/zot is a recreatable registry cache and is deliberately left out
 [tank/data/immich]
   use_template = critical
   hourly = 24

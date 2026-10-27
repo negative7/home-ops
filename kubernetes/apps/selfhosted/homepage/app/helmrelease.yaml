@@ -339,6 +339,10 @@ spec:
                   icon: garage.png
                   href: https://garage.negative7.com
                   description: S3 Object Storage
+              - Zot:
+                  icon: zot-registry.png
+                  href: http://lviv.homelab.internal:5000
+                  description: Registry Pull-through Cache
 
             - Automation:
               - Home Assistant:
