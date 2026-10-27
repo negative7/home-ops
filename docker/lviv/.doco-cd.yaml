@@ -10,6 +10,8 @@ external_secrets:
   GARAGE_ADMIN_TOKEN: op://home-cluster/garage/admin_token
   GARAGE_RPC_SECRET: op://home-cluster/garage/rpc_secret
   GARAGE_METRICS_TOKEN: op://home-cluster/garage/metrics_token
+  GARAGE_UI_OIDC_CLIENT_ID: op://home-cluster/garage_ui/oidc_client_id
+  GARAGE_UI_OIDC_CLIENT_SECRET: op://home-cluster/garage_ui/oidc_client_secret
 force_recreate: false
 reconciliation:
   enabled: true

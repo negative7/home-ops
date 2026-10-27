@@ -24,21 +24,36 @@ services:
       - /mnt/tank/apps/garage/meta:/var/lib/garage/meta
       - /mnt/tank/apps/garage/data:/var/lib/garage/data
 
-  garage-webui:
-    container_name: garage-webui
-    hostname: garage.internal
-    image: docker.io/khairul169/garage-webui:1.1.0@sha256:17c793551873155065bf9a022dabcde874de808a1f26e648d4b82e168806439c
+  garage-ui:
+    container_name: garage-ui
+    image: docker.io/noooste/garage-ui:v0.14.0@sha256:e4a33c448304a3f6e60f08d6aa71b2471fd79ac870a5c7e178ea247dea3238b3
+    user: "2000:2000"
     restart: unless-stopped
     logging:
       driver: json-file
-    # Bridge networking, published on VLAN20 only
+    # Bridge networking, published on VLAN20 only; served as garage.negative7.com via envoy-internal
     ports:
-      - 10.2.0.10:3909:3909
+      - 10.2.0.10:3909:8080
     environment:
-      - PORT=3909
-      - API_BASE_URL=http://10.2.0.10:9002
-      - S3_ENDPOINT_URL=http://10.2.0.10:9000
-      - S3_REGION=us-east-1
-      - API_ADMIN_KEY=${GARAGE_ADMIN_TOKEN}
+      - GARAGE_UI_SERVER_HOST=0.0.0.0
+      - GARAGE_UI_SERVER_PORT=8080
+      - GARAGE_UI_SERVER_ENVIRONMENT=production
+      - GARAGE_UI_SERVER_DOMAIN=garage.negative7.com
+      - GARAGE_UI_SERVER_ROOT_URL=https://garage.negative7.com
+      - GARAGE_UI_GARAGE_ENDPOINT=http://10.2.0.10:9000
+      - GARAGE_UI_GARAGE_ADMIN_ENDPOINT=http://10.2.0.10:9002
+      - GARAGE_UI_GARAGE_REGION=us-east-1
+      - GARAGE_UI_GARAGE_ADMIN_TOKEN=${GARAGE_ADMIN_TOKEN}
+      - GARAGE_UI_AUTH_OIDC_ENABLED=true
+      - GARAGE_UI_AUTH_OIDC_PROVIDER_NAME=Kanidm
+      - GARAGE_UI_AUTH_OIDC_ISSUER_URL=https://idm.negative7.com/oauth2/openid/garage-ui
+      - GARAGE_UI_AUTH_OIDC_CLIENT_ID=${GARAGE_UI_OIDC_CLIENT_ID}
+      - GARAGE_UI_AUTH_OIDC_CLIENT_SECRET=${GARAGE_UI_OIDC_CLIENT_SECRET}
+      - GARAGE_UI_AUTH_OIDC_SCOPES=openid email profile groups
+      - GARAGE_UI_AUTH_OIDC_ROLE_ATTRIBUTE_PATH=groups
+      - GARAGE_UI_AUTH_OIDC_ADMIN_ROLE=admins@idm.negative7.com
+      - GARAGE_UI_AUTH_OIDC_COOKIE_SECURE=true
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      # jwt-key.pem, so sessions survive restarts
+      - /mnt/tank/apps/garage-ui:/app/data
