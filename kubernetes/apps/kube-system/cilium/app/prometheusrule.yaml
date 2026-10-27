@@ -8,19 +8,24 @@ spec:
   groups:
     - name: cilium.rules
       rules:
-        # A caller missing from a CNP or an egress label shows up here instead of as a silent breakage
+        # A caller missing from a CNP or an egress label shows up here instead of as a silent breakage.
+        # Needs drops in 3 of the last six 5m windows: one-off bursts during restarts (cilium, CNPG) don't fire.
         - alert: CiliumPolicyDenied
           expr: |-
-            sum by (source_namespace, source, destination_namespace, destination) (
-              increase(hubble_drop_total{reason=~"POLICY_DENIED|POLICY_DENY"}[30m])
-            ) > 0
-          for: 15m
+            count_over_time(
+              (
+                sum by (source_namespace, source, destination_namespace, destination) (
+                  increase(hubble_drop_total{reason=~"POLICY_DENIED|POLICY_DENY"}[5m])
+                ) > 0
+              )[30m:5m]
+            ) >= 3
+          for: 5m
           annotations:
             summary: >-
               Cilium is dropping {{ $labels.source_namespace }}/{{ $labels.source }} →
               {{ $labels.destination_namespace }}/{{ $labels.destination }}
             description: |
-              Policy-denied drops in the last 30m. Check with
+              Policy-denied drops in {{ $value }} of the last six 5m windows. Check with
               `hubble observe --verdict DROPPED --from-namespace {{ $labels.source_namespace }}`.
           labels:
             severity: warning
