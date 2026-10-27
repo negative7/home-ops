@@ -73,8 +73,11 @@
       description: "Talos Group",
       groupName: "talos",
       matchPackageNames: ["/installer/", "/talosctl/", "siderolabs/talos"],
+      // The group takes its scope from its first dep (the mise talosctl tool), which made a
+      // cluster OS upgrade read as "fix(mise): ..."
+      semanticCommitScope: "talos",
       group: {
-        commitMessageTopic: "{{{groupName}}} group",
+        commitMessageTopic: "Talos OS upgrade",
       },
       minimumGroupSize: 3,
     },
