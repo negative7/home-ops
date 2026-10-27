@@ -1,0 +1,40 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: crowdsec-rules
+spec:
+  groups:
+    - name: crowdsec.rules
+      rules:
+        # The envoy-external SecurityPolicy fails open, so these mean public traffic is not being checked
+        - alert: CrowdSecBouncerDown
+          expr: |-
+            absent(up{namespace="network", job="crowdsec-bouncer"} == 1)
+          for: 5m
+          annotations:
+            summary: >-
+              The CrowdSec ext-auth bouncer is down; envoy-external is failing open
+          labels:
+            severity: critical
+        - alert: CrowdSecLAPIDown
+          expr: |-
+            absent(up{namespace="network", job="crowdsec-service"} == 1)
+          for: 5m
+          annotations:
+            summary: >-
+              The CrowdSec LAPI is down; the bouncer is serving stale decisions
+          labels:
+            severity: warning
+        - alert: CrowdSecBouncerLAPIStale
+          expr: |-
+            max(bouncer_lapi_stream_connected{namespace="network"}) == 0
+              or
+            min(time() - bouncer_lapi_last_sync_timestamp_seconds{namespace="network"}) > 900
+          for: 10m
+          annotations:
+            summary: >-
+              The CrowdSec bouncer has not synced decisions from the LAPI in over fifteen minutes
+          labels:
+            severity: warning
