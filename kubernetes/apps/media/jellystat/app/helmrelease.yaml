@@ -31,6 +31,8 @@ spec:
               # TLS to postgres-rw, verified against the cluster CA (trust-manager root-ca)
               NODE_EXTRA_CA_CERTS: /etc/ssl/root-ca/ca.crt
               POSTGRES_SSL_ENABLED: "true"
+              # backup.js opens its own pg Pool without the ssl option; node-postgres then falls back to PGSSLMODE
+              PGSSLMODE: require
               POSTGRES_PORT: "5432"
               POSTGRES_USER:
                 valueFrom:
