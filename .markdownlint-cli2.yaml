@@ -1,0 +1,4 @@
+---
+# Agent prompt seeds are not documentation
+ignores:
+  - "kubernetes/apps/ai/hermes/app/resources/**"

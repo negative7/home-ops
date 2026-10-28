@@ -279,6 +279,10 @@ spec:
                   icon: immich.png
                   href: https://photos.negative7.com
                   description: Photos
+              - Hermes:
+                  icon: hermes-agent.png
+                  href: https://hermes.negative7.com
+                  description: AI Agent
               - LiteLLM:
                   icon: litellm.png
                   href: https://litellm.negative7.com

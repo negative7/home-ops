@@ -1,0 +1,83 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+# Hermes agent + WebUI. Pod labels `internet` (open world egress for pip/mise/git/web fetches) and
+# `litellm` (ingress allow on the gateway) are set in the HelmRelease; this adds the in-cluster
+# allows. Ingress: envoy-internal to the WebUI (:8787) only.
+# Same-node Service VIP replies count as new ingress on Cilium 1.20, so each in-cluster server
+# the agent calls also needs an ingress fromEndpoints.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: hermes
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: hermes
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "8787"
+              protocol: TCP
+    - # Same-node reply drop (Cilium 1.20): replies from Service VIPs we call
+      fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            app.kubernetes.io/name: litellm
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            app.kubernetes.io/name: memini
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: selfhosted
+            app.kubernetes.io/name: searxng
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
+  egress:
+    - # LiteLLM proxy (model provider + MCP gateway)
+      toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            app.kubernetes.io/name: litellm
+      toPorts:
+        - ports:
+            - port: "4000"
+              protocol: TCP
+    - # memini (agent memory, MCP /mcp)
+      toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            app.kubernetes.io/name: memini
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - # In-cluster web search
+      toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: selfhosted
+            app.kubernetes.io/name: searxng
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - # git.negative7.com (Forgejo) is routed through envoy-internal
+      toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "10443"
+              protocol: TCP
+    - # Kanidm's public address (odesa), pinned by hostAliases because WebUI rejects OIDC issuers
+      # resolving to private IPs. Keep in sync with the hostAliases in helmrelease.yaml.
+      toCIDR:
+        - 135.148.43.50/32
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
