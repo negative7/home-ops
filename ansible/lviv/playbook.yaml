@@ -527,7 +527,8 @@
             -print -exec chown -h apps:apps {} +
           register: apps_chown
           changed_when: apps_chown.stdout | length > 0
-          loop: "{{ apps_data_dirs }}"
+          # garage runs as apps (2000:2000) and holds ~62G of small block files; walking it adds minutes for nothing
+          loop: "{{ apps_data_dirs | difference(['garage']) }}"
 
     - name: doco-cd
       vars:
