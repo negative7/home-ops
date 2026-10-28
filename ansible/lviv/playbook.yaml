@@ -506,7 +506,7 @@
             apps_data_dirs: >-
               {{ lookup('ansible.builtin.pipe',
                 "grep -rhoE '/mnt/tank/apps/[a-zA-Z0-9_-]+' " ~ playbook_dir ~ "/../../docker/lviv | sort -u | xargs -n1 basename"
-              ).splitlines() }}
+              ).splitlines() | difference(['kopia']) }}
           delegate_to: localhost
           become: false
           run_once: true
@@ -529,6 +529,22 @@
           changed_when: apps_chown.stdout | length > 0
           # garage runs as apps (2000:2000) and holds ~62G of small block files; walking it adds minutes for nothing
           loop: "{{ apps_data_dirs | difference(['garage']) }}"
+
+        # kopia runs as root with only DAC_READ_SEARCH (no DAC_OVERRIDE), so it can only write files root owns
+        - name: apps data | Kopia config directory
+          ansible.builtin.file:
+            path: "{{ apps_data_dir }}/kopia"
+            state: directory
+            owner: root
+            group: root
+            mode: "0700"
+
+        - name: apps data | Kopia config ownership
+          ansible.builtin.shell: >-
+            find {{ apps_data_dir }}/kopia \( ! -user root -o ! -group root \)
+            -print -exec chown -h root:root {} +
+          register: kopia_chown
+          changed_when: kopia_chown.stdout | length > 0
 
     - name: doco-cd
       vars:
