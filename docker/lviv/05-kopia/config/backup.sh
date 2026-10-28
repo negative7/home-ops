@@ -71,9 +71,10 @@ run_backups() {
 sleep_until_backup_time() {
     local now target
     now=$(date +%s)
-    target=$(date -d "today ${BACKUP_TIME}" +%s)
+    # BusyBox date: no "today"/"tomorrow" keywords, but "YYYY-MM-DD HH:MM" and "@epoch" work
+    target=$(date -d "$(date +%Y-%m-%d) ${BACKUP_TIME}" +%s)
     if ((target <= now)); then
-        target=$(date -d "tomorrow ${BACKUP_TIME}" +%s)
+        target=$((target + 86400))
     fi
     log "next run at $(date -d "@${target}" -Iseconds)"
     sleep $((target - now))
