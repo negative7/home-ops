@@ -14,9 +14,6 @@ spec:
       main:
         containers:
           main:
-            image:
-              # renovate: datasource=github-releases depName=immich-app/immich
-              tag: v3.3.5
             env:
               TZ: America/New_York
               DB_URL:
@@ -46,6 +43,9 @@ spec:
 
           containers:
             main:
+              image:
+                repository: ghcr.io/immich-app/immich-server
+                tag: v3.3.5@sha256:485d546a2e31d6a8b4db8423fcba5c109de8c218d93410af115fd1ccfc4352a6
               resources:
                 requests:
                   cpu: 11m
@@ -60,6 +60,9 @@ spec:
 
           containers:
             main:
+              image:
+                repository: ghcr.io/immich-app/immich-machine-learning
+                tag: v3.3.5@sha256:5b28c9352c8374b8a1ed96fbdd8d6755fea6e43510ec43fdf6538aa02ea40f56
               resources:
                 requests:
                   cpu: 10m

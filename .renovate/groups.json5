@@ -31,6 +31,16 @@
       minimumGroupSize: 3,
     },
     {
+      description: "Immich group (server and machine-learning must stay on the same version)",
+      groupName: "immich",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/immich-app/immich-server", "ghcr.io/immich-app/immich-machine-learning"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      minimumGroupSize: 2,
+    },
+    {
       description: "Intel Device Plugins Group",
       groupName: "intel-device-plugins",
       matchDatasources: ["docker"],
