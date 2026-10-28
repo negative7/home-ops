@@ -140,6 +140,12 @@ spec:
                 cpu: 10m
               limits:
                 memory: 4Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
     persistence:
       data:
         existingClaim: karakeep-data
@@ -152,6 +158,21 @@ spec:
             app:
               - path: /meili_data
                 subPath: meilisearch
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          karakeep:
+            app:
+              - path: /tmp
+                subPath: tmp_karakeep
+          chrome:
+            app:
+              - path: /tmp
+                subPath: tmp_chrome
+          meilisearch:
+            app:
+              - path: /tmp
+                subPath: tmp_meilisearch
     route:
       app:
         hostnames:
