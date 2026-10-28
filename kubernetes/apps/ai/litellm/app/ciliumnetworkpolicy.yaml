@@ -1,7 +1,7 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
 # LiteLLM proxy. Egress label `internet` (podLabels) already limits it to the world; this adds the
-# in-cluster allows: shared Postgres, its Dragonfly, and envoy-internal (idm.negative7.com for SSO).
+# in-cluster allows: shared Postgres, its Dragonfly, and envoy-external (idm.negative7.com for SSO).
 # Ingress: envoy-internal (Admin UI + API), Prometheus, the operator (admin API), and API clients,
 # which opt in with the label `egress.policy.home.arpa/litellm: "true"` on their pods (any namespace).
 # Clients with their own ingress policy also need a fromEndpoints for litellm (Cilium 1.20 same-node reply drop).
@@ -43,7 +43,7 @@ spec:
             app.kubernetes.io/name: dragonfly
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
-            gateway.networking.k8s.io/gateway-name: envoy-internal
+            gateway.networking.k8s.io/gateway-name: envoy-external
   egress:
     - toEndpoints:
         - matchLabels:
@@ -62,8 +62,8 @@ spec:
         - ports:
             - port: "6379"
               protocol: TCP
-    - # idm.negative7.com is routed through envoy-internal
+    - # idm.negative7.com is routed through envoy-external (hairpinned in-cluster)
       toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
-            gateway.networking.k8s.io/gateway-name: envoy-internal
+            gateway.networking.k8s.io/gateway-name: envoy-external
