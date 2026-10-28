@@ -1,0 +1,38 @@
+---
+# Custom client (not components/kanidm-oidc): Hermes WebUI's native OIDC provider reads the
+# `hermes_access` claim and takes CLIENT_SECRET from the secret kaniop writes to
+# hermes-kanidm-oauth2-credentials. WebUI sends the secret with PKCE.
+# Issuer: https://idm.negative7.com/oauth2/openid/hermes
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmOAuth2Client
+metadata:
+  name: hermes
+spec:
+  kanidmRef:
+    name: kanidm
+    namespace: security
+  displayname: Hermes
+  origin: https://hermes.negative7.com/
+  redirectUrl:
+    - https://hermes.negative7.com/api/auth/oidc/callback
+  # Every signed-in user gets full agent (shell) access, so only `admins` may sign in. The group
+  # is checked both by Kanidm (scopeMap) and by WebUI's allowlist (hermes_access claim).
+  scopeMap:
+    - group: admins
+      scopes:
+        - openid
+        - profile
+        - email
+  # csv keeps the single value a plain string for WebUI's allowlist.
+  claimMap:
+    - name: hermes_access
+      valuesMap:
+        - group: admins
+          values:
+            - admin
+      joinStrategy: csv
+  preferShortUsername: true
+  strictRedirectUrl: true
+  disableConsentPrompt: true
+  image:
+    url: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/hermes-agent.svg

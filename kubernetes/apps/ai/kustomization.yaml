@@ -8,6 +8,7 @@ components:
   - ../../components/kopiur/secret
 resources:
   - ./namespace.yaml
+  - ./hermes/ks.yaml
   - ./litellm/ks.yaml
   - ./litellm-operator/ks.yaml
   - ./memini/ks.yaml
