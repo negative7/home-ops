@@ -7,9 +7,6 @@ metadata:
 spec:
   interval: 1h
   path: "./kubernetes/apps/media/jellyplex-watched/app"
-  postBuild:
-    substitute:
-      APP: jellyfin
   prune: true
   sourceRef:
     kind: GitRepository

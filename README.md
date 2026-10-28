@@ -1,7 +1,7 @@
 
 # Home for my home clusters
 
-_... managed by Flux, Renovate and GitHub Actions_ :robot:
+_... managed by Flux, Renovate and Forgejo Actions_ :robot:
 
 _... inspired/copied from [onedr0p](https://github.com/onedr0p) and [bjw-s](https://github.com/bjw-s)_
 
