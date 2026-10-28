@@ -520,13 +520,13 @@
             mode: "0755"
           loop: "{{ apps_data_dirs }}"
 
+        # find instead of file/recurse: the module stats every file in Python and takes minutes on large trees
         - name: apps data | Recursively fix ownership
-          ansible.builtin.file:
-            path: "{{ apps_data_dir }}/{{ item }}"
-            state: directory
-            owner: apps
-            group: apps
-            recurse: true
+          ansible.builtin.shell: >-
+            find {{ apps_data_dir }}/{{ item }} \( ! -user apps -o ! -group apps \)
+            -print -exec chown -h apps:apps {} +
+          register: apps_chown
+          changed_when: apps_chown.stdout | length > 0
           loop: "{{ apps_data_dirs }}"
 
     - name: doco-cd
