@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmvirtualkey_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMVirtualKey
+metadata:
+  name: kritika
+spec:
+  keyAlias: kritika
+  # Empty would permit every model on the proxy.
+  models:
+    - neuralwatt/dsv4.1f
+    - openrouter/dsv4.1f
+    - openrouter/voyage-code-4
+  proxyRef: litellm
+  proxyNamespace: ai
+  secretName: kritika-litellm

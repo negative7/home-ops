@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+# The chart's own policies cover egress and the public/metrics/gateway ingress. Cilium 1.20 counts
+# same-node Service VIP replies as new ingress, so peers reached through a Service (shared Postgres,
+# litellm, and the gateway from runner pods) need an explicit ingress allow here.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kritika-replies
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: kritika
+      app.kubernetes.io/instance: kritika
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: database
+            cnpg.io/cluster: postgres
+            cnpg.io/podRole: instance
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            app.kubernetes.io/name: litellm
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kritika-runner-replies
+spec:
+  endpointSelector:
+    matchLabels:
+      kritika.home-operations.com/role: runner
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: database
+            cnpg.io/cluster: postgres
+            cnpg.io/podRole: instance
+        - matchLabels:
+            app.kubernetes.io/name: kritika
+            app.kubernetes.io/instance: kritika
