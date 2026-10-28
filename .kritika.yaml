@@ -1,0 +1,9 @@
+---
+# yaml-language-server: $schema=https://kritika.home-operations.com/kritika.schema.json
+skills:
+  scope:
+    # Renovate branches use the "renovate-" prefix (branchPrefix in .renovaterc.json5)
+    renovate-review:
+      when:
+        - name: renovate-branch
+          expr: pr.headRef.startsWith("renovate-")
