@@ -28,6 +28,9 @@ services:
       - B2_KEY_ID=${LVIV_KOPIA_B2_KEY_ID}
       - B2_KEY=${LVIV_KOPIA_B2_KEY}
       - B2_BUCKET=${LVIV_KOPIA_B2_BUCKET}
+      # S3 API endpoint of the bucket's region (from b2_authorize_account v4)
+      - B2_S3_ENDPOINT=s3.us-east-005.backblazeb2.com
+      - B2_S3_REGION=us-east-005
       - BACKUP_TIME=03:00
     volumes:
       - /etc/localtime:/etc/localtime:ro

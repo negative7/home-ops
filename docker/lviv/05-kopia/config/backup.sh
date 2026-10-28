@@ -4,13 +4,17 @@
 set -Eeuo pipefail
 
 PROM=/textfile/lviv-kopia.prom
+SOURCES=(immich apps sergiy alex)
+
+# Kopia's native b2 backend speaks B2 API v1, which this (v4-only) key is refused on; use B2's S3 API
+export AWS_ACCESS_KEY_ID="${B2_KEY_ID}" AWS_SECRET_ACCESS_KEY="${B2_KEY}"
 
 log() {
     echo "$(date -Iseconds) $*"
 }
 
 connect() {
-    local storage=(b2 --bucket "${B2_BUCKET}" --prefix lviv-kopia/)
+    local storage=(s3 --bucket "${B2_BUCKET}" --prefix lviv-kopia/ --endpoint "${B2_S3_ENDPOINT}" --region "${B2_S3_REGION}")
     if kopia repository status >/dev/null 2>&1; then
         return 0
     fi
@@ -55,17 +59,25 @@ write_metric() {
 }
 
 run_backups() {
-    connect
-    set_policies
-    for source in immich apps sergiy alex; do
+    local source rc=0
+    if ! connect || ! set_policies; then
+        log "repository unavailable, skipping snapshots"
+        for source in "${SOURCES[@]}"; do
+            write_metric "${source}" 0
+        done
+        return 1
+    fi
+    for source in "${SOURCES[@]}"; do
         log "snapshot ${source}"
         if kopia snapshot create "/sources/${source}"; then
             write_metric "${source}" 1
         else
             log "snapshot ${source} failed"
             write_metric "${source}" 0
+            rc=1
         fi
     done
+    return "${rc}"
 }
 
 sleep_until_backup_time() {
