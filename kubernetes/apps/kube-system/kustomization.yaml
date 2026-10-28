@@ -9,6 +9,7 @@ resources:
   - ./namespace.yaml
   - ./cilium/ks.yaml
   - ./coredns/ks.yaml
+  - ./gvisor/ks.yaml
   - ./intel-gpu-resource-driver/ks.yaml
   - ./metrics-server/ks.yaml
   - ./reflector/ks.yaml
