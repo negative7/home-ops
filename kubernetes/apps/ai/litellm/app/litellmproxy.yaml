@@ -83,7 +83,6 @@ spec:
     # SSO (Kanidm) is the only Admin UI login; the master key no longer works
     # as the UI password but still authenticates API calls.
     disable_env_credential_login: true
-    health_check_endpoint: /v1/health
     store_model_in_db: false
     # Envoy gateway pods sit in the pod CIDR; trusting them lets the Admin UI
     # login throttle key on the real client address from X-Forwarded-For.
