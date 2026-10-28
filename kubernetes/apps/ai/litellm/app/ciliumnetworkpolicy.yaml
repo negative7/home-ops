@@ -1,0 +1,69 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+# LiteLLM proxy. Egress label `internet` (podLabels) already limits it to the world; this adds the
+# in-cluster allows: shared Postgres, its Dragonfly, and envoy-internal (idm.negative7.com for SSO).
+# Ingress: envoy-internal (Admin UI + API), Prometheus, the operator (admin API), and API clients,
+# which opt in with the label `egress.policy.home.arpa/litellm: "true"` on their pods (any namespace).
+# Clients with their own ingress policy also need a fromEndpoints for litellm (Cilium 1.20 same-node reply drop).
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: litellm
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: litellm
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: observability
+            app.kubernetes.io/name: prometheus
+        - matchLabels:
+            app.kubernetes.io/name: litellm-operator
+        - matchExpressions:
+            - key: k8s:io.kubernetes.pod.namespace
+              operator: Exists
+          matchLabels:
+            egress.policy.home.arpa/litellm: "true"
+      toPorts:
+        - ports:
+            - port: "4000"
+              protocol: TCP
+    # Same-node Service VIP replies count as new ingress on Cilium 1.20
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: database
+            cnpg.io/cluster: postgres
+            cnpg.io/podRole: instance
+        - matchLabels:
+            app: litellm-dragonfly
+            app.kubernetes.io/name: dragonfly
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: database
+            cnpg.io/cluster: postgres
+            cnpg.io/podRole: instance
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app: litellm-dragonfly
+            app.kubernetes.io/name: dragonfly
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+    - # idm.negative7.com is routed through envoy-internal
+      toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
