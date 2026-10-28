@@ -55,7 +55,7 @@ url: tcp://127.0.0.1:13333/
 apiVersion: v1alpha1
 kind: UnattendedInstallConfig
 installer:
-  image: factory.talos.dev/metal-installer/c0986b75e6403ad8ca29191038bc6628931d35cbb24eb0e4220dfdf6c141f5ad:v1.14.5
+  image: factory.talos.dev/metal-installer/b42bdbd7e7cf3eb6876d0be7d71ac6ed22a3f084c7960154e6e896e7485705e6:v1.14.5
 provisioning:
   wipe: false
 ---
@@ -267,6 +267,14 @@ apiVersion: v1alpha1
 kind: KubeAuthorizerConfig
 name: rbac
 type: RBAC
+---
+apiVersion: v1alpha1
+kind: KubeAuditPolicyConfig
+configuration:
+  apiVersion: audit.k8s.io/v1
+  kind: Policy
+  rules:
+    - level: Metadata
 ---
 apiVersion: v1alpha1
 kind: KubeAuthenticationConfig
