@@ -3,9 +3,9 @@
 version: v1alpha1
 machine:
   ca:
-    crt: op://home-cluster/home-ops/MACHINE_CA_CRT
+    crt: op://talos-root/home-ops/MACHINE_CA_CRT
     {% if ENV.IS_CONTROLPLANE %}
-    key: op://home-cluster/home-ops/MACHINE_CA_KEY
+    key: op://talos-root/home-ops/MACHINE_CA_KEY
     {% endif %}
   features:
     apidCheckExtKeyUsage: true
@@ -15,18 +15,18 @@ machine:
     destinations:
       - endpoint: tcp://127.0.0.1:13333/
         format: json_lines
-  token: op://home-cluster/home-ops/MACHINE_TOKEN
+  token: op://talos-root/home-ops/MACHINE_TOKEN
 cluster:
   {% if ENV.IS_CONTROLPLANE %}
   aggregatorCA:
-    crt: op://home-cluster/home-ops/CLUSTER_AGGREGATORCA_CRT
-    key: op://home-cluster/home-ops/CLUSTER_AGGREGATORCA_KEY
+    crt: op://talos-root/home-ops/CLUSTER_AGGREGATORCA_CRT
+    key: op://talos-root/home-ops/CLUSTER_AGGREGATORCA_KEY
   etcd:
     advertisedSubnets:
       - 10.2.0.0/24
     ca:
-      crt: op://home-cluster/home-ops/CLUSTER_ETCD_CA_CRT
-      key: op://home-cluster/home-ops/CLUSTER_ETCD_CA_KEY
+      crt: op://talos-root/home-ops/CLUSTER_ETCD_CA_CRT
+      key: op://talos-root/home-ops/CLUSTER_ETCD_CA_KEY
     extraArgs:
       auto-compaction-mode: revision
       auto-compaction-retention: "10000"
@@ -35,17 +35,17 @@ cluster:
       listen-metrics-urls: http://0.0.0.0:2381
       snapshot-count: "5000"
   serviceAccount:
-    key: op://home-cluster/home-ops/CLUSTER_SERVICEACCOUNT_KEY
+    key: op://talos-root/home-ops/CLUSTER_SERVICEACCOUNT_KEY
   {% endif %}
   ca:
-    crt: op://home-cluster/home-ops/CLUSTER_CA_CRT
+    crt: op://talos-root/home-ops/CLUSTER_CA_CRT
     {% if ENV.IS_CONTROLPLANE %}
-    key: op://home-cluster/home-ops/CLUSTER_CA_KEY
+    key: op://talos-root/home-ops/CLUSTER_CA_KEY
     {% endif %}
   controlPlane:
     endpoint: https://k8s.homelab.internal:6443
   clusterName: home-ops
-  token: op://home-cluster/home-ops/CLUSTER_TOKEN
+  token: op://talos-root/home-ops/CLUSTER_TOKEN
 ---
 apiVersion: v1alpha1
 kind: KmsgLogConfig
@@ -112,8 +112,8 @@ endpoint: https://discovery.talos.dev/
 ---
 apiVersion: v1alpha1
 kind: DiscoveryIdentityConfig
-clusterID: op://home-cluster/home-ops/CLUSTER_ID
-clusterSecret: op://home-cluster/home-ops/CLUSTER_SECRET
+clusterID: op://talos-root/home-ops/CLUSTER_ID
+clusterSecret: op://talos-root/home-ops/CLUSTER_SECRET
 ---
 apiVersion: v1alpha1
 kind: FilesystemTrimConfig
@@ -296,7 +296,7 @@ config:
         - secretbox:
             keys:
               - name: key3
-                secret: op://home-cluster/home-ops/CLUSTER_SECRETBOX_KEY3
+                secret: op://talos-root/home-ops/CLUSTER_SECRETBOX_KEY3
         - identity: {}
       resources:
         - secrets
