@@ -7,6 +7,17 @@ metadata:
 spec:
   image: ghcr.io/berriai/litellm:v1.106.5@sha256:7d6ae6c8d73d1b6aea4cb75d07c4a8a953f0809b0764522b8eab693734c5e905
   replicas: 1
+  # Startup (imports + Prisma toolchain) is single-threaded and takes over a
+  # minute here; the default liveness probe kills it first. No startupProbe in
+  # the CRD, so delay liveness up to the Prisma toolchain timeout (600s).
+  livenessProbe:
+    httpGet:
+      path: /health/liveliness
+      port: 4000
+    initialDelaySeconds: 600
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
   # Admin API access for DB-backed resources (LiteLLMVirtualKey). Models stay
   # file-backed because applyMode is left at its default.
   apiAccess:
