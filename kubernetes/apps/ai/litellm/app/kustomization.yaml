@@ -8,5 +8,6 @@ resources:
   - ./grafanadashboard.yaml
   - ./kanidmoauth2client.yaml
   - ./litellmproxy.yaml
+  - ./mcp-servers/
   - ./models/
   - ./servicemonitor.yaml

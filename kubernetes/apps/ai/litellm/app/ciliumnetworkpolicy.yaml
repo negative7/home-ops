@@ -1,7 +1,8 @@
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
 # LiteLLM proxy. Egress label `internet` (podLabels) already limits it to the world; this adds the
-# in-cluster allows: shared Postgres, its Dragonfly, and envoy-external (idm.negative7.com for SSO).
+# in-cluster allows: shared Postgres, its Dragonfly, envoy-external (idm.negative7.com for SSO), the
+# MCP server pods in this namespace and konflate's MCP endpoint (remote MCP servers go out via the world label).
 # Ingress: envoy-internal (Admin UI + API), Prometheus, the operator (admin API), and API clients,
 # which opt in with the label `egress.policy.home.arpa/litellm: "true"` on their pods (any namespace).
 # Clients with their own ingress policy also need a fromEndpoints for litellm (Cilium 1.20 same-node reply drop).
@@ -44,7 +45,76 @@ spec:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
             gateway.networking.k8s.io/gateway-name: envoy-external
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: flux-system
+            app.kubernetes.io/name: konflate
+        - matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - flux-mcp
+                - grafana-mcp
+                - home-assistant-mcp
+                - kubectl-mcp
+                - kubesearch-mcp
+                - unifi-network-mcp
+                - victoria-logs-mcp
+          matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
   egress:
+    # MCP server workloads (mcp-servers/), one port per server
+    - toEndpoints:
+        - matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - flux-mcp
+                - grafana-mcp
+                - kubectl-mcp
+          matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            app.kubernetes.io/name: home-assistant-mcp
+      toPorts:
+        - ports:
+            - port: "8086"
+              protocol: TCP
+    - toEndpoints:
+        - matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - kubesearch-mcp
+                - unifi-network-mcp
+          matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            app.kubernetes.io/name: victoria-logs-mcp
+      toPorts:
+        - ports:
+            - port: "8081"
+              protocol: TCP
+    # konflate MCP endpoint
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: flux-system
+            app.kubernetes.io/name: konflate
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: database
