@@ -49,6 +49,7 @@ spec:
     pg_hba:
       # Password over TLS for clients that can't present a client cert; must precede the cert rule
       - hostssl all streamystats all scram-sha-256
+      - hostssl all litellm all scram-sha-256
       - hostssl all all all cert clientcert=verify-full map=pooler-map
       # Ahead of CNPG's appended `host all all all scram-sha-256`: no plaintext network logins
       - hostnossl all all all reject

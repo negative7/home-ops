@@ -279,6 +279,10 @@ spec:
                   icon: immich.png
                   href: https://photos.negative7.com
                   description: Photos
+              - LiteLLM:
+                  icon: litellm.png
+                  href: https://litellm.negative7.com
+                  description: LLM Gateway
               - Atuin:
                   icon: atuin.png
                   href: https://atuin.negative7.com
