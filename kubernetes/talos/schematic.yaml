@@ -7,6 +7,7 @@ customization:
   systemExtensions:
     officialExtensions:
       - siderolabs/drbd
+      - siderolabs/gvisor
       - siderolabs/i915
       - siderolabs/intel-ucode
       - siderolabs/nfsrahead
