@@ -5,4 +5,5 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./grafana.yaml
+  - ./grafanaserviceaccount.yaml
   - ./mutatingadmissionpolicy.yaml
