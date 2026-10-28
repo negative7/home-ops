@@ -15,4 +15,5 @@ resources:
   - ./karakeep/ks.yaml
   - ./namespace.yaml
   - ./outline/ks.yaml
+  - ./searxng/ks.yaml
   - ./spoolman/ks.yaml

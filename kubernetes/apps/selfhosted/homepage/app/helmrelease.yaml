@@ -287,6 +287,10 @@ spec:
                   icon: it-tools.png
                   href: https://it-tools.negative7.com
                   description: Developer Tools
+              - SearXNG:
+                  icon: searxng.png
+                  href: https://searxng.negative7.com
+                  description: Metasearch
               - Spoolman:
                   icon: spoolman.png
                   href: https://spoolman.negative7.com
