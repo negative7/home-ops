@@ -230,7 +230,7 @@ config:
   shutdownGracePeriod: 120s # mandatory for miroir/DRBD to release cleanly on reboot
   shutdownGracePeriodCriticalPods: 60s
 defaultRuntimeSeccompProfileEnabled: true
-image: ghcr.io/siderolabs/kubelet:v1.37.1
+image: ghcr.io/siderolabs/kubelet:v1.37.2
 ---
 apiVersion: v1alpha1
 kind: KubeNetworkConfig
@@ -255,7 +255,7 @@ extraArgs:
   enable-aggregator-routing: "true"
   feature-gates: HPAScaleToZero=true
   runtime-config: admissionregistration.k8s.io/v1beta1=true
-image: registry.k8s.io/kube-apiserver:v1.37.1
+image: registry.k8s.io/kube-apiserver:v1.37.2
 ---
 # KubeAPIServerConfig does not inject the default Node/RBAC authorizers like .cluster.apiServer did
 apiVersion: v1alpha1
@@ -306,7 +306,7 @@ kind: KubeControllerManagerConfig
 extraArgs:
   bind-address: 0.0.0.0
   feature-gates: HPAScaleToZero=true
-image: registry.k8s.io/kube-controller-manager:v1.37.1
+image: registry.k8s.io/kube-controller-manager:v1.37.2
 ---
 apiVersion: v1alpha1
 kind: KubeCoreDNSConfig
@@ -315,7 +315,7 @@ enabled: false
 apiVersion: v1alpha1
 kind: KubeProxyConfig
 enabled: false
-image: registry.k8s.io/kube-proxy:v1.37.1
+image: registry.k8s.io/kube-proxy:v1.37.2
 ---
 apiVersion: v1alpha1
 kind: KubeSchedulerConfig
@@ -336,7 +336,7 @@ config:
                 whenUnsatisfiable: ScheduleAnyway
 extraArgs:
   bind-address: 0.0.0.0
-image: registry.k8s.io/kube-scheduler:v1.37.1
+image: registry.k8s.io/kube-scheduler:v1.37.2
 ---
 apiVersion: v1alpha1
 kind: KubeTalosAPIAccessConfig
