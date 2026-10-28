@@ -283,6 +283,10 @@ spec:
                   icon: litellm.png
                   href: https://litellm.negative7.com
                   description: LLM Gateway
+              - Memini:
+                  icon: mdi-brain
+                  href: https://memini.negative7.com
+                  description: Agent Memory
               - Atuin:
                   icon: atuin.png
                   href: https://atuin.negative7.com

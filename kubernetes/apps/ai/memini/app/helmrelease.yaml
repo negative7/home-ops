@@ -1,0 +1,79 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: memini
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: memini
+  interval: 1h
+  values:
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            # Egress is limited to DNS + litellm (ciliumnetworkpolicy.yaml)
+            egress.policy.home.arpa/block-all: "true"
+            # Passes litellm's ingress policy
+            egress.policy.home.arpa/litellm: "true"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/eleboucher/memini
+            env:
+              MEMINI_EMBED_BASE_URL: http://litellm.ai.svc.cluster.local:4000/v1
+              MEMINI_EMBED_MODEL: openrouter/text-embedding-3-small
+              # text-embedding-3-small; must match the model (chart default, set explicitly)
+              MEMINI_EMBED_DIMS: "1536"
+              MEMINI_EMBED_API_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: memini-litellm
+                    key: key
+              MEMINI_CLIENT_DEFAULTS: "{\"namespace_scope\":\"owner_tree\"}"
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
+    route:
+      main:
+        enabled: true
+        hostnames:
+          - memini.negative7.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+        rules:
+          - backendRefs:
+              - port: ui
+      mcp:
+        hostnames:
+          - memini.negative7.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+        rules:
+          - backendRefs:
+              - port: http
+            matches:
+              - path:
+                  value: /mcp
+              - path:
+                  value: /v1
+    serviceMonitor:
+      main:
+        enabled: true
+    grafanaDashboards:
+      enabled: true
+    prometheusRule:
+      enabled: true
+    persistence:
+      data:
+        existingClaim: memini
+      tmp:
+        type: emptyDir
