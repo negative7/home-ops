@@ -31,6 +31,8 @@ spec:
             env: &env
               TZ: America/New_York
               NODE_ENV: production
+              # sslmode=require is verify-full in node-postgres (job-server); trust the cluster CA (trust-manager root-ca)
+              NODE_EXTRA_CA_CERTS: /etc/ssl/root-ca/ca.crt
               HOSTNAME: 0.0.0.0
               JOB_SERVER_URL: http://streamystats-job-server.media.svc.cluster.local:3005
               NEXTJS_URL: http://streamystats-frontend.media.svc.cluster.local:3000
@@ -110,6 +112,12 @@ spec:
                 memory: 1Gi
             securityContext: *securityContext
     persistence:
+      root-ca:
+        type: secret
+        name: root-ca
+        globalMounts:
+          - path: /etc/ssl/root-ca
+            readOnly: true
       tmpfs:
         type: emptyDir
         globalMounts:
