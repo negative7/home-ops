@@ -7,14 +7,18 @@ metadata:
 spec:
   alias: hermes
   # LiteLLM gives virtual keys no MCP servers unless granted. Names are the `alias` of each
-  # LiteLLMMCPServer in litellm/app/mcp-servers; all run read-only.
+  # LiteLLMMCPServer in litellm/app/mcp-servers (kguardian is not deployed); all run read-only.
   mcpServers:
+    - context7
     - flux
+    - grafana
     - home_assistant
-    - kguardian
+    - konflate
     - kubectl
     - kubesearch
+    - sidero
     - unifi_network
+    - victoria_logs
   models:
     - neuralwatt/dsv4.1f
   proxyNamespace: ai
