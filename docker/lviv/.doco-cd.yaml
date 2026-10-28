@@ -8,17 +8,17 @@ auto_discovery:
   depth: 1
   delete: true
 external_secrets:
-  PROTONVPN_WIREGUARD_PRIVATE_KEY: op://home-cluster/protonvpn/private_key
-  PROTONVPN_WIREGUARD_ADDRESSES: op://home-cluster/protonvpn/addresses
-  GARAGE_ADMIN_TOKEN: op://home-cluster/garage/admin_token
-  GARAGE_RPC_SECRET: op://home-cluster/garage/rpc_secret
-  GARAGE_METRICS_TOKEN: op://home-cluster/garage/metrics_token
-  GARAGE_UI_OIDC_CLIENT_ID: op://home-cluster/garage_ui/oidc_client_id
-  GARAGE_UI_OIDC_CLIENT_SECRET: op://home-cluster/garage_ui/oidc_client_secret
-  LVIV_KOPIA_PASSWORD: op://home-cluster/lviv_kopia/password
-  LVIV_KOPIA_B2_KEY_ID: op://home-cluster/lviv_kopia/b2_key_id
-  LVIV_KOPIA_B2_KEY: op://home-cluster/lviv_kopia/b2_key
-  LVIV_KOPIA_B2_BUCKET: op://home-cluster/offsite-backup/B2_BUCKET
+  PROTONVPN_WIREGUARD_PRIVATE_KEY: op://lviv/protonvpn/private_key
+  PROTONVPN_WIREGUARD_ADDRESSES: op://lviv/protonvpn/addresses
+  GARAGE_ADMIN_TOKEN: op://lviv/garage/admin_token
+  GARAGE_RPC_SECRET: op://lviv/garage/rpc_secret
+  GARAGE_METRICS_TOKEN: op://lviv/garage/metrics_token
+  GARAGE_UI_OIDC_CLIENT_ID: op://lviv/garage_ui/oidc_client_id
+  GARAGE_UI_OIDC_CLIENT_SECRET: op://lviv/garage_ui/oidc_client_secret
+  LVIV_KOPIA_PASSWORD: op://lviv/lviv_kopia/password
+  LVIV_KOPIA_B2_KEY_ID: op://lviv/lviv_kopia/b2_key_id
+  LVIV_KOPIA_B2_KEY: op://lviv/lviv_kopia/b2_key
+  LVIV_KOPIA_B2_BUCKET: op://lviv/lviv_kopia/b2_bucket
 force_recreate: false
 reconciliation:
   enabled: true
