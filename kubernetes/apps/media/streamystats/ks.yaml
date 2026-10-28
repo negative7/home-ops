@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app streamystats
+  namespace: &namespace media
+spec:
+  targetNamespace: *namespace
+  components:
+    - ../../../../components/postgres/pass
+  dependsOn:
+    - name: cnpg-operator
+      namespace: database
+  postBuild:
+    substitute:
+      APP: *app
+      # Created by its migrations; the app role can't create extensions itself
+      DATABASE_EXTENSIONS: |
+        [
+          { name: vector },
+          { name: pg_trgm }
+        ]
+  path: ./kubernetes/apps/media/streamystats/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  wait: true
+  interval: 1h
+  retryInterval: 1m

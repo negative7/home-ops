@@ -20,6 +20,9 @@ spec:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
             app.kubernetes.io/name: jellystat
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            app.kubernetes.io/name: streamystats
       toPorts:
         - ports:
             - port: "5432"
