@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/refs/heads/main/schema/compose-spec.json
+services:
+  kopia:
+    container_name: kopia
+    hostname: lviv-kopia
+    image: ghcr.io/home-operations/kopia:0.23.1@sha256:6025a14d5a673bc38de3efdf48711ee93f0130787798b677c85ca95d4eaa0f7a
+    entrypoint:
+      - /usr/bin/catatonit
+      - --
+      - /usr/bin/env
+      - bash
+      - /scripts/backup.sh
+    # Root only to read other users' files (DAC_READ_SEARCH); every source is mounted read-only
+    user: "0:0"
+    cap_drop:
+      - ALL
+    cap_add:
+      - DAC_READ_SEARCH
+    read_only: true
+    restart: unless-stopped
+    logging:
+      driver: json-file
+    environment:
+      - TZ=America/New_York
+      - KOPIA_WEB_ENABLED=false
+      - KOPIA_PASSWORD=${LVIV_KOPIA_PASSWORD}
+      - B2_KEY_ID=${LVIV_KOPIA_B2_KEY_ID}
+      - B2_KEY=${LVIV_KOPIA_B2_KEY}
+      - B2_BUCKET=${LVIV_KOPIA_B2_BUCKET}
+      - BACKUP_TIME=03:00
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./config/backup.sh:/scripts/backup.sh:ro
+      # Kopia config and cache (excluded from the apps source)
+      - /mnt/tank/apps/kopia:/config
+      - /var/lib/node-exporter/textfile:/textfile
+      - /mnt/tank/data/immich:/sources/immich:ro
+      - /mnt/tank/apps:/sources/apps:ro
+      - /mnt/tank/backups/sergiy:/sources/sergiy:ro
+      - /mnt/tank/alex:/sources/alex:ro
+    tmpfs:
+      - /tmp

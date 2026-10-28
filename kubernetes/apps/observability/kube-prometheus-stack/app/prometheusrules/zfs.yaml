@@ -53,3 +53,22 @@ spec:
           for: 30m
           labels:
             severity: warning
+    - name: lviv-kopia.rules
+      rules:
+        # lviv_kopia_* metrics come from the lviv kopia container (docker/lviv/05-kopia, node-exporter textfile)
+        - alert: LvivKopiaBackupFailed
+          annotations:
+            summary: The last Kopia backup of {{$labels.source}} on lviv to B2 failed; check `docker logs kopia`
+          expr: |
+            lviv_kopia_last_run_success == 0
+          for: 15m
+          labels:
+            severity: warning
+        - alert: LvivKopiaBackupStale
+          annotations:
+            summary: No successful Kopia backup of {{$labels.source}} on lviv to B2 for {{ $value | humanizeDuration }}
+          expr: |
+            time() - lviv_kopia_last_success_timestamp_seconds > 26 * 3600
+          for: 1h
+          labels:
+            severity: warning
