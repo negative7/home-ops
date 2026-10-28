@@ -479,7 +479,7 @@
       delegate_to: localhost
       become: false
       loop:
-        - key: home-cluster/doco-cd/1pw_sa_token
+        - key: home-cluster/doco-cd/lviv_sa_token
           var: doco_1pw_sa_token
         - key: home-cluster/doco-cd/api_secret
           var: doco_api_secret
@@ -566,6 +566,7 @@
               content: "{{ doco_api_secret }}"
             - name: webhook_secret
               content: "{{ doco_webhook_secret }}"
+          register: dococd_secrets
 
         - name: doco-cd | Run docker-compose
           community.docker.docker_compose_v2:
@@ -573,6 +574,8 @@
             files:
               - docker-compose.yaml
             pull: always
+            # Secrets are bind-mounted files; a rotated token only reaches the container on recreate
+            recreate: "{{ 'always' if dococd_secrets.changed else 'auto' }}"
             state: present
           when: not ansible_check_mode
 

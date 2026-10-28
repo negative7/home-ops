@@ -8,10 +8,10 @@ auto_discovery:
   depth: 1
   delete: true
 external_secrets:
-  GATUS_PUSHOVER_TOKEN: op://home-cluster/pushover/PUSHOVER_TOKEN
-  GATUS_PUSHOVER_KEY: op://home-cluster/pushover/PUSHOVER_USER_KEY
-  GATUS_HEARTBEAT_TOKEN: op://home-cluster/odesa/heartbeat_token
-  CADDY_ACME_EMAIL: op://home-cluster/odesa/acme_email
+  GATUS_PUSHOVER_TOKEN: op://odesa/pushover/PUSHOVER_TOKEN
+  GATUS_PUSHOVER_KEY: op://odesa/pushover/PUSHOVER_USER_KEY
+  GATUS_HEARTBEAT_TOKEN: op://odesa/odesa/heartbeat_token
+  CADDY_ACME_EMAIL: op://odesa/odesa/acme_email
 force_recreate: false
 reconciliation:
   enabled: true
