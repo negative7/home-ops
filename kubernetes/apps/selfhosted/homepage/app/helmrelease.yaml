@@ -157,6 +157,10 @@ spec:
                   icon: jellyfin.png
                   href: https://jellystat.negative7.com
                   description: Jellyfin Statistics
+              - Streamystats:
+                  icon: sh-streamystats.png
+                  href: https://streamystats.negative7.com
+                  description: Jellyfin Statistics (trial)
               - Tautulli:
                   icon: tautulli.png
                   href: https://tautulli.negative7.com

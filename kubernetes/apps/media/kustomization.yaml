@@ -15,4 +15,5 @@ resources:
   - ./maintainerr/ks.yaml
   - ./plex/ks.yaml
   - ./seerr/ks.yaml
+  - ./streamystats/ks.yaml
   - ./tautulli/ks.yaml
