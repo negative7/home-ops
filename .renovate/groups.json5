@@ -31,6 +31,15 @@
       minimumGroupSize: 3,
     },
     {
+      description: "memini group (the Hermes memory plugin is pinned to the memini server version)",
+      groupName: "memini",
+      matchPackageNames: ["eleboucher/memini", "ghcr.io/eleboucher/charts/memini"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      minimumGroupSize: 2,
+    },
+    {
       description: "Immich group (server and machine-learning must stay on the same version)",
       groupName: "immich",
       matchDatasources: ["docker"],
