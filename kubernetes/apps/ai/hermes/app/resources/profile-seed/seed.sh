@@ -58,3 +58,21 @@ done
 
 mkdir -p "$data/.local/bin"
 ln -sfn /opt/mise/mise "$data/.local/bin/mise"
+
+# memini memory-provider plugin, pinned to the memini server version. Fail-soft: without network
+# the installed copy stays, and without any copy Hermes starts with no external memory.
+plugin_dir="$data/plugins/memini"
+if [[ $(cat "$plugin_dir/.version" 2>/dev/null) != "$MEMINI_PLUGIN_VERSION" ]]; then
+  mkdir -p "$data/.cache"
+  workdir=$(mktemp -d "$data/.cache/memini-plugin.XXXXXX")
+  if HOME=$workdir git -c advice.detachedHead=false clone --quiet --depth 1 --branch "$MEMINI_PLUGIN_VERSION" \
+    https://github.com/eleboucher/memini "$workdir/src"; then
+    mkdir -p "$data/plugins"
+    rm -rf "$plugin_dir"
+    mv "$workdir/src/integrations/hermes/plugin/memini" "$plugin_dir"
+    echo "$MEMINI_PLUGIN_VERSION" > "$plugin_dir/.version"
+  else
+    echo "seed: memini plugin $MEMINI_PLUGIN_VERSION not fetched, keeping the installed copy" >&2
+  fi
+  rm -rf "$workdir"
+fi

@@ -49,6 +49,9 @@ spec:
                     name: hermes-litellm
                     key: key
               SEARXNG_URL: http://searxng.selfhosted.svc.cluster.local:8080
+              # Keep in step with the memini chart (grouped in .renovate/groups.json5)
+              # renovate: datasource=github-tags depName=eleboucher/memini
+              MEMINI_PLUGIN_VERSION: v0.7.37
             envFrom:
               - secretRef:
                   name: hermes
@@ -102,6 +105,9 @@ spec:
               HERMES_WRITE_SAFE_ROOT: /opt/data
               HOME: /opt/data
               LITELLM_BASE_URL: "http://litellm.ai.svc.cluster.local:4000/v1"
+              # memini memory provider (no auth in this cluster; MEMINI_API_KEY unset)
+              MEMINI_BASE_URL: http://memini.ai.svc.cluster.local:8080
+              MEMINI_NAMESPACE: hermes
               LITELLM_API_KEY:
                 valueFrom:
                   secretKeyRef:
