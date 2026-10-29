@@ -5,11 +5,21 @@ kind: Kustomization
 metadata:
   name: mailkeep
 spec:
+  components:
+    - ../../../../components/kopiur/backup
   dependsOn:
     - name: miroir
       namespace: miroir-system
+    - name: kopiur
+      namespace: system
   interval: 1h
   path: "./kubernetes/apps/selfhosted/mailkeep/app"
+  postBuild:
+    substitute:
+      APP: mailkeep
+      KOPIUR_MOVER_UID: "2000"
+      KOPIUR_MOVER_GID: "2000"
+      KOPIUR_STORAGECLASS: miroir-replicated
   prune: true
   sourceRef:
     kind: GitRepository

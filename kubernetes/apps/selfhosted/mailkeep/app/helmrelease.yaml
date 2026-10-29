@@ -78,9 +78,12 @@ spec:
         existingClaim: mailkeep
         globalMounts:
           - path: /data
-            subPath: data
+      storage:
+        type: nfs
+        server: lviv.homelab.internal
+        path: /mnt/tank/data/mailkeep
+        globalMounts:
           - path: /storage
-            subPath: storage
       tmpfs:
         type: emptyDir
         globalMounts:
