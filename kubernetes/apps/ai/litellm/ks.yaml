@@ -30,7 +30,7 @@ spec:
   postBuild:
     substitute:
       APP: litellm
-      KOPIUR_CAPACITY: 1Gi
+      KOPIUR_CAPACITY: 2Gi
   prune: true
   sourceRef:
     kind: GitRepository
