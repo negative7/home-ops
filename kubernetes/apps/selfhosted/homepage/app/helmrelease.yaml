@@ -100,6 +100,9 @@ spec:
               Self-Hosted:
                 style: row
                 columns: 3
+              AI:
+                style: row
+                columns: 4
               System:
                 style: row
                 columns: 3
@@ -279,6 +282,20 @@ spec:
                   icon: immich.png
                   href: https://photos.negative7.com
                   description: Photos
+              - Atuin:
+                  icon: atuin.png
+                  href: https://atuin.negative7.com
+                  description: Shell History
+              - IT Tools:
+                  icon: it-tools.png
+                  href: https://it-tools.negative7.com
+                  description: Developer Tools
+              - Spoolman:
+                  icon: spoolman.png
+                  href: https://spoolman.negative7.com
+                  description: Filament Manager
+
+            - AI:
               - Hermes:
                   icon: hermes-agent.png
                   href: https://hermes.negative7.com
@@ -291,22 +308,10 @@ spec:
                   icon: mdi-brain
                   href: https://memini.negative7.com
                   description: Agent Memory
-              - Atuin:
-                  icon: atuin.png
-                  href: https://atuin.negative7.com
-                  description: Shell History
-              - IT Tools:
-                  icon: it-tools.png
-                  href: https://it-tools.negative7.com
-                  description: Developer Tools
               - SearXNG:
                   icon: searxng.png
                   href: https://searxng.negative7.com
                   description: Metasearch
-              - Spoolman:
-                  icon: spoolman.png
-                  href: https://spoolman.negative7.com
-                  description: Filament Manager
 
             - System:
               - Kanidm:
