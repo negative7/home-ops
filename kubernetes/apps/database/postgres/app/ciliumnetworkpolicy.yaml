@@ -23,6 +23,13 @@ spec:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: ai
             app.kubernetes.io/name: litellm
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: dev
+            app.kubernetes.io/name: kritika
+            app.kubernetes.io/instance: kritika
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: dev
+            kritika.home-operations.com/role: runner
       toPorts:
         - ports:
             - port: "5432"

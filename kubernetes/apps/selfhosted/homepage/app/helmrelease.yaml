@@ -76,6 +76,10 @@ spec:
                     - icon: forgejo.png
                       href: https://git.negative7.com
                       description: Git Server
+                - Kritika:
+                    - icon: mdi-source-pull
+                      href: https://kritika.negative7.com
+                      description: PR Reviews
                 - Renovate:
                     - icon: renovate.png
                       href: https://renovate.negative7.com
