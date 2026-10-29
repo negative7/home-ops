@@ -41,7 +41,12 @@ Start from the PR's release notes, but inspect upstream when they are absent or 
 
 - **OCI chart:** find the source via the app's `ocirepository.yaml`. For `ghcr.io/home-operations/charts-mirror/<chart>`, use that mirror's metadata to find the real chart. If `appVersion` changed, read the application's release notes too.
 - **Container image:** resolve upstream from the image owner or `org.opencontainers.image.source`. For `ghcr.io/home-operations/*`, check `home-operations/containers`.
-- Follow issues and PRs that a changelog only references by number. Look for raised minimums, removed fields, changed auth/storage/network defaults, one-way migrations and relevant security advisories.
+- Read every intermediate release for a major bump or a jump across several versions: breaking changes land in the middle.
+- A repository that publishes many charts prefixes its release tags with the chart name (`<chart>-1.2.3`, not `v1.2.3`). When a release is not found, list the releases and look for the chart name.
+- A digest-only update moved no version. Say whether the tag was rebuilt, and compare the old and new digests' `created` and `revision` metadata when available.
+- Follow issues and PRs that a changelog only references by number, and take an issue to the merged PR that closed it: the PR says what changed and in what scope, where the issue and the note may not. Look for raised minimums, removed fields, changed auth/storage/network defaults, one-way migrations and relevant security advisories.
+- An update also moves images that appear nowhere in the diff: a chart or operator that changes its default images, or stops setting them and leaves them to another operator's built-in defaults. Name each such image with its old and new version, read from the chart's or operator's source at both versions. Nothing here pins them, so Renovate never raises them and the review is the only place they show.
+- Settle ambiguous breaking-change wording ("chart name prefix removed") from the PR or the template: label values and resource names break different consumers. A label value that changed while the key stayed still matches a search for the key.
 - State evidence gaps honestly as **Unknown / needs verification**.
 
 ## 5. Repository-specific caveats
@@ -59,10 +64,16 @@ Start from the PR's release notes, but inspect upstream when they are absent or 
 
 Search the actual consumers of anything removed or renamed, not only whether the new value is set explicitly: ServiceMonitors, alerts and dashboards, NetworkPolicies/CiliumNetworkPolicies, HTTPRoutes, PDBs, Flux `dependsOn`/`healthChecks`, `values`/`valuesFrom`/`postRenderers`, service DNS and CRD instances. For `app-template` or other shared chart changes, check all HelmReleases that use it, since chart defaults can change even when this repo's values do not.
 
+An app configured through its own UI keeps that configuration on its volume, not in git, so a search of this repository proves nothing about it. Call an affected integration or setting there unverified.
+
 ## 7. Verdict
 
 - A finding names the changed line, the affected consumer or path, the concrete failure mode, and the rendered or upstream evidence. Do not guess replacement values; confirm them upstream.
 - Escalate: Renovate hold violations, unsupported Talos/Kubernetes pairings, CRD or schema incompatibilities, storage or data-loss mutations, security relaxations, unexpected `suspend`/`prune`, and selector or name renames that break live consumers.
 - A breaking change with no consumer in this repository is a brief observation, not a blocker.
 - Without render evidence, the recommendation is at best "unverified". Never write "safe".
+- Before prescribing a rename or a new value, confirm it from the upstream PR's diff or the chart's template at the new tag. Without that, make it a check to do after the merge rather than an edit.
+- Put the evidence in the claim: the value found and the file it came from, or the upstream source that says so. "`auth.enabled: true` already set in the HelmRelease values" carries its proof; "auth checked" does not.
+- A version requirement is checked against the version this repository targets, read from where it pins it. A target in git is not proof that a rollout reached every node, so say the line rests on the target.
+- The scorer sees the description and diff but not what tools ran or printed. Give each entry under the release notes' breaking changes and upgrade notes a checked line of its own, including one that touches nothing here: name the entry, then why it does not apply or what it changes.
 - Keep ordinary patch and digest PRs compact: recommendation, what changed, and any real caveat. No fabricated tool results, comparisons or post-merge checks.
