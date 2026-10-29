@@ -14,6 +14,10 @@ spec:
       admin:
         username: ""
       config:
+        # JWT integrations (kritika) fetch keys from an issuer that resolves to envoy-internal
+        # (10.2.1.103). ALLOWED_DOMAINS is exclusive once set, so allow local networks (as bjw-s).
+        authorized_integration:
+          ALLOW_LOCALNETWORKS: true
         cache:
           ENABLED: true
           ADAPTER: redis
