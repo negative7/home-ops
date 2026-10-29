@@ -17,6 +17,8 @@ model:
 
 web:
   search_backend: searxng
+  # Firecrawl cloud for page extraction (FIRECRAWL_API_KEY from the hermes secret), as in bjw-s
+  extract_backend: firecrawl
 
 # MCP: memini (agent memory, no auth, cluster-internal) and the LiteLLM MCP gateway, which
 # exposes only the servers granted to the hermes team (all read-only).
@@ -57,6 +59,13 @@ toolsets:
   - hermes-cli
   - kanban
 
+# memini (mcp_servers.memini) is the only memory store; turn off Hermes's built-in memory so the
+# model cannot pick it and the background review does not write MEMORY.md/USER.md.
+memory:
+  memory_enabled: false
+  user_profile_enabled: false
+  nudge_interval: 0
+
 agent:
   max_turns: 60
   gateway_timeout: 1800
@@ -72,6 +81,8 @@ agent:
     - feishu_drive
     - homeassistant
     - image_gen
+    # Built-in MEMORY.md/USER.md; memini (MCP) is the only memory
+    - memory
     - spotify
     - video
     - video_gen
@@ -88,7 +99,6 @@ platform_toolsets:
     - delegation
     - file
     - kanban
-    - memory
     - session_search
     - skills
     - terminal
