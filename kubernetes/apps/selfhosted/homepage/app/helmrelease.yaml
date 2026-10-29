@@ -298,6 +298,10 @@ spec:
                   icon: spoolman.png
                   href: https://spoolman.negative7.com
                   description: Filament Manager
+              - MailKeep:
+                  icon: mailkeep.png
+                  href: https://mailkeep.negative7.com
+                  description: IMAP Archive
 
             - AI:
               - Hermes:
