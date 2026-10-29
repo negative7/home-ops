@@ -9,6 +9,10 @@ metadata:
 spec:
   instances: 2
 
+  # Node drains: fast shutdown after 30s instead of waiting out the 1800s stopDelay on open connections
+  smartShutdownTimeout: 30
+  stopDelay: 300
+
   imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-trixie@sha256:39add80f5b1e573e2f6b641c66fd1a2f8dede67ca0330e870285bc1078551390
 
   storage:
