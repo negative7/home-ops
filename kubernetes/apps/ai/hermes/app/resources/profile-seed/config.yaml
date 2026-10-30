@@ -17,11 +17,8 @@ model:
 
 web:
   search_backend: searxng
-  # Firecrawl cloud for page extraction (FIRECRAWL_API_KEY from the hermes secret), as in bjw-s
   extract_backend: firecrawl
 
-# MCP: the LiteLLM MCP gateway, which exposes only the servers granted to the hermes team (all
-# read-only). memini is wired as the native memory provider below, not as an MCP server.
 mcp_servers:
   homelab:
     url: http://litellm.ai.svc.cluster.local:4000/mcp
@@ -57,15 +54,8 @@ toolsets:
   - hermes-cli
   - kanban
 
-# memini is the only memory store, as Hermes's native memory provider (plugin installed by
-# seed.sh): it recalls before each turn and captures every exchange. The `memory` toolset must
-# stay enabled (it also gates provider tools); built-in MEMORY.md/USER.md stay off here so the
-# model cannot pick them and the background review does not write them.
 memory:
   provider: memini
-  memory_enabled: false
-  user_profile_enabled: false
-  nudge_interval: 0
 
 agent:
   max_turns: 60
