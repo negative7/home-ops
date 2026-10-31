@@ -9,11 +9,11 @@ components:
 resources:
   - ./actual/ks.yaml
   - ./atuin/ks.yaml
+  - ./bichon/ks.yaml
   - ./homepage/ks.yaml
   - ./immich/ks.yaml
   - ./it-tools/ks.yaml
   - ./karakeep/ks.yaml
-  - ./mailkeep/ks.yaml
   - ./namespace.yaml
   - ./outline/ks.yaml
   - ./searxng/ks.yaml
