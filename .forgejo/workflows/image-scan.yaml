@@ -41,7 +41,7 @@ jobs:
       # (GitHub downloads are ~350 kB/s per connection from home).
       - name: Setup mise
         continue-on-error: true
-        uses: https://github.com/jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
+        uses: https://github.com/jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
         with:
           cache: true
           install_args: github:home-operations/flate aqua:aquasecurity/trivy aqua:jqlang/jq
