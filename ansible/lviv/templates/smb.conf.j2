@@ -39,4 +39,10 @@
 	read only = no
 	guest ok = no
 	inherit permissions = no
+{% if share.force_user is defined %}
+	force user = {{ share.force_user }}
+	force group = {{ share.force_group | default(share.force_user) }}
+	create mask = 0664
+	directory mask = 0775
+{% endif %}
 {% endfor %}
