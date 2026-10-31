@@ -302,6 +302,10 @@ spec:
                   icon: paperless-ngx.png
                   href: https://paperless.negative7.com
                   description: Document Management
+                  widget:
+                    type: paperlessngx
+                    url: http://paperless.selfhosted.svc.cluster.local:8000
+                    key: '{{ "{{" }}HOMEPAGE_VAR_PAPERLESS_KEY{{ "}}" }}'
               - Bichon:
                   icon: mdi-email-search
                   href: https://bichon.negative7.com

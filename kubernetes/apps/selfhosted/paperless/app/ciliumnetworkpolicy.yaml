@@ -27,3 +27,11 @@ spec:
         - ports:
             - port: "8000"
               protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: selfhosted
+            app.kubernetes.io/name: homepage
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
