@@ -1,0 +1,9 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# ChatGPT Plus subscription (no API key): the first request prints a device
+# login to the litellm log; tokens persist in CHATGPT_TOKEN_DIR on the PVC.
+resources:
+  - ./gpt-6-luna.yaml
+  - ./gpt-6-sol.yaml

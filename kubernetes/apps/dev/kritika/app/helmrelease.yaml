@@ -55,8 +55,8 @@ spec:
               input: 0.14
               output: 0.42
       review:
-        model: litellm/neuralwatt/dsv4.1f
-        fallback: litellm/openrouter/dsv4.1f
+        model: litellm/chatgpt/gpt-6-luna
+        fallback: litellm/neuralwatt/dsv4.1f
       trigger:
         exclude:
           - name: forks
