@@ -53,6 +53,17 @@ spec:
               timeout: 3h
               shutdown_timeout: 3m
           podspec-default.yaml: |-
+            # Prefer kharkiv (i5-9500, 65 W) over the 35 W i5-9500T nodes; other nodes when it is busy or down.
+            affinity:
+              nodeAffinity:
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  - weight: 100
+                    preference:
+                      matchExpressions:
+                        - key: kubernetes.io/hostname
+                          operator: In
+                          values:
+                            - kharkiv
             containers:
               - env:
                   - name: DEBIAN_FRONTEND
@@ -68,6 +79,17 @@ spec:
                     memory: 256Mi
             restartPolicy: Never
           podspec-dind.yaml: |-
+            # Prefer kharkiv (i5-9500, 65 W) over the 35 W i5-9500T nodes; other nodes when it is busy or down.
+            affinity:
+              nodeAffinity:
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  - weight: 100
+                    preference:
+                      matchExpressions:
+                        - key: kubernetes.io/hostname
+                          operator: In
+                          values:
+                            - kharkiv
             initContainers:
               - name: dind
                 image: docker:29-dind@sha256:9e79b879b177fbd72c34376a3dd3d91747da5db49e1f560f76aea59561471977
