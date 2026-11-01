@@ -13,3 +13,8 @@ resources:
   - ./workstation-qwen3.5-9b.yaml
   - ./workstation-qwen3.6-35b.yaml
   - ./workstation-qwen3.8-27b.yaml
+  - ./workstation-qwen3.8-27b-mail.yaml
+  - ./workstation-qwen3.6-35b-mail.yaml
+  - ./workstation-qwen3.5-9b-mail.yaml
+  - ./workstation-gemma4-26b-mail.yaml
+  - ./workstation-gemma4-e4b-mail.yaml
