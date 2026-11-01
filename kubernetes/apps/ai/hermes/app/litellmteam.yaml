@@ -20,6 +20,8 @@ spec:
     - unifi_network
     - victoria_logs
   models:
+    - chatgpt/gpt-6-luna
+    - chatgpt/gpt-6.1-sol
     - neuralwatt/dsv4.1f
   proxyNamespace: ai
   proxyRef: litellm

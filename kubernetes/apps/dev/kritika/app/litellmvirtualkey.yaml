@@ -8,6 +8,7 @@ spec:
   keyAlias: kritika
   # Empty would permit every model on the proxy.
   models:
+    - chatgpt/gpt-6-luna
     - neuralwatt/dsv4.1f
     - openrouter/dsv4.1f
     - openrouter/voyage-code-4
