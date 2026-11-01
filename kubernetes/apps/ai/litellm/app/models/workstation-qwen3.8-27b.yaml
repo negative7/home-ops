@@ -15,4 +15,5 @@ spec:
     apiKey: none
   info:
     mode: chat
-    maxInputTokens: 4096
+    maxInputTokens: 32768
+    supportsFunctionCalling: true
