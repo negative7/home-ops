@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: workstation-gemma4-26b
+spec:
+  modelName: workstation/gemma4-26b
+  proxyRef: litellm
+  params:
+    model: openai/gemma4-26b
+    apiBaseRef:
+      name: litellm
+      key: LLAMA_SWAP_API_BASE
+    apiKey: none
+  info:
+    mode: chat
+    maxInputTokens: 4096
+    supportsFunctionCalling: true
