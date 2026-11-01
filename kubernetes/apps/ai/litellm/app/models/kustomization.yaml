@@ -7,3 +7,9 @@ resources:
   - ./openrouter-dsv4.1f.yaml
   - ./openrouter-text-embedding-3-small.yaml
   - ./openrouter-voyage-code-4.yaml
+  - ./workstation-gemma4-26b.yaml
+  - ./workstation-gemma4-e4b.yaml
+  - ./workstation-gpt-oss-20b.yaml
+  - ./workstation-qwen3.5-9b.yaml
+  - ./workstation-qwen3.6-35b.yaml
+  - ./workstation-qwen3.8-27b.yaml
