@@ -262,6 +262,8 @@ spec:
           hermes:
             app:
               - path: /opt/data
+              # WebUI passes attachment/workspace paths under its own mount; mirror it here
+              - path: /home/hermeswebui/.hermes
             config-migrate:
               - path: /opt/data
             profile-seed:
