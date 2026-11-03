@@ -1,0 +1,43 @@
+---
+# Filebrowser Quantum config: https://filebrowserquantum.com/en/docs/configuration/
+# ${VAR} references are expanded from the container environment
+http:
+  port: 8080
+  baseURL: /
+  externalUrl: https://files.negative7.com
+  trustProxyHeaders: true
+server:
+  disableUpdateCheck: true
+  cacheDir: /home/filebrowser/data/cache
+  database:
+    path: /home/filebrowser/data/database.sqlite
+  logging:
+    - levels: info|warning|error
+  # Mounted read-only; readOnly also hides write actions in the UI and WebDAV
+  sources:
+    - path: /srv/media
+      name: media
+      config:
+        readOnly: true
+        defaultEnabled: true
+    - path: /srv/mail
+      name: mail
+      config:
+        readOnly: true
+        defaultEnabled: true
+    - path: /srv/sergiy
+      name: sergiy
+      config:
+        readOnly: true
+        defaultEnabled: true
+auth:
+  methods:
+    password:
+      enabled: false
+    oidc:
+      enabled: true
+      issuerUrl: https://idm.negative7.com/oauth2/openid/filebrowser
+      clientId: ${FILEBROWSER_OIDC_CLIENT_ID}
+      scopes: openid email profile groups
+      userIdentifier: preferred_username
+      adminGroup: admins@idm.negative7.com

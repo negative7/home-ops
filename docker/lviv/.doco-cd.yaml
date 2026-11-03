@@ -15,6 +15,8 @@ external_secrets:
   GARAGE_METRICS_TOKEN: op://lviv/garage/metrics_token
   GARAGE_UI_OIDC_CLIENT_ID: op://lviv/garage_ui/oidc_client_id
   GARAGE_UI_OIDC_CLIENT_SECRET: op://lviv/garage_ui/oidc_client_secret
+  FILEBROWSER_OIDC_CLIENT_ID: op://lviv/filebrowser/oidc_client_id
+  FILEBROWSER_OIDC_CLIENT_SECRET: op://lviv/filebrowser/oidc_client_secret
   LVIV_KOPIA_PASSWORD: op://lviv/lviv_kopia/password
   LVIV_KOPIA_B2_KEY_ID: op://lviv/lviv_kopia/b2_key_id
   LVIV_KOPIA_B2_KEY: op://lviv/lviv_kopia/b2_key

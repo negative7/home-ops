@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/refs/heads/main/schema/compose-spec.json
+services:
+  filebrowser:
+    container_name: filebrowser
+    image: ghcr.io/gtsteffaniak/filebrowser:2.0.2-stable@sha256:de2b4c4d18485ea202ab2cdada5bd25d8f0b8ed071712c8216a67194c31285ae
+    # apps owns data/media and data/mail; backups/sergiy is world-readable
+    user: "2000:2000"
+    cap_drop:
+      - ALL
+    read_only: true
+    restart: unless-stopped
+    logging:
+      driver: json-file
+    # Bridge networking, published on VLAN20 only; served as files.negative7.com via envoy-internal
+    ports:
+      - 10.2.0.10:8090:8080
+    environment:
+      - TZ=America/New_York
+      - FILEBROWSER_CONFIG=/config/config.yaml
+      - FILEBROWSER_OIDC_CLIENT_ID=${FILEBROWSER_OIDC_CLIENT_ID}
+      - FILEBROWSER_OIDC_CLIENT_SECRET=${FILEBROWSER_OIDC_CLIENT_SECRET}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./config/config.yaml:/config/config.yaml:ro
+      # Database, index and preview cache
+      - /mnt/tank/apps/filebrowser:/home/filebrowser/data
+      - /mnt/tank/data/media:/srv/media:ro
+      - /mnt/tank/data/mail:/srv/mail:ro
+      - /mnt/tank/backups/sergiy:/srv/sergiy:ro
+    tmpfs:
+      - /tmp
