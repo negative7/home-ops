@@ -1,0 +1,50 @@
+---
+# filebrowser runs on lviv (docker/lviv/06-filebrowser), so its credentials go to 1Password for doco-cd
+apiVersion: kaniop.rs/v1beta1
+kind: KanidmOAuth2Client
+metadata:
+  name: filebrowser
+spec:
+  kanidmRef:
+    name: kanidm
+  displayname: Filebrowser
+  origin: https://files.negative7.com/
+  redirectUrl:
+    - https://files.negative7.com/api/auth/oidc/callback
+  scopeMap:
+    - group: admins
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+  strictRedirectUrl: true
+  preferShortUsername: true
+  # filebrowser's OIDC flow does not send a PKCE challenge
+  allowInsecureClientDisablePkce: true
+  image:
+    url: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/filebrowser-quantum.svg
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/external-secrets.io/pushsecret_v1alpha1.json
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  name: filebrowser-kanidm-oauth2-credentials
+spec:
+  secretStoreRefs:
+    - name: onepassword-connect
+      kind: ClusterSecretStore
+  selector:
+    secret:
+      name: filebrowser-kanidm-oauth2-credentials
+  data:
+    - match:
+        secretKey: CLIENT_ID
+        remoteRef:
+          remoteKey: filebrowser
+          property: oidc_client_id
+    - match:
+        secretKey: CLIENT_SECRET
+        remoteRef:
+          remoteKey: filebrowser
+          property: oidc_client_secret
