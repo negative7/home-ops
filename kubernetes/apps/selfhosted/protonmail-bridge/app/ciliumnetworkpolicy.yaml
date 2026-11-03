@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+# Only Bichon reads the decrypted mailbox over IMAP; SMTP stays unreachable. Egress is limited to
+# the Proton API by the pod's `internet` label.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: protonmail-bridge
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: protonmail-bridge
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: bichon
+            app.kubernetes.io/instance: bichon
+      toPorts:
+        - ports:
+            - port: "143"
+              protocol: TCP

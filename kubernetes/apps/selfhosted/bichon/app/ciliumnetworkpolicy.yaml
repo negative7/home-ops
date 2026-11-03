@@ -18,3 +18,7 @@ spec:
         - ports:
             - port: "15630"
               protocol: TCP
+    # Same-node Service VIP replies count as new ingress on Cilium 1.20
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: protonmail-bridge

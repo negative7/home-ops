@@ -1,0 +1,13 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  packageRules: [
+    {
+      // Tags are <bridge version>-<image build> (v3.27.1-7); docker versioning would read the build
+      // number as a fixed suffix and never offer v3.27.1-8 or v3.28.0-1.
+      description: "Version protonmail-bridge image tags as bridge version plus image build",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/dancwilliams/protonmail-bridge-docker"],
+      versioning: "regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(-(?<build>\\d+))?$",
+    },
+  ],
+}
