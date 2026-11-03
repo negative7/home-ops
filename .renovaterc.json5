@@ -11,6 +11,7 @@
     "local>negative7/home-ops//.renovate/groups.json5",
     "local>negative7/home-ops//.renovate/labels.json5",
     "local>negative7/home-ops//.renovate/apps/cloudnative-pg.json5",
+    "local>negative7/home-ops//.renovate/apps/protonmail-bridge.json5",
     ":timezone(America/New_York)",
   ],
   // Forgejo/Gitea bug: commits/{ref}/statuses 404s when the ref contains a

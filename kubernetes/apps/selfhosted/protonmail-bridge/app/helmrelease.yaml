@@ -1,0 +1,117 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: protonmail-bridge
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: protonmail-bridge
+  interval: 30m
+  dependsOn:
+    - name: miroir
+      namespace: miroir-system
+  values:
+    controllers:
+      protonmail-bridge:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            egress.policy.home.arpa/internet: "true"
+          securityContext:
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 2000
+            runAsNonRoot: true
+            runAsUser: 2000
+            seccompProfile:
+              type: RuntimeDefault
+        containers:
+          app:
+            image:
+              repository: ghcr.io/dancwilliams/protonmail-bridge-docker
+              tag: v3.27.1-7@sha256:466a52a468195037b1e518ac06e7708da1db5423217774058ee7c94eca3c9851
+            # The image runs the bridge as PID 1, so the interactive login cannot share the pod with
+            # it: until $HOME/.initialised exists the pod idles. First login (and any re-login):
+            #   kubectl -n selfhosted exec -it deploy/protonmail-bridge -- bash /protonmail/entrypoint.sh init
+            #     login / info (IMAP password for Bichon) / telemetry disable / exit
+            #   kubectl -n selfhosted exec deploy/protonmail-bridge -- touch /root/.initialised
+            #   kubectl -n selfhosted rollout restart deploy/protonmail-bridge
+            # To re-login, delete /root/.initialised and restart first.
+            command:
+              - /bin/bash
+              - -c
+              - |
+                if [ ! -f "$HOME/.initialised" ]; then
+                  echo "waiting for the first login (see the HelmRelease comment)"
+                  trap 'exit 0' TERM
+                  sleep infinity & wait
+                fi
+                exec bash /protonmail/entrypoint.sh
+            env:
+              # The image hard-codes /root; the PVC is mounted there and owned by the pod user
+              HOME: /root
+              TZ: America/New_York
+            envFrom:
+              - secretRef:
+                  name: protonmail-bridge-secret
+            probes:
+              # Healthy while waiting for the first login, then the image's port check
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: &healthcheck
+                      - /bin/bash
+                      - -c
+                      - "[ ! -f $HOME/.initialised ] || bash /protonmail/healthcheck.sh"
+                  failureThreshold: 3
+                  periodSeconds: 30
+                  timeoutSeconds: 15
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: *healthcheck
+                  failureThreshold: 3
+                  periodSeconds: 30
+                  timeoutSeconds: 15
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: *healthcheck
+                  failureThreshold: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 15
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      data:
+        existingClaim: protonmail-bridge
+        globalMounts:
+          - path: /root
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    service:
+      app:
+        ports:
+          imap:
+            port: 143
