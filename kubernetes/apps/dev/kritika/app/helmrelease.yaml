@@ -57,6 +57,30 @@ spec:
       review:
         model: litellm/chatgpt/gpt-6-luna
         fallback: litellm/neuralwatt/dsv4.1f
+      # A second model scores each review 0-5. Score only for now: no gate
+      # and no approvals, so the status shows the score and always passes.
+      confidence:
+        model: litellm/chatgpt/gpt-6.1-sol
+        fallback: litellm/chatgpt/gpt-6-luna
+        threshold: 4
+        instructions: >-
+          Changes to Talos, tuppr upgrades, Miroir/DRBD, CNPG or Kopiur can
+          lose data or break etcd quorum on a three-node cluster; rate them
+          by that, not by the version step alone.
+        # Core infrastructure, as excluded from patch automerge in
+        # .renovate/autoMerge.json5.
+        floors:
+          high:
+            - kubernetes/talos/**
+            - kubernetes/apps/system-upgrade/tuppr/upgrades/**
+            - kubernetes/apps/miroir-system/**
+            - kubernetes/apps/database/**
+            - kubernetes/apps/system/kopiur/**
+            - kubernetes/apps/kube-system/cilium/**
+            - kubernetes/apps/flux-system/**
+            - kubernetes/apps/security/**
+            - kubernetes/apps/external-secrets/**
+            - kubernetes/apps/network/envoy-gateway/**
       trigger:
         exclude:
           - name: forks
