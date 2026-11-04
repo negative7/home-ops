@@ -11,3 +11,4 @@ resources:
   - ./mcp-servers/
   - ./models/
   - ./servicemonitor.yaml
+  - ./workstation.yaml

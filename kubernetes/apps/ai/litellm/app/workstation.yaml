@@ -1,0 +1,36 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmteam_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMTeam
+metadata:
+  name: workstation
+spec:
+  alias: workstation
+  # MCP access for Claude Code / Codex on the workstation (read-only servers, no home data).
+  mcpServers:
+    - context7
+    - flux
+    - grafana
+    - konflate
+    - kubectl
+    - kubesearch
+    - sidero
+    - victoria_logs
+  # An empty list allows every model and the operator rejects it anyway (sent as null).
+  # A name no model has keeps the team MCP-only; replace it with real models to allow LLMs.
+  models:
+    - no-default-models
+  proxyNamespace: ai
+  proxyRef: litellm
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmvirtualkey_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMVirtualKey
+metadata:
+  name: workstation
+spec:
+  keyAlias: workstation
+  teamID: workstation
+  proxyNamespace: ai
+  proxyRef: litellm
+  secretName: workstation-litellm
