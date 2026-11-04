@@ -7,6 +7,18 @@ metadata:
 spec:
   image: ghcr.io/berriai/litellm:v1.108.0@sha256:c560d317136880ea92d62334d4367ab10955b1af189dd3ea24f6551290b1d6c1
   replicas: 1
+  # The RWO `litellm` PVC is replicated (no PV node affinity) and the operator
+  # always rolls out with RollingUpdate, so a new pod on another node hangs on
+  # the DRBD mount. Co-locate with the pod being replaced; with no litellm pod
+  # running, a pod matching its own term schedules anywhere.
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: litellm
+              app.kubernetes.io/instance: litellm
+          topologyKey: kubernetes.io/hostname
   # Startup (imports + Prisma toolchain) is single-threaded and takes over a
   # minute here; the default liveness probe kills it first. No startupProbe in
   # the CRD, so delay liveness up to the Prisma toolchain timeout (600s).
