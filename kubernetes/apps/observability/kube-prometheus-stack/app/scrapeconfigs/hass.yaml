@@ -7,12 +7,13 @@ metadata:
 spec:
   scheme: https
   staticConfigs:
-    - targets: [hass.negative7.com]
+    - targets:
+        - hass.negative7.com
   metricsPath: /api/prometheus
   authorization:
-      credentials: 
-        name: scrape-secret
-        key: hass_token      
+    credentials:
+      name: scrape-secret
+      key: hass_token
   relabelings:
     - action: replace
       targetLabel: job
