@@ -70,6 +70,7 @@
         "ghcr.io/cloudnative-pg/postgresql",
         "ghcr.io/emberstack/helm-charts/reflector",
         "ghcr.io/mogenius/helm-charts/renovate-operator",
+        "ghcr.io/nesquena/hermes-webui",
       ],
       automerge: true,
       automergeType: "pr",
