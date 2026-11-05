@@ -48,7 +48,7 @@ spec:
               LOG_FILE: /tmp/jellyplex-watched.log
               MARK_FILE: /tmp/jellyplex-watched.mark.log
               RUN_ONLY_ONCE: true
-              LIBRARY_MAPPING: '{ "Shows": "TV Shows" }'
+              LIBRARY_MAPPING: "{ \"Shows\": \"TV Shows\" }"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
