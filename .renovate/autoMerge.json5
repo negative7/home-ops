@@ -85,13 +85,12 @@
     },
     {
       // MCP servers are tooling for agents, not core services; 0.x minors count as major, so include every type
-      description: "Auto-merge all MCP server updates weekly",
+      description: "Auto-merge all MCP server updates straight to main",
       matchDatasources: ["docker"],
       matchPackageNames: ["/mcp/"],
       matchUpdateTypes: ["major", "minor", "patch", "digest"],
       automerge: true,
-      automergeType: "pr",
-      schedule: ["before 6am on Monday"],
+      automergeType: "branch",
     },
     {
       // Dev and CI tooling, any update type including 0.x minors and majors; a bad bump is a one-line revert
