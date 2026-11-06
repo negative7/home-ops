@@ -1,0 +1,14 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  packageRules: [
+    {
+      // paperless-ngx's tika_client posts to /tika/form/text, which Tika 4.x removed (404, 2026-11-06).
+      // Lift once paperless supports Tika 4.
+      description: "Keep Tika on 3.x for paperless-ngx",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["docker.io/apache/tika"],
+      matchUpdateTypes: ["major"],
+      enabled: false,
+    },
+  ],
+}
