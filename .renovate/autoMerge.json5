@@ -78,6 +78,11 @@
         "ghcr.io/home-operations/sonarr",
         "ghcr.io/home-operations/radarr",
         "ghcr.io/home-operations/prowlarr",
+        "ghcr.io/kimdre/doco-cd",
+        "ghcr.io/berriai/litellm",
+        "ghcr.io/ggml-org/llama.cpp",
+        "ghcr.io/autobrr/qui",
+        "fnsys/dockhand",
       ],
       automerge: true,
       automergeType: "pr",
@@ -93,12 +98,24 @@
       automergeType: "branch",
     },
     {
+      // The three extension images ship together for each Postgres release; one PR, once a week
+      description: "Group and auto-merge CNPG extension images weekly",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/cloudnative-pg\\/(timescaledb-oss|postgis-extension|pgvector)/"],
+      matchUpdateTypes: ["digest", "minor", "patch"],
+      groupName: "cnpg extension images",
+      automerge: true,
+      automergeType: "pr",
+      schedule: ["before 6am on Monday"],
+    },
+    {
       // Dev and CI tooling, any update type including 0.x minors and majors; a bad bump is a one-line revert
       description: "Auto-merge all dev tooling (mise) updates",
       matchManagers: ["mise"],
       matchUpdateTypes: ["major", "minor", "patch"],
       automerge: true,
       automergeType: "pr",
+      schedule: ["before 6am on Monday"],
     },
     {
       description: "Auto-merge Grafana dashboards",
