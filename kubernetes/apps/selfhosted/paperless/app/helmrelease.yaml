@@ -39,6 +39,10 @@ spec:
               PAPERLESS_CONSUMER_RECURSIVE: "true"
               PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: "true"
               PAPERLESS_OCR_LANGUAGE: eng
+              # Office document and email conversion via the Tika and Gotenberg sidecars
+              PAPERLESS_TIKA_ENABLED: "true"
+              PAPERLESS_TIKA_ENDPOINT: http://localhost:9998
+              PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://localhost:3000
               PAPERLESS_REDIS: redis://paperless-dragonfly:6379
               # Only affects local storage; NFS access from lviv is owned by apps (2000:2000)
               USERMAP_UID: "2000"
@@ -62,6 +66,68 @@ spec:
                 memory: 2Gi
               limits:
                 memory: 6Gi
+          gotenberg:
+            image:
+              repository: docker.io/gotenberg/gotenberg
+              tag: 8.40.0@sha256:53073e798c8ef39ea2187e44cb67bab77894ea2509100b94c4fe3b461f7b2996
+            command:
+              - gotenberg
+              - --chromium-disable-javascript=true
+              - --chromium-allow-list=file:///tmp/.*
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 3000
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 3000
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - "ALL"
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+          tika:
+            image:
+              repository: docker.io/apache/tika
+              tag: 4.2.0@sha256:b99f19c4fd76237dafe7d22f719b9bddfa9a449da687c597a41e2f6d9a595418
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 9998
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 9998
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - "ALL"
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
     persistence:
       data:
         existingClaim: paperless-data
