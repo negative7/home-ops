@@ -19,3 +19,5 @@ resources:
   - ./workstation-qwen3.5-9b-mail.yaml
   - ./workstation-gemma4-26b-mail.yaml
   - ./workstation-gemma4-e4b-mail.yaml
+  - ./workstation-qwen3.5-9b-photos.yaml
+  - ./workstation-qwen3.8-27b-photos.yaml
