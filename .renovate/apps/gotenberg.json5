@@ -1,0 +1,15 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  packageRules: [
+    {
+      // Gotenberg 9 replaces the PDF and LibreOffice engines and remaps routes, fields and flags
+      // (https://gotenberg.dev/docs/getting-started/upgrade). paperless-ngx only documents Gotenberg 8.
+      // Lift once paperless supports Gotenberg 9 and the sidecar flags are migrated.
+      description: "Keep Gotenberg on 8.x for paperless-ngx",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["docker.io/gotenberg/gotenberg"],
+      matchUpdateTypes: ["major"],
+      enabled: false,
+    },
+  ],
+}
