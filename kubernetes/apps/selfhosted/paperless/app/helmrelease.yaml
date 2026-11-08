@@ -74,6 +74,9 @@ spec:
               - gotenberg
               - --chromium-disable-javascript=true
               - --chromium-allow-list=file:///tmp/.*
+              # LibreOffice conversions of .docx timed out at the 30s default while Paperless
+              # consumed a backlog of mailsort documents (2026-11-08).
+              - --api-timeout=180s
             probes:
               liveness:
                 enabled: true
