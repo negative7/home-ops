@@ -9,13 +9,15 @@ spec:
     - name: cilium.rules
       rules:
         # A caller missing from a CNP or an egress label shows up here instead of as a silent breakage.
+        # ICMP is excluded: error replies (unreachable, frag-needed) from internet hosts reach pods that have
+        # egress-only policies as reserved:world drops (mailsort-worker, litellm) and are not blocked traffic.
         # Needs drops in 3 of the last six 5m windows: one-off bursts during restarts (cilium, CNPG) don't fire.
         - alert: CiliumPolicyDenied
           expr: |-
             count_over_time(
               (
                 sum by (source_namespace, source, destination_namespace, destination) (
-                  increase(hubble_drop_total{reason=~"POLICY_DENIED|POLICY_DENY"}[5m])
+                  increase(hubble_drop_total{reason=~"POLICY_DENIED|POLICY_DENY", protocol!~"ICMP.*"}[5m])
                 ) > 0
               )[30m:5m]
             ) >= 3
