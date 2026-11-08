@@ -1,0 +1,51 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: alertmanager
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: alertmanager
+  # Callers taken from kguardian (12 days, 2026-11-08). Cluster-wide egress policies already cover Alertmanager's own
+  # outbound traffic; this adds ingress only.
+  ingress:
+    - # Prometheus: alert delivery and config-reloader scrape
+      fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "9093"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP
+    - # silence-operator and vector (alert annotations/logs) are in the same namespace
+      fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: silence-operator
+        - matchLabels:
+            app.kubernetes.io/name: victoria-logs-vector
+      toPorts:
+        - ports:
+            - port: "9093"
+              protocol: TCP
+    - # Flux notification-controller posts Flux alerts
+      fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: flux-system
+            app: notification-controller
+      toPorts:
+        - ports:
+            - port: "9093"
+              protocol: TCP
+    - # envoy-internal serves the Alertmanager UI
+      fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "9093"
+              protocol: TCP

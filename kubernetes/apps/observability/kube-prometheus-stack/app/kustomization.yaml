@@ -6,6 +6,7 @@ resources:
   - ./ocirepository.yaml
   - ./helmrelease.yaml
   - ./alertmanagerconfig.yaml
+  - ./alertmanager-ciliumnetworkpolicy.yaml
   - ./externalsecret.yaml
   - ./grafanadatasource.yaml
   - ./grafanadashboard.yaml
