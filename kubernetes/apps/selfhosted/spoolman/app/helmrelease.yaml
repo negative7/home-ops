@@ -49,9 +49,17 @@ spec:
                     port: *httpPort
                   initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 1
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+              readiness:
+                <<: *probes
+                spec:
+                  httpGet:
+                    path: /api/v1/health
+                    port: *httpPort
+                  periodSeconds: 10
+                  timeoutSeconds: 5
                   failureThreshold: 3
-              readiness: *probes
             resources:
               requests:
                 cpu: 12m
