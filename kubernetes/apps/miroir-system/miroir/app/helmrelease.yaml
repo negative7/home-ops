@@ -15,6 +15,11 @@ spec:
     crds: CreateReplace
   values:
     autoDiskfulAfter: 10m
+    agent:
+      resources:
+        limits:
+          # Includes LVM/DRBD helpers and file/kernel memory charged to the container.
+          memory: 256Mi
     # Anything above 1 enables leader election (warm standby, ~15s failover)
     # instead of a single controller pod being a SPOF for provision/snapshot/resize.
     replicaCount: 2
