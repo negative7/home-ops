@@ -26,3 +26,12 @@ spec:
         - ports:
             - protocol: TCP
               port: "7878"
+    - # Plex library scans (in-cluster since the LB moved to the pool range)
+      toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            app.kubernetes.io/name: plex
+      toPorts:
+        - ports:
+            - protocol: TCP
+              port: "32400"
