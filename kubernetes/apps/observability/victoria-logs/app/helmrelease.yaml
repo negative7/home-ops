@@ -15,6 +15,10 @@ spec:
       image:
         registry: quay.io
     server:
+      # Chart ships no requests; keeps the scheduler from treating it as free
+      resources:
+        requests:
+          cpu: 100m
       persistentVolume:
         enabled: true
         storageClassName: miroir-replicated

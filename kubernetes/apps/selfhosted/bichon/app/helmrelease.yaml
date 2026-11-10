@@ -39,18 +39,36 @@ spec:
               - secretRef:
                   name: bichon-secret
             probes:
-              liveness: &probes
+              startup:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
-                    path: /
+                    path: /healthz
+                    port: *port
+                  failureThreshold: 60
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port
+                  failureThreshold: 18
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/status
                     port: *port
                   failureThreshold: 3
-                  initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 1
-              readiness: *probes
+                  timeoutSeconds: 5
             resources:
               requests:
                 cpu: 10m
