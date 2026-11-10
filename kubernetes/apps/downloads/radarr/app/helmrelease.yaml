@@ -60,11 +60,32 @@ spec:
                     httpHeaders:
                       - name: Host
                         value: localhost
-                  initialDelaySeconds: 0
-                  periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
-              readiness: *probes
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                <<: *probes
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                    httpHeaders:
+                      - name: Host
+                        value: localhost
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              # Slow first start after an update (DB migration) killed the pod 14 times (radarr 7.0.2)
+              startup:
+                <<: *probes
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                    httpHeaders:
+                      - name: Host
+                        value: localhost
+                  periodSeconds: 5
+                  failureThreshold: 30
             resources:
               requests:
                 cpu: 20m
