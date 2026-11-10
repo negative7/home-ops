@@ -12,15 +12,8 @@
       automergeType: "pr",
     },
     {
-      // A new digest behind an existing tag is a re-push; give a bad or compromised one a day to be pulled
-      description: "Soak digest rebuilds for a day",
-      matchDatasources: ["docker"],
-      matchUpdateTypes: ["digest"],
-      minimumReleaseAge: "1 day",
-      minimumReleaseAgeBehaviour: "timestamp-optional",
-    },
-    {
-      // Patch releases of apps and charts, after a 3-day soak so regressions surface upstream first.
+      // Patch releases of apps and charts. No minimumReleaseAge: GHCR returns no release
+      // timestamps, so a soak would only ever apply to the few Docker Hub images.
       // Core infrastructure is excluded and always gets a manual review.
       description: "Auto-merge patch updates outside core infrastructure",
       matchDatasources: ["docker"],
@@ -46,9 +39,6 @@
         "!/1password/",
         "!/tuppr/",
       ],
-      minimumReleaseAge: "3 days",
-      // Some registries return no release timestamp; don't hold those updates forever
-      minimumReleaseAgeBehaviour: "timestamp-optional",
       automerge: true,
       automergeType: "pr",
     },
