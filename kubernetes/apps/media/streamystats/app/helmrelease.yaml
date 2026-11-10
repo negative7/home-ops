@@ -27,7 +27,7 @@ spec:
           app:
             image:
               repository: ghcr.io/fredrikburmester/streamystats-nextjs
-              tag: v2.20.0@sha256:45f93e6233eac3802d056c237293482704ae5dd9502a2566f6df5aa8a4fa214c
+              tag: v2.22.2@sha256:de183b3e4361377d7b7795dee7a7f0e2cddbb9c6cb43a1e7ea13298d654d99fa
             env: &env
               TZ: America/New_York
               NODE_ENV: production
@@ -79,7 +79,7 @@ spec:
           app:
             image:
               repository: ghcr.io/fredrikburmester/streamystats-job-server
-              tag: v2.20.0@sha256:b9e6fc640b02ede44f379970cf3f8e81a20bb82bb846e2f738c5db650784137c
+              tag: v2.22.2@sha256:433302aec2dfd3588bb421ad6b580b8c85099d9e300f926c1e31843e805bf049
             env:
               <<: *env
               HOST: 0.0.0.0
