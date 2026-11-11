@@ -18,14 +18,25 @@ spec:
             resets(node_boot_time_seconds[15m]) > 0
           labels:
             severity: warning
-        # Textfile metric from odesa's 04-exporters and lviv's reboot-required-metric timer (Debian
-        # /run/reboot-required). Unattended-upgrades installs ~06:00 and reboots at 03:00 (odesa) /
-        # 05:00 (lviv), so only alert when that nightly reboot was missed.
+        # Textfile metric from odesa's 04-exporters, lviv's reboot-required-metric timer and kyiv's
+        # prometheus-node-exporter-collectors (Debian /run/reboot-required). Unattended-upgrades installs
+        # ~06:00 and reboots at 03:00 (odesa) / 05:00 (lviv), so only alert when that nightly reboot
+        # was missed. kyiv never reboots itself, so there this is the manual-reboot reminder.
         - alert: NodeRebootRequired
           annotations:
             summary: Node {{$labels.instance}} has installed updates that need a reboot.
           expr: |
             node_reboot_required == 1
           for: 24h
+          labels:
+            severity: warning
+        # kyiv only (prometheus-node-exporter-collectors' apt timer): unattended-upgrades clears
+        # Debian updates daily, so anything still pending after 3 days is a manual Proxmox upgrade
+        - alert: NodeUpdatesPending
+          annotations:
+            summary: Node {{$labels.instance}} has {{$value}} package updates waiting for a manual upgrade.
+          expr: |
+            sum by (instance) (apt_upgrades_pending) > 0
+          for: 3d
           labels:
             severity: warning
