@@ -7,6 +7,7 @@ metadata:
 spec:
   staticConfigs:
     - targets:
+        - kyiv.homelab.internal:9100
         - lviv.homelab.internal:9100
         - pikvm.homelab.internal:9100
   metricsPath: /metrics

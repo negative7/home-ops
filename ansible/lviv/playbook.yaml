@@ -486,6 +486,10 @@
           var: doco_api_secret
         - key: home-cluster/doco-cd/webhook_secret
           var: doco_webhook_secret
+        - key: home-cluster/pbs/admin_password
+          var: pbs_admin_password
+        - key: home-cluster/pbs/kyiv_password
+          var: pbs_kyiv_password
       check_mode: false
       changed_when: false
       no_log: true
@@ -496,6 +500,8 @@
         doco_1pw_sa_token: "{{ secrets_raw.results[0].stdout }}"
         doco_api_secret: "{{ secrets_raw.results[1].stdout }}"
         doco_webhook_secret: "{{ secrets_raw.results[2].stdout }}"
+        pbs_admin_password: "{{ secrets_raw.results[3].stdout }}"
+        pbs_kyiv_password: "{{ secrets_raw.results[4].stdout }}"
       no_log: true
 
     - name: apps data
@@ -605,6 +611,272 @@
           retries: 30
           delay: 10
           when: not ansible_check_mode
+
+    # Proxmox Backup Server for kyiv (ansible/kyiv backs up to lviv.homelab.internal:8007).
+    # Bootstrap: put admin_password and kyiv_password in op://home-cluster/pbs, run this, save
+    # the printed fingerprint as pbs/fingerprint, then run kyiv. Retention lives here, not on kyiv.
+    # Updates stay manual like Docker: unattended-upgrades only takes Debian origins.
+    # The proxy listens on every interface (no bind option); the VLAN1 firewall drops 8007 there
+    - name: pbs
+      tags:
+        - pbs
+      vars:
+        pbs_keyring: /usr/share/keyrings/proxmox-archive-keyring.gpg
+        pbs_dataset: tank/pbs
+        pbs_path: /mnt/tank/pbs
+        pbs_datastore: kyiv
+        # kyiv backs up at 02:00 and kopiur runs at 03:00; done before the 05:00 update reboot
+        # (an interrupted GC is harmless, it just runs again the next night)
+        pbs_gc_schedule: "04:15"
+        pbs_homepage_user: homepage@pbs
+        pbs_homepage_tokenid: homepage@pbs!homepage
+        pbs_jobs:
+          - type: prune-job
+            id: kyiv-daily
+            options: {store: kyiv, schedule: "04:00", keep-daily: 7, keep-weekly: 4}
+          # Re-reads each snapshot once its last verify is a month old; Sunday is after the reboot window
+          - type: verify-job
+            id: kyiv-weekly
+            options: {store: kyiv, schedule: "sun 06:00", ignore-verified: true, outdated-after: 30}
+        pbs_acls:
+          - {path: /, role: Admin, auth_id: admin@pbs}
+          - {path: /datastore/kyiv, role: DatastoreBackup, auth_id: kyiv@pbs}
+          # Homepage widget: token permissions are the intersection of the user's and the token's
+          - {path: /, role: Audit, auth_id: homepage@pbs}
+          - {path: /, role: Audit, auth_id: homepage@pbs!homepage}
+      block:
+        # sha256 from the Proxmox "Install Proxmox VE on Debian 13 Trixie" guide
+        - name: pbs | Proxmox archive keyring
+          ansible.builtin.get_url:
+            url: https://enterprise.proxmox.com/debian/proxmox-archive-keyring-trixie.gpg
+            dest: "{{ pbs_keyring }}"
+            checksum: sha256:136673be77aba35dcce385b28737689ad64fd785a797e57897589aed08db6e45
+            owner: root
+            group: root
+            mode: "0644"
+
+        # The Proxmox repo also carries its own systemd, grub, shim, lvm2, smartmontools, ZFS and
+        # kernels. Priority 100 lets Debian win wherever both have a package, so only Proxmox-only
+        # packages come from it; -1 means its ZFS (backports zfs-dkms must match) and kernels never
+        # install. Pinned before the source exists, so no apt run ever sees it unpinned
+        - name: pbs | APT pinning and repository
+          ansible.builtin.copy:
+            dest: "{{ item.dest }}"
+            content: "{{ item.content }}"
+            owner: root
+            group: root
+            mode: "0644"
+          loop:
+            - dest: /etc/apt/preferences.d/proxmox
+              content: |
+                # Managed by ansible
+                Package: src:zfs-linux
+                Pin: origin download.proxmox.com
+                Pin-Priority: -1
+
+                Package: zfs* libzfs* libzpool* libnvpair* libuutil* proxmox-kernel* proxmox-headers* proxmox-default-* linux-tools-* pve-firmware
+                Pin: origin download.proxmox.com
+                Pin-Priority: -1
+
+                Package: *
+                Pin: origin download.proxmox.com
+                Pin-Priority: 100
+            - dest: /etc/apt/sources.list.d/pbs-no-subscription.sources
+              content: |
+                # Managed by ansible
+                Types: deb
+                URIs: http://download.proxmox.com/debian/pbs
+                Suites: trixie
+                Components: pbs-no-subscription
+                Signed-By: {{ pbs_keyring }}
+          loop_control:
+            label: "{{ item.dest }}"
+          register: pbs_apt
+
+        - name: pbs | Refresh APT lists
+          ansible.builtin.apt:
+            update_cache: true
+          when: pbs_apt.changed
+
+        # postfix satisfies PBS's mail-transport-agent dependency; Debian's default ("Internet Site")
+        # would listen on :25, Proxmox's own installs keep it loopback-only
+        - name: pbs | Postfix local only
+          ansible.builtin.debconf:
+            name: postfix
+            question: postfix/main_mailer_type
+            value: Local only
+            vtype: select
+
+        # Not the proxmox-backup metapackage (Proxmox kernel + ZFS). No Recommends: they add
+        # zfsutils-linux and ifupdown2, which would replace ifupdown under NetworkManager
+        - name: pbs | Install
+          ansible.builtin.apt:
+            name: proxmox-backup-server
+            state: present
+            install_recommends: false
+          register: pbs_install
+
+        # Never use the PBS network UI: it writes /etc/network/interfaces.new, applied at next boot
+        - name: pbs | Configure
+          when: not (ansible_check_mode and pbs_install.changed)
+          block:
+            # The package ships the subscription-only repo as a conffile; apt update 401s on it
+            - name: pbs | Disable the enterprise repository
+              ansible.builtin.lineinfile:
+                path: /etc/apt/sources.list.d/pbs-enterprise.sources
+                regexp: "^Enabled:"
+                line: "Enabled: false"
+
+            # A plain dataset, not under tank/apps or tank/backups: lviv's kopia and the B2 offsite
+            # sync never see it, and sanoid skips it (snapshots of a dedup chunk store are just churn).
+            # Chunks are already zstd-compressed (lz4 gives up on them cheaply) and up to 4 MiB.
+            # GC sets atime explicitly, so atime=off is safe; PBS checks that on create and every GC.
+            # Quota for the same reason as Garage
+            - name: pbs | Dataset
+              community.general.zfs:
+                name: "{{ pbs_dataset }}"
+                state: present
+                extra_zfs_properties:
+                  recordsize: 1M
+                  compression: lz4
+                  atime: "off"
+                  quota: 500G
+
+            # proxmox-backup-proxy runs as backup and writes the backup groups into the root
+            - name: pbs | Datastore directory owner
+              ansible.builtin.file:
+                path: "{{ pbs_path }}"
+                state: directory
+                owner: backup
+                group: backup
+
+            - name: pbs | Read current config
+              ansible.builtin.command: "proxmox-backup-manager {{ item }} list --output-format json"
+              loop:
+                - datastore
+                - user
+                - acl
+                - prune-job
+                - verify-job
+              register: pbs_lists
+              changed_when: false
+              check_mode: false
+
+            - name: pbs | Parse current config
+              ansible.builtin.set_fact:
+                pbs_current: >-
+                  {{ dict(pbs_lists.results | map(attribute='item')
+                     | zip(pbs_lists.results | map(attribute='stdout') | map('from_json'))) }}
+
+            - name: pbs | Datastore
+              vars:
+                current: "{{ pbs_current.datastore | selectattr('name', 'eq', pbs_datastore) | first | default({}) }}"
+              ansible.builtin.command:
+                argv: >-
+                  {{ ['proxmox-backup-manager', 'datastore']
+                     + (['update', pbs_datastore] if current else ['create', pbs_datastore, pbs_path])
+                     + ['--gc-schedule', pbs_gc_schedule] }}
+              when: current.get('gc-schedule') != pbs_gc_schedule
+              changed_when: true
+
+            # The CLI only sets passwords on create (user update ignores --password); change them in the UI
+            - name: pbs | Users
+              ansible.builtin.command:
+                argv: >-
+                  {{ ['proxmox-backup-manager', 'user', 'create', item.userid, '--comment', item.comment]
+                     + (['--password', item.password] if item.password is defined else []) }}
+              loop:
+                - {userid: admin@pbs, comment: Administrator, password: "{{ pbs_admin_password }}"}
+                - {userid: kyiv@pbs, comment: kyiv Proxmox VE backups, password: "{{ pbs_kyiv_password }}"}
+                - {userid: "{{ pbs_homepage_user }}", comment: Homepage widget (API token only)}
+              when: item.userid not in (pbs_current.user | map(attribute='userid'))
+              changed_when: true
+              no_log: true
+
+            - name: pbs | Read Homepage API tokens
+              ansible.builtin.command: "proxmox-backup-manager user list-tokens {{ pbs_homepage_user }} --output-format json"
+              register: pbs_homepage_tokens
+              changed_when: false
+              check_mode: false
+              when: pbs_homepage_user in (pbs_current.user | map(attribute='userid'))
+
+            # The secret is only shown once, so it goes straight to 1Password (homepage's ExternalSecret
+            # reads it); if that fails the token is deleted so the next run makes a new one
+            - name: pbs | Homepage API token
+              when: >-
+                pbs_homepage_tokens is skipped
+                or pbs_homepage_tokenid not in (pbs_homepage_tokens.stdout | from_json | map(attribute='tokenid'))
+              block:
+                - name: pbs | Generate Homepage API token
+                  ansible.builtin.command: "proxmox-backup-manager user generate-token {{ pbs_homepage_user }} homepage"
+                  register: pbs_homepage_token
+                  no_log: true
+
+                - name: pbs | Store Homepage API token in 1Password
+                  vars:
+                    token: "{{ pbs_homepage_token.stdout | regex_replace('^\\s*Result:\\s*', '') | from_json }}"
+                  ansible.builtin.shell: >-
+                    op item edit pbs --vault home-cluster
+                    {{ ('homepage_token_id[text]=' ~ token.tokenid) | quote }}
+                    {{ ('homepage_token_secret[password]=' ~ token.value) | quote }}
+                    > /dev/null < /dev/null
+                  delegate_to: localhost
+                  become: false
+                  changed_when: true
+                  no_log: true
+                  when: not ansible_check_mode
+              rescue:
+                - name: pbs | Delete the unsaved Homepage API token
+                  ansible.builtin.command: "proxmox-backup-manager user delete-token {{ pbs_homepage_user }} homepage"
+                  changed_when: true
+                  failed_when: false
+
+                - name: pbs | Fail on the Homepage API token
+                  ansible.builtin.fail:
+                    msg: Could not create the Homepage API token or save it to op://home-cluster/pbs; fix and re-run
+
+            - name: pbs | ACLs
+              ansible.builtin.command:
+                argv:
+                  - proxmox-backup-manager
+                  - acl
+                  - update
+                  - "{{ item.path }}"
+                  - "{{ item.role }}"
+                  - --auth-id
+                  - "{{ item.auth_id }}"
+              loop: "{{ pbs_acls }}"
+              when: >-
+                pbs_current.acl | selectattr('path', 'eq', item.path) | selectattr('ugid', 'eq', item.auth_id)
+                | selectattr('roleid', 'eq', item.role) | list | length == 0
+              changed_when: true
+
+            - name: pbs | Prune and verify jobs
+              vars:
+                current: "{{ pbs_current[item.type] | selectattr('id', 'eq', item.id) | first | default({}) }}"
+              ansible.builtin.command:
+                argv: >-
+                  {{ ['proxmox-backup-manager', item.type, 'update' if current else 'create', item.id]
+                     + (item.options | dict2items
+                        | map(attribute='key') | map('regex_replace', '^', '--')
+                        | zip(item.options.values() | map('string') | map('lower'))
+                        | flatten) }}
+              loop: "{{ pbs_jobs }}"
+              loop_control:
+                label: "{{ item.id }}"
+              when: (current | dict2items | selectattr('key', 'in', item.options | list) | items2dict) != item.options
+              changed_when: true
+
+            - name: pbs | Read TLS fingerprint
+              ansible.builtin.command: proxmox-backup-manager cert info
+              register: pbs_cert
+              changed_when: false
+              check_mode: false
+
+            # kyiv pins this self-signed cert; it changes if the cert is ever regenerated
+            - name: pbs | Store this fingerprint as op://home-cluster/pbs/fingerprint
+              ansible.builtin.debug:
+                msg: "{{ pbs_cert.stdout_lines | select('search', '(?i)fingerprint') | list }}"
 
   handlers:
     - name: Apply sysctl

@@ -1,5 +1,6 @@
 # Managed by ansible. The most specific section wins; nothing is recursive except Garage,
-# whose meta and data must be snapshotted atomically (zfs snapshot -r)
+# whose meta and data must be snapshotted atomically (zfs snapshot -r).
+# tank/pbs is left out on purpose: PBS keeps its own retention, snapshots would only pin dead chunks
 [tank/data/immich]
   use_template = critical
   hourly = 24

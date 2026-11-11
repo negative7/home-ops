@@ -1,0 +1,511 @@
+---
+# kyiv: single-node Proxmox VE host (hass and the Debian control VM). The pbs tag needs the
+# Proxmox Backup Server on lviv (ansible/lviv) up first: adding the storage connects to it.
+# Before that, run with --skip-tags pbs
+- name: Bootstrap kyiv
+  hosts: all
+  become: true
+  gather_facts: false
+  vars:
+    ansible_user: root
+    ansible_python_interpreter: auto_silent
+    timezone: America/New_York
+
+  tasks:
+    - name: Check host connectivity
+      ansible.builtin.ping:
+
+    - name: Set timezone
+      community.general.timezone:
+        name: "{{ timezone }}"
+
+    # No subscription: only the pve-no-subscription repo. The installer's enterprise repos (and the
+    # pve-test one) would only fail with 401 or pull test builds
+    - name: repos
+      tags:
+        - repos
+      block:
+        - name: repos | Proxmox VE no-subscription
+          ansible.builtin.copy:
+            dest: /etc/apt/sources.list.d/proxmox.sources
+            content: |
+              Types: deb
+              URIs: http://download.proxmox.com/debian/pve
+              Suites: trixie
+              Components: pve-no-subscription
+              Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg
+            owner: root
+            group: root
+            mode: "0644"
+          register: repo_added
+
+        - name: repos | Remove enterprise and test repos
+          ansible.builtin.file:
+            path: "/etc/apt/sources.list.d/{{ item }}"
+            state: absent
+          loop:
+            - pve-enterprise.sources
+            - pve-test.sources
+            - ceph.sources
+          register: repos_removed
+
+        - name: repos | Update apt cache after repository changes
+          ansible.builtin.apt:
+            update_cache: true
+          when: repo_added.changed or repos_removed.changed
+          changed_when: false
+
+    # Debian + Debian-Security origins only (the stock 50unattended-upgrades): Proxmox packages stay
+    # manual. PVE kernels don't drop /run/reboot-required, so this only reboots for Debian packages.
+    # Reboots after the 02:00 PBS backup job
+    - name: unattended-upgrades
+      tags:
+        - unattended-upgrades
+      vars:
+        auto_reboot_time: "03:00"
+      block:
+        - name: unattended-upgrades | Install
+          ansible.builtin.apt:
+            name: unattended-upgrades
+            state: present
+            update_cache: true
+            cache_valid_time: 3600
+
+        - name: unattended-upgrades | Enable periodic security upgrades
+          ansible.builtin.copy:
+            dest: /etc/apt/apt.conf.d/20auto-upgrades
+            content: |
+              APT::Periodic::Update-Package-Lists "1";
+              APT::Periodic::Unattended-Upgrade "1";
+            owner: root
+            group: root
+            mode: "0644"
+
+        - name: unattended-upgrades | Enable timers
+          ansible.builtin.systemd_service:
+            name: "{{ item }}"
+            enabled: true
+            state: started
+          loop:
+            - apt-daily.timer
+            - apt-daily-upgrade.timer
+
+        # NodeRebootRequired only fires if this didn't happen (see kube-prometheus-stack prometheusrules)
+        - name: unattended-upgrades | Reboot automatically when required
+          ansible.builtin.copy:
+            dest: /etc/apt/apt.conf.d/52unattended-upgrades-reboot
+            content: |
+              Unattended-Upgrade::Automatic-Reboot "true";
+              Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+              Unattended-Upgrade::Automatic-Reboot-Time "{{ auto_reboot_time }}";
+            owner: root
+            group: root
+            mode: "0644"
+
+    - name: tuning
+      tags:
+        - tuning
+      block:
+        # Guests' memory is what counts; don't push it to the (worn) SATA SSD early
+        - name: tuning | Swappiness
+          ansible.builtin.copy:
+            dest: /etc/sysctl.d/60-swappiness.conf
+            content: |
+              vm.swappiness = 10
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Apply swappiness
+
+        # Proxmox kernels default to the performance governor. With intel_pstate (HWP) powersave
+        # still boosts on demand. systemd-tmpfiles writes it on every boot
+        - name: tuning | CPU governor
+          ansible.builtin.copy:
+            dest: /etc/tmpfiles.d/cpu-governor.conf
+            content: |
+              w /sys/devices/system/cpu/cpufreq/policy*/scaling_governor - - - - powersave
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Apply CPU governor
+
+    # node-exporter on :9100 and smartctl_exporter on :9633, scraped by kube-prometheus-stack
+    # (scrapeconfigs/node-exporter.yaml, smartctl-exporter.yaml)
+    - name: monitoring
+      tags:
+        - monitoring
+      vars:
+        # renovate: datasource=github-releases depName=prometheus-community/smartctl_exporter
+        smartctl_exporter_version: v0.15.0
+        # Checksum comes from the release's own sha256sums.txt so a Renovate version bump needs no hash edit
+        smartctl_exporter_release: "https://github.com/prometheus-community/smartctl_exporter/releases/download/{{ smartctl_exporter_version }}"
+        smartctl_exporter_dir: "/opt/smartctl_exporter-{{ smartctl_exporter_version }}"
+      block:
+        # The collectors package's apt timer writes node_reboot_required (and apt_upgrades_pending)
+        # to the Debian textfile dir /var/lib/prometheus/node-exporter
+        - name: monitoring | Install node-exporter
+          ansible.builtin.apt:
+            name:
+              - prometheus-node-exporter
+              - prometheus-node-exporter-collectors
+            state: present
+            update_cache: true
+            cache_valid_time: 3600
+
+        - name: monitoring | Enable node-exporter
+          ansible.builtin.systemd_service:
+            name: prometheus-node-exporter.service
+            enabled: true
+            state: started
+
+        # Not packaged in Debian; same exporter (and smartctl_* metrics/alerts) as lviv's container
+        - name: monitoring | smartctl_exporter directory
+          ansible.builtin.file:
+            path: "{{ smartctl_exporter_dir }}"
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: monitoring | Download smartctl_exporter
+          ansible.builtin.get_url:
+            url: "{{ smartctl_exporter_release }}/smartctl_exporter-{{ smartctl_exporter_version | regex_replace('^v', '') }}.linux-amd64.tar.gz"
+            dest: "{{ smartctl_exporter_dir }}/smartctl_exporter.tar.gz"
+            checksum: "sha256:{{ smartctl_exporter_release }}/sha256sums.txt"
+            owner: root
+            group: root
+            mode: "0644"
+
+        - name: monitoring | Unpack smartctl_exporter
+          ansible.builtin.unarchive:
+            src: "{{ smartctl_exporter_dir }}/smartctl_exporter.tar.gz"
+            dest: "{{ smartctl_exporter_dir }}"
+            remote_src: true
+            extra_opts:
+              - --strip-components=1
+            creates: "{{ smartctl_exporter_dir }}/smartctl_exporter"
+
+        - name: monitoring | Link smartctl_exporter
+          ansible.builtin.file:
+            src: "{{ smartctl_exporter_dir }}/smartctl_exporter"
+            dest: /usr/local/bin/smartctl_exporter
+            state: link
+          notify: Restart smartctl_exporter
+
+        # Upstream's systemd/smartctl_exporter.service, with the binary path changed
+        - name: monitoring | smartctl_exporter unit
+          ansible.builtin.copy:
+            dest: /etc/systemd/system/smartctl_exporter.service
+            content: |
+              [Unit]
+              Description=smartctl exporter service
+              After=network-online.target
+
+              [Service]
+              Type=simple
+              ExecStart=/usr/local/bin/smartctl_exporter
+              User=root
+              Group=root
+              SyslogIdentifier=smartctl_exporter
+              Restart=on-failure
+              RestartSec=100ms
+
+              [Install]
+              WantedBy=multi-user.target
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Restart smartctl_exporter
+
+        - name: monitoring | Enable smartctl_exporter
+          ansible.builtin.systemd_service:
+            name: smartctl_exporter.service
+            enabled: true
+            state: started
+            daemon_reload: true
+
+    # Warnings and errors (failed backups, etc.) go to Pushover like Alertmanager's alerts. Pushover
+    # caps messages at 1024 chars, so it carries the title only; the full text is in the PVE task log.
+    # The built-in default-matcher → mail-to-root stays as is. The API never returns secrets, so the
+    # comment carries a hash of the wanted config and a mismatch rewrites the target
+    - name: notifications
+      tags:
+        - notifications
+      vars:
+        webhook_name: pushover
+        webhook_url: https://api.pushover.net/1/messages.json
+        webhook_body: !unsafe |-
+          {"token": "{{ secrets.token }}", "user": "{{ secrets.user }}", "title": "kyiv: {{ severity }}", "message": "{{ escape title }}", "url": "https://kyiv.homelab.internal:8006", "url_title": "Proxmox VE"}
+        webhook_header: "name=Content-Type,value={{ 'application/json' | b64encode }}"
+        webhook_comment: >-
+          Managed by ansible ({{ ([webhook_url, webhook_body, webhook_header, pushover_token, pushover_user_key]
+          | join('|') | hash('sha256'))[:12] }})
+        matcher_name: pushover-warnings
+        matcher_severity: warning,error
+        matcher_comment: >-
+          Managed by ansible ({{ ([webhook_name, matcher_severity] | join('|') | hash('sha256'))[:12] }})
+      block:
+        - name: notifications | Read Pushover keys from 1Password
+          ansible.builtin.shell: "op read 'op://home-cluster/pushover/{{ item }}' < /dev/null"
+          delegate_to: localhost
+          become: false
+          loop:
+            - PUSHOVER_TOKEN
+            - PUSHOVER_USER_KEY
+          check_mode: false
+          changed_when: false
+          no_log: true
+          register: pushover_secrets_raw
+
+        - name: notifications | Set Pushover key facts
+          ansible.builtin.set_fact:
+            pushover_token: "{{ pushover_secrets_raw.results[0].stdout }}"
+            pushover_user_key: "{{ pushover_secrets_raw.results[1].stdout }}"
+          no_log: true
+
+        - name: notifications | Read webhook targets
+          ansible.builtin.command: pvesh get /cluster/notifications/endpoints/webhook --output-format json
+          register: webhooks_raw
+          changed_when: false
+          check_mode: false
+
+        - name: notifications | Pushover webhook target
+          ansible.builtin.command:
+            argv: >-
+              {{ (['pvesh', 'set', '/cluster/notifications/endpoints/webhook/' ~ webhook_name] if webhook_current
+              else ['pvesh', 'create', '/cluster/notifications/endpoints/webhook', '--name', webhook_name]) + pvesh_args }}
+          vars:
+            webhook_current: "{{ webhooks_raw.stdout | from_json | selectattr('name', 'equalto', webhook_name) | list }}"
+            pvesh_args:
+              - --method
+              - post
+              - --url
+              - "{{ webhook_url }}"
+              - --header
+              - "{{ webhook_header }}"
+              - --body
+              - "{{ webhook_body | b64encode }}"
+              - --secret
+              - "name=token,value={{ pushover_token | b64encode }}"
+              - --secret
+              - "name=user,value={{ pushover_user_key | b64encode }}"
+              - --comment
+              - "{{ webhook_comment }}"
+          when: (webhook_current | map(attribute='comment', default='') | first | default('')) != webhook_comment
+          changed_when: true
+          no_log: true
+
+        - name: notifications | Read matchers
+          ansible.builtin.command: pvesh get /cluster/notifications/matchers --output-format json
+          register: matchers_raw
+          changed_when: false
+          check_mode: false
+
+        - name: notifications | Warnings and errors to Pushover
+          ansible.builtin.command:
+            argv: >-
+              {{ (['pvesh', 'set', '/cluster/notifications/matchers/' ~ matcher_name] if matcher_current
+              else ['pvesh', 'create', '/cluster/notifications/matchers', '--name', matcher_name]) + pvesh_args }}
+          vars:
+            matcher_current: "{{ matchers_raw.stdout | from_json | selectattr('name', 'equalto', matcher_name) | list }}"
+            pvesh_args:
+              - --match-severity
+              - "{{ matcher_severity }}"
+              - --mode
+              - all
+              - --target
+              - "{{ webhook_name }}"
+              - --comment
+              - "{{ matcher_comment }}"
+          when: (matcher_current | map(attribute='comment', default='') | first | default('')) != matcher_comment
+          changed_when: true
+
+    # Proxmox Backup Server on lviv (ansible/lviv). PBS prunes server-side (keep-daily 7,
+    # keep-weekly 4), so PVE keeps all and the job has no retention of its own
+    - name: pbs
+      tags:
+        - pbs
+      vars:
+        pbs_storage_id: lviv-pbs
+        pbs_storage:
+          server: lviv.homelab.internal
+          port: "8007"
+          datastore: kyiv
+          username: kyiv@pbs
+          fingerprint: "{{ pbs_fingerprint }}"
+          content: backup
+          prune-backups: keep-all=1
+        # server and datastore can't be changed with pvesm set
+        pbs_storage_fixed:
+          - server
+          - datastore
+        backup_job_id: kyiv-daily
+        # Values as pvesh prints them; schedule is host local time (America/New_York)
+        backup_job:
+          all: "1"
+          mode: snapshot
+          storage: lviv-pbs
+          schedule: "02:00"
+          enabled: "1"
+          notes-template: !unsafe "{{guestname}}"
+          notification-mode: notification-system
+      block:
+        # fingerprint is stored by hand after the first lviv PBS run
+        - name: pbs | Read credentials from 1Password
+          ansible.builtin.shell: "op read 'op://home-cluster/pbs/{{ item }}' < /dev/null"
+          delegate_to: localhost
+          become: false
+          loop:
+            - kyiv_password
+            - fingerprint
+          check_mode: false
+          changed_when: false
+          no_log: true
+          register: pbs_secrets_raw
+
+        - name: pbs | Set credential facts
+          ansible.builtin.set_fact:
+            pbs_password: "{{ pbs_secrets_raw.results[0].stdout }}"
+            pbs_fingerprint: "{{ pbs_secrets_raw.results[1].stdout }}"
+          no_log: true
+
+        - name: pbs | Read storage config
+          ansible.builtin.command: pvesh get /storage --output-format json
+          register: storages_raw
+          changed_when: false
+          check_mode: false
+
+        - name: pbs | Read stored password
+          ansible.builtin.slurp:
+            src: "/etc/pve/priv/storage/{{ pbs_storage_id }}.pw"
+          register: pbs_password_file
+          failed_when: false
+          no_log: true
+
+        - name: pbs | Compare storage config
+          ansible.builtin.set_fact:
+            # No drift renders an empty template, which ansible-core 2.19+ turns into None, hence
+            # the default('', true) wherever the *_drift strings are used
+            pbs_storage_drift: >-
+              {% for k, v in pbs_storage.items() %}{% if (pbs_storage_current[k] | default('8007' if k == 'port' else '') | string) != v %}{{ k }} {% endif %}{% endfor %}
+            pbs_password_drift: "{{ (pbs_password_file.content | default('') | b64decode | trim) != pbs_password }}"
+          vars:
+            pbs_storage_current: "{{ storages_raw.stdout | from_json | selectattr('storage', 'equalto', pbs_storage_id) | first | default({}) }}"
+          no_log: true
+
+        # Removing only drops PVE's config; the backups stay on PBS
+        - name: pbs | Remove storage to change server or datastore
+          ansible.builtin.command: "pvesm remove {{ pbs_storage_id }}"
+          when:
+            - pbs_storage_id in (storages_raw.stdout | from_json | map(attribute='storage'))
+            - pbs_storage_drift | default('', true) | split | intersect(pbs_storage_fixed) | length > 0
+          changed_when: true
+          register: pbs_storage_removed
+
+        # pvesm add connects to PBS and fails if it isn't reachable
+        - name: pbs | Add storage
+          ansible.builtin.command:
+            argv:
+              - pvesm
+              - add
+              - pbs
+              - "{{ pbs_storage_id }}"
+              - --server
+              - "{{ pbs_storage.server }}"
+              - --port
+              - "{{ pbs_storage.port }}"
+              - --datastore
+              - "{{ pbs_storage.datastore }}"
+              - --username
+              - "{{ pbs_storage.username }}"
+              - --password
+              - "{{ pbs_password }}"
+              - --fingerprint
+              - "{{ pbs_storage.fingerprint }}"
+              - --content
+              - "{{ pbs_storage.content }}"
+              - --prune-backups
+              - "{{ pbs_storage['prune-backups'] }}"
+          when: >-
+            pbs_storage_removed is changed
+            or pbs_storage_id not in (storages_raw.stdout | from_json | map(attribute='storage'))
+          changed_when: true
+          register: pbs_storage_added
+          no_log: true
+
+        - name: pbs | Update storage
+          ansible.builtin.command:
+            argv:
+              - pvesm
+              - set
+              - "{{ pbs_storage_id }}"
+              - --port
+              - "{{ pbs_storage.port }}"
+              - --username
+              - "{{ pbs_storage.username }}"
+              - --password
+              - "{{ pbs_password }}"
+              - --fingerprint
+              - "{{ pbs_storage.fingerprint }}"
+              - --content
+              - "{{ pbs_storage.content }}"
+              - --prune-backups
+              - "{{ pbs_storage['prune-backups'] }}"
+          when:
+            - pbs_storage_added is skipped
+            - (pbs_storage_drift | default('', true) | trim | length > 0) or pbs_password_drift
+          changed_when: true
+          no_log: true
+
+        - name: pbs | Read backup jobs
+          ansible.builtin.command: pvesh get /cluster/backup --output-format json
+          register: backup_jobs_raw
+          changed_when: false
+          check_mode: false
+
+        - name: pbs | Compare backup job
+          ansible.builtin.set_fact:
+            backup_job_exists: "{{ backup_job_current | length > 0 }}"
+            backup_job_drift: >-
+              {% for k, v in backup_job.items() %}{% if (backup_job_current[k] | default('1' if k == 'enabled' else '') | string) != v %}{{ k }} {% endif %}{% endfor %}
+          vars:
+            backup_job_current: "{{ backup_jobs_raw.stdout | from_json | selectattr('id', 'equalto', backup_job_id) | first | default({}) }}"
+
+        - name: pbs | Backup job
+          ansible.builtin.command:
+            argv: >-
+              {{ (['pvesh', 'set', '/cluster/backup/' ~ backup_job_id] if backup_job_exists
+              else ['pvesh', 'create', '/cluster/backup', '--id', backup_job_id]) + pvesh_args }}
+          vars:
+            pvesh_args:
+              - --all
+              - "{{ backup_job.all }}"
+              - --mode
+              - "{{ backup_job.mode }}"
+              - --storage
+              - "{{ backup_job.storage }}"
+              - --schedule
+              - "{{ backup_job.schedule }}"
+              - --enabled
+              - "{{ backup_job.enabled }}"
+              - --notes-template
+              - "{{ backup_job['notes-template'] }}"
+              - --notification-mode
+              - "{{ backup_job['notification-mode'] }}"
+          when: backup_job_drift | default('', true) | trim | length > 0
+          changed_when: true
+
+  handlers:
+    - name: Apply swappiness
+      ansible.builtin.command: sysctl -p /etc/sysctl.d/60-swappiness.conf
+      changed_when: true
+
+    - name: Apply CPU governor
+      ansible.builtin.command: systemd-tmpfiles --create /etc/tmpfiles.d/cpu-governor.conf
+      changed_when: true
+
+    - name: Restart smartctl_exporter
+      ansible.builtin.systemd_service:
+        name: smartctl_exporter.service
+        state: restarted
+        daemon_reload: true

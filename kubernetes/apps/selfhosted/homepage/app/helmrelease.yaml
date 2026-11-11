@@ -364,6 +364,16 @@ spec:
                     url: https://kyiv.homelab.internal:8006
                     username: '{{ "{{" }}HOMEPAGE_VAR_PROXMOX_TOKEN{{ "}}" }}'
                     password: '{{ "{{" }}HOMEPAGE_VAR_PROXMOX_TOKEN_SECRET{{ "}}" }}'
+              - Proxmox Backup Server:
+                  icon: proxmox-backup-server.png
+                  href: https://lviv.homelab.internal:8007/
+                  description: kyiv VM Backups
+                  widget:
+                    type: proxmoxbackupserver
+                    url: https://lviv.homelab.internal:8007
+                    username: '{{ "{{" }}HOMEPAGE_VAR_PBS_TOKEN{{ "}}" }}'
+                    password: '{{ "{{" }}HOMEPAGE_VAR_PBS_TOKEN_SECRET{{ "}}" }}'
+                    datastore: kyiv
               - Dockhand:
                   icon: dockhand.png
                   href: http://lviv.homelab.internal:3000

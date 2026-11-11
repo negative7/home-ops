@@ -6,9 +6,10 @@ set shell := ['bash', '-euo', 'pipefail', '-c']
 
 ansible_dir := justfile_dir() + '/ansible'
 
-# Hosts are reached by IP: odesa only over WireGuard, lviv on VLAN20 (survives its network cutover)
+# Hosts are reached by IP: odesa only over WireGuard, lviv on VLAN20 (survives its network cutover); kyiv by name
 lviv_host := '10.2.0.10'
 odesa_host := '10.99.0.1'
+kyiv_host := 'kyiv.homelab.internal'
 unifi_host := '10.0.1.1'
 
 [private]
@@ -32,6 +33,12 @@ odesa *args: _op
     just log info "Running playbook" "host" "odesa" "address" "{{ odesa_host }}"
     ansible-playbook -i "{{ odesa_host }}," "{{ ansible_dir }}/odesa/playbook.yaml" "$@"
 
+[doc('Run the kyiv (Proxmox VE) playbook')]
+[script]
+kyiv *args: _op
+    just log info "Running playbook" "host" "kyiv" "address" "{{ kyiv_host }}"
+    ansible-playbook -i "{{ kyiv_host }}," "{{ ansible_dir }}/kyiv/playbook.yaml" "$@"
+
 [doc('Run the UniFi gateway playbook')]
 [script]
 unifi *args:
@@ -43,7 +50,7 @@ unifi *args:
     just log info "Running playbook" "host" "unifi" "address" "{{ unifi_host }}"
     ansible-playbook -i "{{ unifi_host }}," "{{ ansible_dir }}/unifi/playbook.yaml" "$@"
 
-# The lviv and odesa playbooks read secrets with `op read`
+# The lviv, odesa and kyiv playbooks read secrets with `op read`
 [private]
 [script]
 _op:
