@@ -33,47 +33,20 @@ spec:
             seccompProfile:
               type: RuntimeDefault
 
-        initContainers:
-          # Imports every Service annotated com.dashbrr.service.type (all namespaces) and
-          # resolves their DASHBRR_*_API_KEY placeholders from this env. Services already
-          # in the DB (matched by URL) are skipped, so a rotated key needs the card re-added
-          discover:
-            image: &image
+        containers:
+          app:
+            image:
               repository: ghcr.io/autobrr/dashbrr
               tag: v0.8.0@sha256:ce36626f51e4f7b2d7017c025c99faf2c41540209f21bb665a601d60c11ffffd
-            args:
-              - "config"
-              - "discover"
-              - "--k8s"
-              - "--yes"
-            env: &env
+            env:
               TZ: America/New_York
               DASHBRR__DB_TYPE: sqlite
               DASHBRR__DB_PATH: /config/dashbrr.db
-            envFrom:
-              - secretRef:
-                  name: dashbrr-secret
-              - secretRef:
-                  name: dashbrr-extra-secret
-                  optional: true
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: 256Mi
-            securityContext: &securityContext
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop:
-                  - ALL
-
-        containers:
-          app:
-            image: *image
-            env:
-              <<: *env
               DASHBRR__LISTEN_ADDR: 0.0.0.0:8080
+              # serve syncs every Service annotated com.dashbrr.service.type; the annotations own
+              # those cards (read-only in the UI). Default scope is the pod's own namespace.
+              DASHBRR__K8S_DISCOVERY_ENABLED: "true"
+              DASHBRR__K8S_DISCOVERY_NAMESPACES: "*"
               DASHBRR__LOG_LEVEL: info
               DASHBRR__OIDC_ISSUER: https://idm.negative7.com/oauth2/openid/dashbrr
               DASHBRR__OIDC_CLIENT_ID: dashbrr
@@ -83,6 +56,13 @@ spec:
                     name: dashbrr-kanidm-oauth2-credentials
                     key: CLIENT_SECRET
               DASHBRR__OIDC_REDIRECT_URL: https://dashbrr.negative7.com/api/auth/oidc/callback
+            # Resolves the DASHBRR_*_API_KEY placeholders in the Service annotations
+            envFrom:
+              - secretRef:
+                  name: dashbrr-secret
+              - secretRef:
+                  name: dashbrr-extra-secret
+                  optional: true
             probes:
               liveness: &probes
                 enabled: true
@@ -100,7 +80,12 @@ spec:
                 cpu: 10m
               limits:
                 memory: 256Mi
-            securityContext: *securityContext
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
 
     serviceAccount:
       dashbrr: {}
