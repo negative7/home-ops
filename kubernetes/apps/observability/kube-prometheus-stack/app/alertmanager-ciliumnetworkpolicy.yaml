@@ -21,12 +21,12 @@ spec:
               protocol: TCP
             - port: "8080"
               protocol: TCP
-    - # silence-operator and vector (alert annotations/logs) are in the same namespace
+    - # silence-operator syncs silences; Grafana queries its Alertmanager datasource on demand
       fromEndpoints:
         - matchLabels:
             app.kubernetes.io/name: silence-operator
         - matchLabels:
-            app.kubernetes.io/name: victoria-logs-vector
+            app: grafana
       toPorts:
         - ports:
             - port: "9093"
