@@ -1,0 +1,51 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: victoria-logs
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: victoria-logs-single
+      app.kubernetes.io/instance: victoria-logs
+  # Callers taken from kguardian (2026-10-28 to 2026-11-11) and checked against the repo. Ingress only.
+  ingress:
+    - # Collector ships pod logs, Prometheus scrapes, Grafana queries its datasource on demand
+      fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: victoria-logs-collector
+        - matchLabels:
+            app.kubernetes.io/name: prometheus
+        - matchLabels:
+            app: grafana
+      toPorts:
+        - ports:
+            - port: "9428"
+              protocol: TCP
+    - # Vector ships Talos logs from the host network of every node
+      fromEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "9428"
+              protocol: TCP
+    - # victoria-logs MCP server
+      fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            app.kubernetes.io/name: victoria-logs-mcp
+      toPorts:
+        - ports:
+            - port: "9428"
+              protocol: TCP
+    - # envoy-internal serves the VictoriaLogs UI
+      fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "9428"
+              protocol: TCP
