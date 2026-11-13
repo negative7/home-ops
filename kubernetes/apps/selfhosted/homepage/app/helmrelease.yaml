@@ -256,18 +256,10 @@ spec:
                   icon: headlamp.png
                   href: https://headlamp.negative7.com
                   description: Kubernetes Dashboard
-              - Hubble:
-                  icon: cilium.png
-                  href: https://hubble.negative7.com
-                  description: Network Observability
               - VictoriaLogs:
                   icon: victoriametrics.png
                   href: https://victoria-logs.negative7.com
                   description: Logs
-              - Kopia:
-                  icon: kopia.png
-                  href: https://kopia.negative7.com
-                  description: Backup Repository
 
             - Self-Hosted:
               - Outline:
