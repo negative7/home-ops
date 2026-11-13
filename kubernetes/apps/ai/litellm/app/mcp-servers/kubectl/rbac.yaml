@@ -80,7 +80,6 @@ rules:
       - cilium.io
       - coordination.k8s.io
       - discovery.k8s.io
-      - dragonflydb.io
       - events.k8s.io
       - external-secrets.io
       - externaldns.k8s.io
