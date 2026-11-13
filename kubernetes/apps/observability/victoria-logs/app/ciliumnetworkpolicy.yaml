@@ -23,14 +23,6 @@ spec:
         - ports:
             - port: "9428"
               protocol: TCP
-    - # Vector ships Talos logs from the host network of every node
-      fromEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "9428"
-              protocol: TCP
     - # victoria-logs MCP server
       fromEndpoints:
         - matchLabels:
