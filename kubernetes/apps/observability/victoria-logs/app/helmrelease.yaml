@@ -15,13 +15,23 @@ spec:
       image:
         registry: quay.io
     server:
+      # Single-replica local volume: logs are recreatable, and vinnytsia's disk is the most worn
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - vinnytsia
       # Chart ships no requests; keeps the scheduler from treating it as free
       resources:
         requests:
           cpu: 100m
       persistentVolume:
         enabled: true
-        storageClassName: miroir-replicated
+        storageClassName: miroir-local
         size: 20Gi
       retentionPeriod: 14d
       route:
