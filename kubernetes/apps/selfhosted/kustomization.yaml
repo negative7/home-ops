@@ -12,7 +12,6 @@ resources:
   - ./bichon/ks.yaml
   - ./homepage/ks.yaml
   - ./immich/ks.yaml
-  - ./it-tools/ks.yaml
   - ./karakeep/ks.yaml
   - ./namespace.yaml
   - ./outline/ks.yaml

@@ -156,10 +156,6 @@ spec:
                     type: jellyseerr
                     url: http://seerr.media.svc.cluster.local
                     key: '{{ "{{" }}HOMEPAGE_VAR_SEERR_KEY{{ "}}" }}'
-              - Maintainerr:
-                  icon: maintainerr.png
-                  href: https://maintainerr.negative7.com
-                  description: Media Cleanup
               - Streamystats:
                   icon: sh-streamystats.png
                   href: https://streamystats.negative7.com
@@ -282,10 +278,6 @@ spec:
                   icon: atuin.png
                   href: https://atuin.negative7.com
                   description: Shell History
-              - IT Tools:
-                  icon: it-tools.png
-                  href: https://it-tools.negative7.com
-                  description: Developer Tools
               - Spoolman:
                   icon: spoolman.png
                   href: https://spoolman.negative7.com

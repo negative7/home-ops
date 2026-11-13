@@ -64,7 +64,6 @@
         "ghcr.io/jdx/mise",
         "ghcr.io/home-operations/charts/kritika",
         "ghcr.io/atuinsh/atuin",
-        "ghcr.io/maintainerr/maintainerr",
         "ghcr.io/home-operations/sonarr",
         "ghcr.io/home-operations/radarr",
         "ghcr.io/home-operations/prowlarr",
