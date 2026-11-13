@@ -14,7 +14,8 @@
       description: "1Password Connect group",
       groupName: "1Password Connect",
       matchDatasources: ["docker"],
-      matchPackageNames: ["/1password/"],
+      // Not the bare pattern: it also caught 1password/op (the mise CLI), which then sat alone below minimumGroupSize
+      matchPackageNames: ["/1password\\/connect/"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
@@ -108,6 +109,9 @@
       // The group takes its scope from its first dep (the mise talosctl tool), which made a
       // cluster OS upgrade read as "fix(mise): ..."
       semanticCommitScope: "talos",
+      // The talosFactory preset splits patches for the installer and tuppr version only; without
+      // this the mise talosctl tool lands on its own branch and neither reaches minimumGroupSize
+      separateMinorPatch: true,
       group: {
         commitMessageTopic: "Talos OS upgrade",
       },
