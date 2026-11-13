@@ -122,6 +122,16 @@ spec:
     ###
     prometheus:
       prometheusSpec:
+        # Single-replica local volume: metrics are recreatable, and vinnytsia's disk is the most worn
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: NotIn
+                      values:
+                        - vinnytsia
         externalUrl: https://prometheus.negative7.com
         securityContext:
           runAsNonRoot: true
@@ -144,7 +154,7 @@ spec:
         storageSpec:
           volumeClaimTemplate:
             spec:
-              storageClassName: miroir-replicated
+              storageClassName: miroir-local
               resources:
                 requests:
                   storage: 55Gi

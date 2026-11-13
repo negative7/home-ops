@@ -23,7 +23,6 @@ spec:
     kind: ClusterRepository
     name: nas
   retention:
-    keepHourly: 24
     keepDaily: 7
   sources:
     - pvc:

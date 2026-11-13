@@ -11,10 +11,6 @@ machine:
     apidCheckExtKeyUsage: true
     diskQuotaSupport: true
     rbac: true
-  logging:
-    destinations:
-      - endpoint: tcp://127.0.0.1:13333/
-        format: json_lines
   token: op://talos-root/home-ops/MACHINE_TOKEN
 cluster:
   {% if ENV.IS_CONTROLPLANE %}
@@ -46,11 +42,6 @@ cluster:
     endpoint: https://k8s.homelab.internal:6443
   clusterName: home-ops
   token: op://talos-root/home-ops/CLUSTER_TOKEN
----
-apiVersion: v1alpha1
-kind: KmsgLogConfig
-name: victoria-logs
-url: tcp://127.0.0.1:13333/
 ---
 apiVersion: v1alpha1
 kind: UnattendedInstallConfig
