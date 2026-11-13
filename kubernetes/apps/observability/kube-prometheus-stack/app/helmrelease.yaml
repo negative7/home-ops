@@ -55,6 +55,11 @@ spec:
             sourceLabels:
               - "__name__"
             regex: (apiserver_response_sizes_bucket|apiserver_watch_events_sizes_bucket)
+          # Newer histograms no rule uses; together ~100k series. _sum and _count are kept
+          - action: drop
+            sourceLabels:
+              - "__name__"
+            regex: apiserver_(watch_events_dispatch_duration_seconds|request_body_size_bytes|watch_list_duration_seconds|storage_list_duration_seconds|watch_cache_read_wait_seconds|watch_cache_initialization_duration_seconds)_bucket
 
     kubeControllerManager:
       enabled: false
