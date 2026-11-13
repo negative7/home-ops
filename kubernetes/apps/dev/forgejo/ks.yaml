@@ -7,21 +7,14 @@ metadata:
 spec:
   components:
     - ../../../../components/anubis
-    - ../../../../components/dragonfly
-    - ../../../../components/kopiur/backup
     - ../../../../components/kanidm-oidc
+    - ../../../../components/kopiur/backup
+    - ../../../../components/valkey
   dependsOn:
     - name: kopiur
       namespace: system
-    - name: dragonfly-operator
-      namespace: database
     - name: kanidm
       namespace: security
-  healthCheckExprs:
-    - apiVersion: dragonflydb.io/v1alpha1
-      kind: Dragonfly
-      failed: status.phase != 'ready'
-      current: status.phase == 'ready'
   interval: 1h
   path: "./kubernetes/apps/dev/forgejo/app"
   postBuild:

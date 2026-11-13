@@ -6,8 +6,8 @@ metadata:
   name: paperless
 spec:
   components:
-    - ../../../../components/dragonfly
     - ../../../../components/kopiur/backup
+    - ../../../../components/valkey
     - ../../../../components/zeroscaler
   dependsOn:
     - name: miroir

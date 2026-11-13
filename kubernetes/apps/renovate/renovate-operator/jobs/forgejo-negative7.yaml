@@ -16,7 +16,7 @@ spec:
       value: |-
         [{"matchHost": "git.negative7.com", "allowInternal": true}]
     - name: RENOVATE_REDIS_URL
-      value: redis://renovate-dragonfly.renovate.svc.cluster.local:6379
+      value: redis://renovate-valkey.renovate.svc.cluster.local:6379
     - name: RENOVATE_REPOSITORY_CACHE
       value: enabled
     - name: RENOVATE_REPOSITORY_CACHE_TYPE

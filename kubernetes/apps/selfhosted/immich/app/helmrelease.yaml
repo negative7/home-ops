@@ -21,7 +21,7 @@ spec:
                   secretKeyRef:
                     name: "{{ .Release.Name }}-postgres"
                     key: url
-              REDIS_HOSTNAME: immich-dragonfly.selfhosted.svc.cluster.local
+              REDIS_HOSTNAME: immich-valkey.selfhosted.svc.cluster.local
 
     immich:
       metrics:

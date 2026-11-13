@@ -6,10 +6,10 @@ metadata:
   name: outline
 spec:
   components:
-    - ../../../../components/dragonfly
-    - ../../../../components/kopiur/backup
     - ../../../../components/kanidm-oidc
+    - ../../../../components/kopiur/backup
     - ../../../../components/postgres/cert
+    - ../../../../components/valkey
   dependsOn:
     - name: kopiur
       namespace: system

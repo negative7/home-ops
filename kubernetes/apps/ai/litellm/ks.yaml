@@ -6,25 +6,18 @@ metadata:
   name: litellm
 spec:
   components:
-    - ../../../../components/dragonfly
     - ../../../../components/kopiur/backup
     - ../../../../components/postgres/pass
+    - ../../../../components/valkey
   dependsOn:
     - name: kopiur
       namespace: system
     - name: cnpg-operator
       namespace: database
-    - name: dragonfly-operator
-      namespace: database
     - name: kanidm
       namespace: security
     - name: litellm-operator
       namespace: ai
-  healthCheckExprs:
-    - apiVersion: dragonflydb.io/v1alpha1
-      kind: Dragonfly
-      failed: status.phase != 'ready'
-      current: status.phase == 'ready'
   interval: 1h
   path: "./kubernetes/apps/ai/litellm/app"
   postBuild:

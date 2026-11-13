@@ -6,23 +6,16 @@ metadata:
   name: immich
 spec:
   components:
-    - ../../../../components/dragonfly
     - ../../../../components/kanidm-oidc
     - ../../../../components/postgres/cert
+    - ../../../../components/valkey
   dependsOn:
     - name: cnpg-operator
       namespace: database
     - name: barman-cloud-plugin
       namespace: database
-    - name: dragonfly-operator
-      namespace: database
     - name: kanidm
       namespace: security
-  healthCheckExprs:
-    - apiVersion: dragonflydb.io/v1alpha1
-      kind: Dragonfly
-      failed: status.phase != 'ready'
-      current: status.phase == 'ready'
   interval: 1h
   path: "./kubernetes/apps/selfhosted/immich/app"
   postBuild:

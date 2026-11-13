@@ -26,11 +26,9 @@ metadata:
   name: renovate-operator-jobs
 spec:
   components:
-    - ../../../../components/dragonfly
+    - ../../../../components/valkey
   dependsOn:
     - name: renovate-operator
-    - name: dragonfly-operator
-      namespace: database
   interval: 1h
   path: "./kubernetes/apps/renovate/renovate-operator/jobs"
   postBuild:

@@ -10,10 +10,11 @@ spec:
       app.kubernetes.io/name: paperless
       app.kubernetes.io/instance: paperless
   egress:
-    - # Dragonfly (egress label internet denies the rest of the cluster)
+    - # Valkey (egress label internet denies the rest of the cluster)
       toEndpoints:
         - matchLabels:
-            k8s:app: paperless-dragonfly
+            app.kubernetes.io/name: paperless-valkey
+            app.kubernetes.io/controller: valkey
       toPorts:
         - ports:
             - port: "6379"
