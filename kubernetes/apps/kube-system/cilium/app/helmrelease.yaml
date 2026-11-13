@@ -52,17 +52,14 @@ spec:
         # Pod labels let Hubble remove metrics when pods are deleted, including one-off Jobs.
         enabled:
           - drop:sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity;labelsContext=source_namespace,source_pod,destination_namespace,destination_pod
-          - flow:sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity;labelsContext=source_namespace,source_pod,destination_namespace,destination_pod
           - policy:sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity;labelsContext=source_namespace,source_pod,destination_namespace,destination_pod
         serviceMonitor:
           enabled: true
           trustCRDsExist: true
       relay:
-        enabled: true
-        rollOutPods: true
+        enabled: false
       ui:
-        enabled: true
-        rollOutPods: true
+        enabled: false
     ipam:
       mode: kubernetes
     ipv4NativeRoutingCIDR: 10.244.0.0/16
