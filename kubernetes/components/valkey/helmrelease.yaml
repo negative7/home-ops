@@ -46,16 +46,14 @@ spec:
               - 512mb
               - --maxmemory-policy
               - noeviction
+            # TCP probes: exec probes (sh + valkey-cli ping every 5-10s) cost ~20m CPU per pod, ~7x Valkey itself
             probes:
               startup:
                 enabled: true
                 custom: true
                 spec:
-                  exec: &ping
-                    command:
-                      - /bin/sh
-                      - -ec
-                      - "test \"$(valkey-cli -h 127.0.0.1 ping)\" = PONG"
+                  tcpSocket: &tcp
+                    port: 6379
                   failureThreshold: 60
                   periodSeconds: 5
                   timeoutSeconds: 2
@@ -63,15 +61,15 @@ spec:
                 enabled: true
                 custom: true
                 spec:
-                  exec: *ping
+                  tcpSocket: *tcp
                   periodSeconds: 10
                   timeoutSeconds: 2
               readiness:
                 enabled: true
                 custom: true
                 spec:
-                  exec: *ping
-                  periodSeconds: 5
+                  tcpSocket: *tcp
+                  periodSeconds: 10
                   timeoutSeconds: 2
             resources:
               requests:
