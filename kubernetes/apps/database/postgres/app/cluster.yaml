@@ -70,7 +70,7 @@ spec:
     extensions:
       - name: pgvector
         image:
-          reference: ghcr.io/cloudnative-pg/pgvector:0.8.7-18-trixie@sha256:36dd07720447813c0659c6d8a961e1bc79a4324c6d6de46cd57f6201b70db53a
+          reference: ghcr.io/cloudnative-pg/pgvector:0.8.7-18-trixie@sha256:969f10190a34052c88492d5632ce3e49c042b59553ed363427235abdf93457d2
       - name: vchord
         image:
           reference: ghcr.io/tensorchord/vchord-scratch:pg18-v1.1.1@sha256:bdea43bed2a414e21bbf71767bf6f0739747ac480b267b51772dc214ac28dcb3
@@ -80,12 +80,12 @@ spec:
           - /usr/share/postgresql/18/
       - name: postgis
         image:
-          reference: ghcr.io/cloudnative-pg/postgis-extension:3.7.0-18-trixie@sha256:094af4bd2db0541c15a57f00609a6837a0d2100ae9ea6f2de3be53200e3e77bd
+          reference: ghcr.io/cloudnative-pg/postgis-extension:3.7.0-18-trixie@sha256:f7bf475e0a01928c6b8dc84a251f827eb18f0980d9ecb924def3f90cc5ef3bdd
         ld_library_path:
           - system
       - name: timescaledb-oss
         image:
-          reference: ghcr.io/cloudnative-pg/timescaledb-oss:2.31.0-18-trixie@sha256:ceae1326e5e6e4c85882e7a3bf28abb141a2a8114727337d46f6b4af7d89b77a
+          reference: ghcr.io/cloudnative-pg/timescaledb-oss:2.32.0-18-trixie@sha256:1e80dd1b09b9b81bb63d20d8fb9771e3e4f140f37c25d22af0104f0bdac1e8b1
 
   monitoring:
     enablePodMonitor: true
