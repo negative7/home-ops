@@ -43,7 +43,7 @@ spec:
           app:
             image:
               repository: ghcr.io/koush/scrypted
-              tag: v0.148.3-noble-intel@sha256:8b30eaaa541bae09da80793900d83128a1f1c0880702e8477bff8ebae1b08ce8
+              tag: v0.148.4-noble-intel@sha256:187104f2b48ba9abbeb613dd992105333f440214272c249b9d0fc4151584f174
             env:
               TZ: America/New_York
             probes:
