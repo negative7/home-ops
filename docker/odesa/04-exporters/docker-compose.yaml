@@ -6,7 +6,7 @@ name: exporters
 # (it exits and restarts until wg0 is up) and reach the loopback-published exporters.
 services:
   node-exporter:
-    image: quay.io/prometheus/node-exporter:v1.12.1@sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
+    image: quay.io/prometheus/node-exporter:v1.13.1@sha256:011e2d12c5bff759b90804bda642664775d7b4b127bf5148539bb82d3f590bb7
     container_name: node-exporter
     restart: unless-stopped
     network_mode: host
@@ -21,7 +21,7 @@ services:
 
   # Debian's unattended-upgrades drops /run/reboot-required when an update needs a reboot
   reboot-required:
-    image: quay.io/prometheus/node-exporter:v1.12.1@sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
+    image: quay.io/prometheus/node-exporter:v1.13.1@sha256:011e2d12c5bff759b90804bda642664775d7b4b127bf5148539bb82d3f590bb7
     container_name: reboot-required
     restart: unless-stopped
     # The image defaults to nobody, which can't write the root-owned volume; no network, /run is read-only
