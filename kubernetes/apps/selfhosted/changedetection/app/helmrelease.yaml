@@ -35,7 +35,7 @@ spec:
             image:
               # Upstream + CloakBrowser plugin, built from containers/changedetection
               repository: git.negative7.com/negative7/changedetection
-              tag: 0.70.4@sha256:f8d1b1f9d6d8a63cc6e545739b68d4ae5fb215472d00178640a7a760a7b8e36f
+              tag: 0.70.4@sha256:d04da0fb20cf5662730ad1fcedf15586818a1bee2fde0252d68b4d41da4b80a1
             env:
               TZ: America/New_York
               PORT: &port 5000
