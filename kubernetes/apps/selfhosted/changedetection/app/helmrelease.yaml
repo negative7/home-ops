@@ -64,6 +64,8 @@ spec:
               repository: docker.io/dgtlmoon/sockpuppetbrowser
               tag: 0.0.5@sha256:71fed9b1de8de865a8f30c61e6d8d129de183bf34f8cc545dc7ae499198ec935
             env:
+              # UID 2000 has no passwd entry, so HOME would be the read-only /
+              HOME: /home/chrome
               LOG_LEVEL: INFO
               MAX_CONCURRENT_CHROME_PROCESSES: 4
               SCREEN_WIDTH: 1920
