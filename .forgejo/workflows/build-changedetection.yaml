@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - main
+      - feat/changedetection-cloak
     paths:
       - containers/changedetection/**
       - .forgejo/workflows/build-changedetection.yaml
@@ -17,6 +18,7 @@ concurrency:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   image:
@@ -33,10 +35,11 @@ jobs:
           persist-credentials: false
 
       - name: Log in to the Forgejo registry
+        # The run's automatic token, so no long-lived registry secret is needed
         run: echo "${REGISTRY_TOKEN}" | docker login git.negative7.com --username "${REGISTRY_USER}" --password-stdin
         env:
-          REGISTRY_USER: ${{ vars.REGISTRY_USER }}
-          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+          REGISTRY_USER: ${{ forgejo.actor }}
+          REGISTRY_TOKEN: ${{ forgejo.token }}
 
       - name: Build and push
         # Tag = upstream changedetection.io version, so Renovate sees a normal version; a rebuild
