@@ -18,7 +18,6 @@ concurrency:
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   image:
@@ -35,11 +34,11 @@ jobs:
           persist-credentials: false
 
       - name: Log in to the Forgejo registry
-        # The run's automatic token, so no long-lived registry secret is needed
+        # A write:package token: the run's automatic token can log in but gets 401 on push
         run: echo "${REGISTRY_TOKEN}" | docker login git.negative7.com --username "${REGISTRY_USER}" --password-stdin
         env:
-          REGISTRY_USER: ${{ forgejo.actor }}
-          REGISTRY_TOKEN: ${{ forgejo.token }}
+          REGISTRY_USER: ${{ vars.REGISTRY_USER }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
 
       - name: Build and push
         # Tag = upstream changedetection.io version, so Renovate sees a normal version; a rebuild
