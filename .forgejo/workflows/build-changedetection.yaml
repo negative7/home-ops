@@ -1,0 +1,53 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Build changedetection
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - containers/changedetection/**
+      - .forgejo/workflows/build-changedetection.yaml
+
+concurrency:
+  group: ${{ forgejo.ref }}-${{ forgejo.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    name: build and push image
+    # The docker label runs a privileged dind sidecar; DOCKER_HOST points at it over TLS.
+    runs-on: docker
+    timeout-minutes: 30
+    env:
+      IMAGE: git.negative7.com/negative7/changedetection
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Log in to the Forgejo registry
+        run: echo "${REGISTRY_TOKEN}" | docker login git.negative7.com --username "${REGISTRY_USER}" --password-stdin
+        env:
+          REGISTRY_USER: ${{ vars.REGISTRY_USER }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Build and push
+        # Tag = upstream changedetection.io version, so Renovate sees a normal version; a rebuild
+        # of the same version (plugin bump) moves the tag and Renovate follows the new digest.
+        run: |
+          version="$(sed -nE 's|^FROM [^:]+:([0-9][^@]*)@.*|\1|p' containers/changedetection/Dockerfile)"
+          [[ -n "${version}" ]]
+          sha="sha-${FORGEJO_SHA::12}"
+          docker build --pull -t "${IMAGE}:${version}" -t "${IMAGE}:${sha}" containers/changedetection
+          docker push "${IMAGE}:${version}"
+          docker push "${IMAGE}:${sha}"
+          echo "Pushed: $(docker inspect --format '{{index .RepoDigests 0}}' "${IMAGE}:${version}")"
+        env:
+          FORGEJO_SHA: ${{ forgejo.sha }}
