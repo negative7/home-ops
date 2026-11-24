@@ -33,8 +33,9 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/dgtlmoon/changedetection.io
-              tag: 0.70.4@sha256:b6aae2572a0bf1a671b1b202365ddcfe16a31fa8a60be89df606705731b55f8b
+              # Upstream + CloakBrowser plugin, built from containers/changedetection
+              repository: git.negative7.com/negative7/changedetection
+              tag: 0.70.4@sha256:f8d1b1f9d6d8a63cc6e545739b68d4ae5fb215472d00178640a7a760a7b8e36f
             env:
               TZ: America/New_York
               PORT: &port 5000
@@ -42,6 +43,15 @@ spec:
               FETCH_WORKERS: 4
               HIDE_REFERER: true
               PLAYWRIGHT_DRIVER_URL: ws://localhost:3000
+              # CloakBrowser runs Chromium in this container: UID 2000 needs a writable HOME,
+              # and the ~200 MB binary is re-downloaded into scratch space on each restart
+              HOME: /home/app
+              CLOAKBROWSER_CACHE_DIR: /cache/cloakbrowser
+            envFrom:
+              - secretRef:
+                  name: changedetection-secret
+                  # The pod starts before the CloakBrowser key exists in 1Password
+                  optional: true
             probes:
               liveness:
                 enabled: true
@@ -51,7 +61,7 @@ spec:
               requests:
                 cpu: 20m
               limits:
-                memory: 1Gi
+                memory: 2Gi
             securityContext: &securityContext
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -109,11 +119,20 @@ spec:
             app:
               - path: /tmp
                 subPath: app
+              - path: /home/app
+                subPath: app-home
             browser:
               - path: /tmp
                 subPath: browser
               - path: /home/chrome
                 subPath: home
+      cache:
+        type: emptyDir
+        sizeLimit: 2Gi
+        advancedMounts:
+          changedetection:
+            app:
+              - path: /cache
 
     route:
       app:
