@@ -1,0 +1,49 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+# Egress label `internet` (podLabels) limits feed polling to the world; this adds the in-cluster
+# allows: the shared Postgres pooler and envoy-external (idm.negative7.com for SSO).
+# Ingress: envoy-internal (UI + API) and Homepage (widget).
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: miniflux
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: miniflux
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-internal
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: selfhosted
+            app.kubernetes.io/name: homepage
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # Same-node Service VIP replies count as new ingress on Cilium 1.20
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: database
+            cnpg.io/cluster: postgres
+            cnpg.io/podRole: pooler
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-external
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: database
+            cnpg.io/cluster: postgres
+            cnpg.io/podRole: pooler
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - # idm.negative7.com is routed through envoy-external (hairpinned in-cluster)
+      toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            gateway.networking.k8s.io/gateway-name: envoy-external
