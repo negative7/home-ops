@@ -40,13 +40,13 @@ spec:
                   secretKeyRef:
                     name: miniflux-postgres
                     key: url
-              # SSO only; new accounts are gated by the Kanidm `apps` group
+              # SSO only; no new accounts (existing users only)
               DISABLE_LOCAL_AUTH: "1"
               OAUTH2_PROVIDER: oidc
               OAUTH2_OIDC_PROVIDER_NAME: Kanidm
               OAUTH2_OIDC_DISCOVERY_ENDPOINT: https://idm.negative7.com/oauth2/openid/miniflux
               OAUTH2_REDIRECT_URL: https://miniflux.negative7.com/oauth2/oidc/callback
-              OAUTH2_USER_CREATION: "1"
+              OAUTH2_USER_CREATION: "0"
               POLLING_SCHEDULER: entry_frequency
               SCHEDULER_ENTRY_FREQUENCY_MAX_INTERVAL: "240"
               POLLING_LIMIT_PER_HOST: "5"
