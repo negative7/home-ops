@@ -294,6 +294,10 @@ spec:
                   icon: mdi-email-search
                   href: https://bichon.negative7.com
                   description: IMAP Archive
+              - Miniflux:
+                  icon: miniflux.png
+                  href: https://miniflux.negative7.com
+                  description: RSS Reader
 
             - AI:
               - Hermes:

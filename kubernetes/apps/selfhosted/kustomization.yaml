@@ -13,6 +13,7 @@ resources:
   - ./homepage/ks.yaml
   - ./immich/ks.yaml
   - ./karakeep/ks.yaml
+  - ./miniflux/ks.yaml
   - ./namespace.yaml
   - ./outline/ks.yaml
   - ./paperless/ks.yaml

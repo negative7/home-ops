@@ -1,0 +1,106 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: miniflux
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: miniflux
+  interval: 30m
+  values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 65532
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 65532
+        runAsNonRoot: true
+        runAsUser: 65532
+    controllers:
+      miniflux:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            egress.policy.home.arpa/internet: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/miniflux/miniflux
+              tag: 2.3.5-distroless@sha256:c826edc9c2284a8181e297d22a5ade1482bd9a8a4beabb2b6356bd22ce731310
+            env:
+              TZ: America/New_York
+              BASE_URL: https://miniflux.negative7.com
+              PORT: &port 8080
+              LOG_FORMAT: json
+              RUN_MIGRATIONS: "1"
+              DATABASE_URL:
+                valueFrom:
+                  secretKeyRef:
+                    name: miniflux-postgres
+                    key: url
+              # SSO only; new accounts are gated by the Kanidm `apps` group
+              DISABLE_LOCAL_AUTH: "1"
+              OAUTH2_PROVIDER: oidc
+              OAUTH2_OIDC_PROVIDER_NAME: Kanidm
+              OAUTH2_OIDC_DISCOVERY_ENDPOINT: https://idm.negative7.com/oauth2/openid/miniflux
+              OAUTH2_REDIRECT_URL: https://miniflux.negative7.com/oauth2/oidc/callback
+              OAUTH2_USER_CREATION: "1"
+              POLLING_SCHEDULER: entry_frequency
+              SCHEDULER_ENTRY_FREQUENCY_MAX_INTERVAL: "240"
+              POLLING_LIMIT_PER_HOST: "5"
+              CLEANUP_ARCHIVE_READ_DAYS: "60"
+              CLEANUP_ARCHIVE_UNREAD_DAYS: "180"
+            envFrom:
+              - secretRef:
+                  name: miniflux-kanidm-oauth2-credentials
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 3
+              readiness:
+                <<: *probe
+                spec:
+                  httpGet:
+                    path: /readyz
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 3
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    persistence:
+      tmpfs:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    route:
+      app:
+        hostnames:
+          - miniflux.negative7.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    service:
+      app:
+        ports:
+          http:
+            port: *port
