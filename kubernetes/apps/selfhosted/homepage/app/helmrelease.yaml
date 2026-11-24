@@ -298,6 +298,10 @@ spec:
                   icon: miniflux.png
                   href: https://miniflux.negative7.com
                   description: RSS Reader
+                  widget:
+                    type: miniflux
+                    url: http://miniflux.selfhosted.svc.cluster.local:8080
+                    key: '{{ "{{" }}HOMEPAGE_VAR_MINIFLUX_KEY{{ "}}" }}'
               - changedetection.io:
                   icon: changedetection.png
                   href: https://changedetection.negative7.com
