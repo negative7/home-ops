@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - main
-      - feat/changedetection-cloak
     paths:
       - containers/changedetection/**
       - .forgejo/workflows/build-changedetection.yaml
