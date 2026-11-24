@@ -32,7 +32,7 @@ spec:
           app:
             image:
               repository: ghcr.io/dancwilliams/protonmail-bridge-docker
-              tag: v3.27.2-3@sha256:e82db15e698ad6dc4b668009a2773815fa7b4ffe2dc12702df562fe1d6742e56
+              tag: v3.27.2-4@sha256:f3db27b256d131e9bb898c4e83086a9c8a18107cdd0fd79d9d838f3afa78c2a1
             # The image runs the bridge as PID 1, so the interactive login cannot share the pod with
             # it: until $HOME/.initialised exists the pod idles. First login (and any re-login):
             #   kubectl -n selfhosted exec -it deploy/protonmail-bridge -- bash /protonmail/entrypoint.sh init
