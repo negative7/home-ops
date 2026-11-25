@@ -266,6 +266,10 @@ spec:
                   icon: actual-budget.png
                   href: https://actual.negative7.com
                   description: Budgeting
+              - Securo:
+                  icon: sh-securo.png
+                  href: https://securo.negative7.com
+                  description: Personal Finance
               - Karakeep:
                   icon: karakeep.png
                   href: https://karakeep.negative7.com
