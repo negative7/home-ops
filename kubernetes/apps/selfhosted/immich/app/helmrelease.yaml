@@ -22,6 +22,9 @@ spec:
                     name: "{{ .Release.Name }}-postgres"
                     key: url
               REDIS_HOSTNAME: immich-valkey.selfhosted.svc.cluster.local
+              # v3.4.2 metrics exporter 400s on the default '::' host; drop once
+              # immich-app/immich#33466's fix ships
+              IMMICH_HOST: 0.0.0.0
 
     immich:
       metrics:
