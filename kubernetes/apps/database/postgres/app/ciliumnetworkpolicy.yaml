@@ -68,6 +68,10 @@ spec:
             app.kubernetes.io/name: miniflux
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: selfhosted
+            app.kubernetes.io/name: securo
+            app.kubernetes.io/controller: securo
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: selfhosted
             app.kubernetes.io/instance: immich
             app.kubernetes.io/name: server
       toPorts:
