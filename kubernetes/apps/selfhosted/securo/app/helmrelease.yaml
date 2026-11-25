@@ -1,0 +1,249 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: securo
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: securo
+  interval: 30m
+  values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 2000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 2000
+        seccompProfile:
+          type: RuntimeDefault
+    controllers:
+      # API + Celery worker + beat share one pod: scheduled backups and attachments
+      # need one filesystem across the API and the worker (RWO PVC)
+      securo:
+        strategy: Recreate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            egress.policy.home.arpa/internet: "true"
+        initContainers:
+          migrate:
+            image: &image
+              repository: ghcr.io/securo-finance/securo-backend
+              tag: 0.22.0@sha256:b993682d9d99079695e1009ee3c95dc5190f46ef7416d2bf0968baa4d619610e
+            command:
+              - alembic
+              - upgrade
+              - head
+            env: &env
+              TZ: America/New_York
+              HOME: /tmp
+              PYTHONDONTWRITEBYTECODE: "1"
+              FRONTEND_URL: https://securo.negative7.com
+              # asyncpg reads the client cert from PGSSL* (no libpq-style DSN params via SQLAlchemy)
+              DATABASE_URL: postgresql+asyncpg://securo@pooler-rw.database.svc:5432/securo
+              PGSSLMODE: verify-full
+              PGSSLCERT: /var/run/secrets/postgresql/tls.crt
+              PGSSLKEY: /var/run/secrets/postgresql/tls.key
+              PGSSLROOTCERT: /var/run/secrets/root-ca/ca.crt
+              REDIS_URL: redis://securo-valkey.selfhosted.svc.cluster.local:6379/0
+              # SECRET_KEY left unset: generated on first start and kept in the database
+              STORAGE_PROVIDER: local
+              STORAGE_LOCAL_PATH: /app/data/attachments
+              # envoy-internal → frontend nginx → backend
+              TRUSTED_PROXY_HOPS: "2"
+              LOCAL_AUTH_ENABLED: "false"
+              # Needed for OIDC auto-register; the Kanidm scope map limits who can sign in
+              REGISTRATION_ENABLED: "true"
+              OIDC_ENABLED: "true"
+              OIDC_PROVIDER_NAME: Kanidm
+              OIDC_DISCOVERY_URL: https://idm.negative7.com/oauth2/openid/securo/.well-known/openid-configuration
+              OIDC_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: securo-kanidm-oauth2-credentials
+                    key: client-id
+              OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: securo-kanidm-oauth2-credentials
+                    key: client-secret
+              OIDC_SCOPES: openid email profile groups
+              OIDC_AUTO_REGISTER: "true"
+              OIDC_SYNC_ROLES: "true"
+              OIDC_ROLES_CLAIM: groups
+              OIDC_ADMIN_ROLES: admins@idm.negative7.com
+              SIMPLEFIN_ENABLED: "true"
+              SIMPLEFIN_API_URL: https://bridge.simplefin.org
+              TESOURO_DIRETO_ENABLED: "false"
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
+            securityContext: &securityContext
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+        containers:
+          app:
+            image: *image
+            command:
+              - uvicorn
+              - app.main:app
+              - --host
+              - 0.0.0.0
+              - --port
+              - "8000"
+            env: *env
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: 8000
+                  periodSeconds: 20
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                <<: *probe
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: 8000
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              startup:
+                <<: *probe
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: 8000
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+            resources:
+              requests:
+                cpu: 20m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+            securityContext: *securityContext
+          worker:
+            image: *image
+            command:
+              - celery
+              - -A
+              - app.worker
+              - worker
+              - --loglevel=info
+              - --concurrency=2
+            env: *env
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+            securityContext: *securityContext
+          beat:
+            image: *image
+            command:
+              - celery
+              - -A
+              - app.worker
+              - beat
+              - --loglevel=info
+              - --schedule=/tmp/celerybeat-schedule
+            env: *env
+            resources:
+              requests:
+                cpu: 5m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext: *securityContext
+      frontend:
+        pod:
+          securityContext:
+            fsGroup: 101
+            runAsGroup: 101
+            runAsNonRoot: true
+            runAsUser: 101
+            seccompProfile:
+              type: RuntimeDefault
+        containers:
+          app:
+            image:
+              repository: ghcr.io/securo-finance/securo-frontend
+              tag: 0.22.0@sha256:5ecbe79a212c5f1a92c83e80aff5419a2b8942e9cda42f5278142a618caf5316
+            env:
+              BACKEND_URL: http://securo-app.selfhosted.svc.cluster.local:8000
+            probes:
+              liveness: &frontendProbe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: &frontendPort 8080
+                  periodSeconds: 20
+                  timeoutSeconds: 2
+                  failureThreshold: 3
+              readiness: *frontendProbe
+            resources:
+              requests:
+                cpu: 5m
+                memory: 16Mi
+              limits:
+                memory: 128Mi
+            securityContext: *securityContext
+    persistence:
+      data:
+        existingClaim: securo
+        advancedMounts:
+          securo:
+            app:
+              - path: /app/data
+            worker:
+              - path: /app/data
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+      nginx-conf:
+        type: emptyDir
+        advancedMounts:
+          frontend:
+            app:
+              - path: /etc/nginx/conf.d
+    route:
+      app:
+        hostnames:
+          - securo.negative7.com
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+        rules:
+          - backendRefs:
+              - identifier: frontend
+                port: *frontendPort
+    service:
+      app:
+        controller: securo
+        ports:
+          http:
+            port: 8000
+      frontend:
+        controller: frontend
+        ports:
+          http:
+            port: *frontendPort

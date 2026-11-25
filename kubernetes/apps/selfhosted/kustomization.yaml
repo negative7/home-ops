@@ -20,4 +20,5 @@ resources:
   - ./paperless/ks.yaml
   - ./protonmail-bridge/ks.yaml
   - ./searxng/ks.yaml
+  - ./securo/ks.yaml
   - ./spoolman/ks.yaml
