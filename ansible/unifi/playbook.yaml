@@ -41,8 +41,12 @@
     container_binds: []
     adguard_service: AdGuardHome.service
     adguard_dir: /opt/AdGuardHome
-    # Only used for a fresh install; AdGuard Home updates itself afterwards
-    adguard_download_url: https://static.adtidy.org/adguardhome/release/AdGuardHome_linux_arm64.tar.gz
+    # Installed and updated by this playbook; the unit runs AdGuard Home with --no-check-update.
+    # Checksum comes from the release's checksums.txt so a Renovate bump needs no hash edit
+    # renovate: datasource=github-releases depName=AdguardTeam/AdGuardHome
+    adguard_version: v0.107.79
+    adguard_release: "https://github.com/AdguardTeam/AdGuardHome/releases/download/{{ adguard_version }}"
+    adguard_tarball: "/data/custom/AdGuardHome_linux_arm64-{{ adguard_version }}.tar.gz"
     # Installed in the container when missing
     container_packages:
       - openssh-server
@@ -66,6 +70,10 @@
 
     - name: Restart container sshd
       ansible.builtin.command: "systemctl --machine={{ container_name }} restart ssh.service"
+      changed_when: true
+
+    - name: Restart AdGuard Home
+      ansible.builtin.command: "systemctl --machine={{ container_name }} restart {{ adguard_service }}"
       changed_when: true
 
   tasks:
@@ -290,14 +298,54 @@
             path: "{{ container_rootfs }}{{ adguard_dir }}/AdGuardHome"
           register: adguard_bin
 
-        - name: container | Install AdGuard Home
-          ansible.builtin.command: >-
-            systemd-run --machine={{ container_name }} --wait --pipe --quiet
-            /bin/sh -c 'curl -fsSL {{ adguard_download_url }} | tar -xz -C {{ adguard_dir | dirname }}'
-          when: not adguard_bin.stat.exists
-          changed_when: true
+        - name: container | Check for AdGuard Home config
+          ansible.builtin.stat:
+            path: "{{ container_rootfs }}{{ adguard_dir }}/AdGuardHome.yaml"
+          register: adguard_config
 
-        # Only written when missing; the one on the gateway came from `AdGuardHome -s install`
+        # Static binary, so it runs from the host too. Prints "AdGuard Home, version vX.Y.Z"
+        - name: container | AdGuard Home version
+          ansible.builtin.command: "{{ container_rootfs }}{{ adguard_dir }}/AdGuardHome --version"
+          when: adguard_bin.stat.exists
+          register: adguard_version_out
+          changed_when: false
+          check_mode: false
+
+        - name: container | Install or update AdGuard Home
+          when: >-
+            not adguard_bin.stat.exists or
+            adguard_version_out.stdout.split() | last != adguard_version
+          block:
+            # A new version can migrate the config schema; keep a copy of the old one first
+            - name: container | Back up AdGuard Home config before updating
+              ansible.builtin.command: "systemctl --machine={{ container_name }} start adguard-backup.service"
+              when: adguard_config.stat.exists
+              changed_when: true
+
+            - name: container | Download AdGuard Home {{ adguard_version }}
+              ansible.builtin.get_url:
+                url: "{{ adguard_release }}/AdGuardHome_linux_arm64.tar.gz"
+                dest: "{{ adguard_tarball }}"
+                checksum: "sha256:{{ adguard_release }}/checksums.txt"
+                owner: root
+                group: root
+                mode: "0644"
+
+            # GNU tar unlinks the running binary before writing, so no "text file busy"; the
+            # restart handler picks up the new one
+            - name: container | Unpack AdGuard Home {{ adguard_version }}
+              ansible.builtin.command: >-
+                tar -xzf {{ adguard_tarball }} --no-same-owner
+                -C {{ container_rootfs }}{{ adguard_dir | dirname }}
+              changed_when: true
+              notify: Restart AdGuard Home
+
+          always:
+            - name: container | Remove AdGuard Home tarball
+              ansible.builtin.file:
+                path: "{{ adguard_tarball }}"
+                state: absent
+
         - name: container | AdGuard Home unit
           ansible.builtin.template:
             src: templates/AdGuardHome.service.j2
@@ -305,13 +353,9 @@
             owner: root
             group: root
             mode: "0644"
-            force: false
-          notify: Reload container systemd
-
-        - name: container | Check for AdGuard Home config
-          ansible.builtin.stat:
-            path: "{{ container_rootfs }}{{ adguard_dir }}/AdGuardHome.yaml"
-          register: adguard_config
+          notify:
+            - Reload container systemd
+            - Restart AdGuard Home
 
         # Exit 3 means there is no backup yet; AdGuard then starts its setup wizard on :3000
         - name: container | Restore AdGuard Home config from latest backup
