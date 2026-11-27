@@ -44,7 +44,7 @@
     # Installed and updated by this playbook; the unit runs AdGuard Home with --no-check-update.
     # Checksum comes from the release's checksums.txt so a Renovate bump needs no hash edit
     # renovate: datasource=github-releases depName=AdguardTeam/AdGuardHome
-    adguard_version: v0.107.79
+    adguard_version: v1.0.0
     adguard_release: "https://github.com/AdguardTeam/AdGuardHome/releases/download/{{ adguard_version }}"
     adguard_tarball: "/data/custom/AdGuardHome_linux_arm64-{{ adguard_version }}.tar.gz"
     # Installed in the container when missing
