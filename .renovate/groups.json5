@@ -64,6 +64,16 @@
       minimumGroupSize: 2,
     },
     {
+      description: "Securo group (frontend and backend are released together and the backend runs the schema migration)",
+      groupName: "securo",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/securo-finance/securo-backend", "ghcr.io/securo-finance/securo-frontend"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      minimumGroupSize: 2,
+    },
+    {
       description: "Intel Device Plugins Group",
       groupName: "intel-device-plugins",
       matchDatasources: ["docker"],
