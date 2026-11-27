@@ -150,6 +150,20 @@
             enabled: true
             state: started
 
+        # kyiv has no BMC: openipmi (pulled in via collectors -> ipmitool) fails at every boot
+        # and fires NodeSystemdServiceFailed; the ipmitool sensor collector has nothing to read
+        - name: monitoring | Mask openipmi (no BMC)
+          ansible.builtin.systemd_service:
+            name: openipmi.service
+            masked: true
+            state: stopped
+
+        - name: monitoring | Disable ipmitool sensor collector
+          ansible.builtin.systemd_service:
+            name: prometheus-node-exporter-ipmitool-sensor.timer
+            enabled: false
+            state: stopped
+
         # Not packaged in Debian; same exporter (and smartctl_* metrics/alerts) as lviv's container
         - name: monitoring | smartctl_exporter directory
           ansible.builtin.file:
